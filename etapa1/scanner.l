@@ -1,9 +1,8 @@
 %{
 	#include <stdio.h>
 	#include "tokens.h"
-	
-	int line_number = 1;
 
+	int line_number = 1;
 %}
 
  /* Definicao de algumas expressoes */
@@ -97,10 +96,9 @@ string \"[^"]*\"
 "&" {return '&';}
 "%" {return '%';}
 "#" {return '#';}
-"ˆ" {return 'ˆ';}    /* Gera warning - multi-character character constant */
-"." {return '.';}
+"^" {return '^';}
+"." {return '.';}		
 "$" {return '$';}
-
 
  /* Identifica os identificadores da linguagem */
  {alphabet}({alphabet}|{digit})* {return TK_IDENTIFICADOR;}

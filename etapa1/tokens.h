@@ -6,6 +6,7 @@ deve ser distinto e fora da escala ASCII. Assim, não conflitam entre
 si e com os tokens representados pelo próprio valor ASCII de
 caracteres isolados.
 */
+
 #define TK_PR_INT 256
 #define TK_PR_FLOAT 257
 #define TK_PR_BOOL 258
