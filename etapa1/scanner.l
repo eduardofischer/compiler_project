@@ -11,6 +11,8 @@ integer ("-"|"+")?{digit}+
 char \'[^']\'
 string \"[^"]*\"
 
+%x IGNORE_COMMENT
+
 %%
  /* Guarda o numero de linhas */
 \n {line_number++;}
@@ -22,7 +24,12 @@ string \"[^"]*\"
 
  /* Ignora comentarios */
 \/\/.* {}
-\/\*(.*\n*)*\*\/ {}
+
+\/\* {BEGIN(IGNORE_COMMENT);}
+<IGNORE_COMMENT>[^*\n]*                    /* Qualquer char que nao for * */
+<IGNORE_COMMENT>\*\[^*/\n]*                /* "*" nao seguido de "/" */
+<IGNORE_COMMENT>\n {line_number++;}        /* conta quebra de linhas em comentarios */
+<IGNORE_COMMENT>\*\/ {BEGIN(INITIAL);}     /* fim do comentario */
  
   /* Identifica os literais da linguagem */
 {integer} {return TK_LIT_INT;}     
