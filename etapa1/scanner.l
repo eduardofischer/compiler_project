@@ -1,11 +1,10 @@
 %{
-	#include <stdio.h>
 	#include "tokens.h"
 
 	int line_number = 1;
 %}
 
- /* Definicao de algumas expressoes */
+	/* Definicao de algumas expressoes */
 digit [0-9]     
 alphabet [A-Za-z]
 integer ("-"|"+")?{digit}+
@@ -14,7 +13,7 @@ string \"[^"]*\"
 
 %%
  /* Guarda o numero de linhas */
-"\n" {line_number += 1;}
+"\n" {line_number++;}
 
  /* Caracteres que devem ser ignorados */
 " " {}
@@ -100,8 +99,11 @@ string \"[^"]*\"
 "." {return '.';}		
 "$" {return '$';}
 
- /* Identifica os identificadores da linguagem */
- {alphabet}({alphabet}|{digit})* {return TK_IDENTIFICADOR;}
+	/* Identifica os identificadores da linguagem */
+{alphabet}({alphabet}|{digit})* {return TK_IDENTIFICADOR;}
+
+{digit}+{alphabet}+ {return TOKEN_ERRO;}
+. {return TOKEN_ERRO;}
 
 %%
 
