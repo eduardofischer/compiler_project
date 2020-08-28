@@ -13,16 +13,16 @@ string \"[^"]*\"
 
 %%
  /* Guarda o numero de linhas */
-"\n" {line_number++;}
+\n {line_number++;}
 
  /* Caracteres que devem ser ignorados */
 " " {}
 "	" {}
-"\r" {}
+\r {}
 
  /* Ignora comentarios */
 \/\/.* {}
-\/\*.*\*\/ {}
+\/\*(.*\n*)*\*\/ {}
  
   /* Identifica os literais da linguagem */
 {integer} {return TK_LIT_INT;}     
@@ -102,7 +102,7 @@ string \"[^"]*\"
 	/* Identifica os identificadores da linguagem */
 {alphabet}({alphabet}|{digit})* {return TK_IDENTIFICADOR;}
 
-{digit}+{alphabet}+ {return TOKEN_ERRO;}
+{digit}+{alphabet}+.* {return TOKEN_ERRO;}
 . {return TOKEN_ERRO;}
 
 %%
