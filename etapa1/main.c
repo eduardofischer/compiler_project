@@ -93,7 +93,7 @@ int main (int argc, char **argv)
     case TK_LIT_CHAR: print_nome (TK_LIT_CHAR); break;
     case TK_LIT_STRING: print_nome (TK_LIT_STRING); break;
     case TK_IDENTIFICADOR: print_nome (TK_IDENTIFICADOR); break;
-    case TOKEN_ERRO:  print_nome (TOKEN_ERRO); break;
+    case TOKEN_ERRO:  print_nome (TOKEN_ERRO); return 1;
     default: printf ("<Invalid Token with code %d>\n", token); return 1; break;
     }
   }
