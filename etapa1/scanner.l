@@ -11,7 +11,7 @@ SIGN ("-"|"+")
 DELIMITERS [ \n[:punct:]]
 INT {SIGN}?{DIGIT}+
 CHAR \'[^']\'
-STRING \"[^"]*\"
+STRING \"[^("|\n)]*\"
 BOOL_LITERAL_TRUE "TRUE"|"true"
 BOOL_LITERAL_FALSE "FALSE"|"false"
 
