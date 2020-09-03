@@ -30,7 +30,7 @@ BOOL_LITERAL_FALSE "FALSE"|"false"
 \/\/.* {}
 
  /* Ignora comentarios multi-linha */
-\/\* {BEGIN(MULTILINE_COMMENT);}							/* Ao detectar /*, entra no estado MULTILINE_COMMENT */
+\/\* {BEGIN(MULTILINE_COMMENT);}							/* Entra no estado MULTILINE_COMMENT */
 <MULTILINE_COMMENT>[^*\n]* {}               	/* Ignora qualquer CHAR que nao for * ou \n */
 <MULTILINE_COMMENT>\*[^*/\n]* {}            	/* Ignora "*" nao seguido de "/" */
 <MULTILINE_COMMENT>\n {line_number++;}       	/* Conta quebra de linhas em comentarios */
