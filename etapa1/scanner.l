@@ -5,13 +5,15 @@
 %}
 
 	/* Definicao de algumas expressoes */
-digit [0-9]     
-alphabet [A-Za-z]
-integer ("-"|"+")?{digit}+
-char \'[^']\'
-string \"[^"]*\"
-bool_literal_true "TRUE"|"true"
-bool_literal_false "FALSE"|"false"
+DIGIT [0-9]
+ALPHA [A-Za-z_]
+SIGN ("-"|"+")
+DELIMITERS [ \n[:punct:]]
+INT {SIGN}?{DIGIT}+
+CHAR \'[^']\'
+STRING \"[^"]*\"
+BOOL_LITERAL_TRUE "TRUE"|"true"
+BOOL_LITERAL_FALSE "FALSE"|"false"
 
 %x MULTILINE_COMMENT
 
@@ -29,23 +31,22 @@ bool_literal_false "FALSE"|"false"
 
  /* Ignora comentarios multi-linha */
 \/\* {BEGIN(MULTILINE_COMMENT);}							/* Ao detectar /*, entra no estado MULTILINE_COMMENT */
-<MULTILINE_COMMENT>[^*\n]* {}               	/* Ignora qualquer char que nao for * ou \n */
-<MULTILINE_COMMENT>\*[^*/\n]* {}            	/* Ignora "*" nao seguido de "/" */
+<MULTILINE_COMMENT>[^*\n]* {}               	/* Ignora qualquer CHAR que nao for * ou \n */
+<MULTILINE_COMMENT>\*/[^*/\n]* {}            	/* Ignora "*" nao seguido de "/" */
 <MULTILINE_COMMENT>\n {line_number++;}       	/* Conta quebra de linhas em comentarios */
 <MULTILINE_COMMENT>\*\/ {BEGIN(INITIAL);}    	/* Fim do comentario, retorna ao estado INITIAL */
  
   /* Identifica os literais da linguagem */
-{integer} {return TK_LIT_INT;}     
+{INT}/{DELIMITERS} {return TK_LIT_INT;}
 
-{integer}("."{digit}+)?((".E"|".e"){integer})? {return TK_LIT_FLOAT;}
+{INT}/{DELIMITERS}("."{DIGIT}+)?((".E"|".e"){INT})? {return TK_LIT_FLOAT;}
 
-{char} {return TK_LIT_CHAR;}
+{CHAR} {return TK_LIT_CHAR;}
 
-{string} {return TK_LIT_STRING;}
+{STRING} {return TK_LIT_STRING;}
 
-{bool_literal_true} {return TK_LIT_TRUE;}
-{bool_literal_false} {return TK_LIT_FALSE;}
- 
+{BOOL_LITERAL_TRUE} {return TK_LIT_TRUE;}
+{BOOL_LITERAL_FALSE} {return TK_LIT_FALSE;}
  
  /* Identifica as palavras reservadas da linguagem */
 "int" {return TK_PR_INT;}
@@ -113,9 +114,9 @@ bool_literal_false "FALSE"|"false"
 "$" {return '$';}
 
 	/* Identifica os identificadores da linguagem */
-{alphabet}({alphabet}|{digit})* {return TK_IDENTIFICADOR;}
+{ALPHA}({ALPHA}|{DIGIT})* {return TK_IDENTIFICADOR;}
 
-{digit}+{alphabet}+.* {return TOKEN_ERRO;}
+ /* Para qualquer outro padrão, retorna o token de erro */
 . {return TOKEN_ERRO;}
 
 %%
