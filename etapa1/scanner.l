@@ -7,7 +7,7 @@
 	/* Definicao de algumas expressoes */
 DIGIT [0-9]
 ALPHA [A-Za-z_]
-SIGN ("-"|"+")
+SIGN [+-]
 DELIMITERS [ \n[:punct:]]
 INT {SIGN}?{DIGIT}+
 CHAR \'[^']\'
@@ -32,14 +32,14 @@ BOOL_LITERAL_FALSE "FALSE"|"false"
  /* Ignora comentarios multi-linha */
 \/\* {BEGIN(MULTILINE_COMMENT);}							/* Ao detectar /*, entra no estado MULTILINE_COMMENT */
 <MULTILINE_COMMENT>[^*\n]* {}               	/* Ignora qualquer CHAR que nao for * ou \n */
-<MULTILINE_COMMENT>\*/[^*/\n]* {}            	/* Ignora "*" nao seguido de "/" */
+<MULTILINE_COMMENT>\*[^*/\n]* {}            	/* Ignora "*" nao seguido de "/" */
 <MULTILINE_COMMENT>\n {line_number++;}       	/* Conta quebra de linhas em comentarios */
 <MULTILINE_COMMENT>\*\/ {BEGIN(INITIAL);}    	/* Fim do comentario, retorna ao estado INITIAL */
  
   /* Identifica os literais da linguagem */
 {INT}/{DELIMITERS} {return TK_LIT_INT;}
 
-{INT}"."({DIGIT}+|("E"|"e"){INT})? {return TK_LIT_FLOAT;}
+{INT}\.({DIGIT}+|[Ee]{INT}) {return TK_LIT_FLOAT;}
 
 {CHAR} {return TK_LIT_CHAR;}
 
