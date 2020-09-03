@@ -10,6 +10,8 @@ alphabet [A-Za-z]
 integer ("-"|"+")?{digit}+
 char \'[^']\'
 string \"[^"]*\"
+bool_literal_true "TRUE"|"true"
+bool_literal_false "FALSE"|"false"
 
 %x MULTILINE_COMMENT
 
@@ -35,11 +37,14 @@ string \"[^"]*\"
   /* Identifica os literais da linguagem */
 {integer} {return TK_LIT_INT;}     
 
-{integer}("."{digit}+)?(("E"|"e"){integer})? {return TK_LIT_FLOAT;}
+{integer}("."{digit}+)?((".E"|".e"){integer})? {return TK_LIT_FLOAT;}
 
 {char} {return TK_LIT_CHAR;}
 
 {string} {return TK_LIT_STRING;}
+
+{bool_literal_true} {return TK_LIT_TRUE;}
+{bool_literal_false} {return TK_LIT_FALSE;}
  
  
  /* Identifica as palavras reservadas da linguagem */
