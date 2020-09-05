@@ -39,7 +39,7 @@ BOOL_LITERAL_FALSE "FALSE"|"false"
   /* Identifica os literais da linguagem */
 {INT}/{DELIMITERS} {return TK_LIT_INT;}
 
-{INT}\.({DIGIT}+|[Ee]{INT}) {return TK_LIT_FLOAT;}
+{INT}\.({DIGIT}+|[Ee]{INT})/{DELIMITERS} {return TK_LIT_FLOAT;}
 
 {CHAR} {return TK_LIT_CHAR;}
 
