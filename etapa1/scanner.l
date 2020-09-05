@@ -8,7 +8,7 @@
 DIGIT [0-9]
 ALPHA [A-Za-z_]
 SIGN [+-]
-DELIMITERS [ \n[:punct:]]
+DELIMITER [ \n[:punct:]]
 INT {SIGN}?{DIGIT}+
 CHAR \'[^']\'
 STRING \"[^("|\n)]*\"
@@ -37,16 +37,16 @@ BOOL_LITERAL_FALSE "FALSE"|"false"
 <MULTILINE_COMMENT>\*\/ {BEGIN(INITIAL);}    	/* Fim do comentario, retorna ao estado INITIAL */
  
   /* Identifica os literais da linguagem */
-{INT}/{DELIMITERS} {return TK_LIT_INT;}
+{INT}/{DELIMITER} {return TK_LIT_INT;}
 
-{INT}\.({DIGIT}+|[Ee]{INT})/{DELIMITERS} {return TK_LIT_FLOAT;}
+{INT}\.({DIGIT}+|[Ee]{INT})/{DELIMITER} {return TK_LIT_FLOAT;}
 
-{CHAR} {return TK_LIT_CHAR;}
+{CHAR}/{DELIMITER} {return TK_LIT_CHAR;}
 
-{STRING} {return TK_LIT_STRING;}
+{STRING}/{DELIMITER} {return TK_LIT_STRING;}
 
-{BOOL_LITERAL_TRUE} {return TK_LIT_TRUE;}
-{BOOL_LITERAL_FALSE} {return TK_LIT_FALSE;}
+{BOOL_LITERAL_TRUE}/{DELIMITER} {return TK_LIT_TRUE;}
+{BOOL_LITERAL_FALSE}/{DELIMITER} {return TK_LIT_FALSE;}
  
  /* Identifica as palavras reservadas da linguagem */
 "int" {return TK_PR_INT;}
