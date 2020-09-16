@@ -14,6 +14,7 @@ CHAR \'[^']\'
 STRING \"[^("|\n)]*\"
 BOOL_LITERAL_TRUE "TRUE"|"true"
 BOOL_LITERAL_FALSE "FALSE"|"false"
+SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$]
 
 %x MULTILINE_COMMENT
 
@@ -84,34 +85,11 @@ BOOL_LITERAL_FALSE "FALSE"|"false"
 "!=" {return TK_OC_NE;}
 "&&" {return TK_OC_AND;}
 "||" {return TK_OC_OR;}
-">>" {return TK_OC_SL;}
-"<<" {return TK_OC_SR;}
+">>" {return TK_OC_SR;}
+"<<" {return TK_OC_SL;}
  
  /* Identifica os caracteres especiais da linguagem */
-"," {return ',';}
-";" {return ';';}
-":" {return ':';}
-"(" {return '(';}
-")" {return ')';}
-"[" {return '[';}
-"]" {return ']';}
-"{" {return '{';}
-"}" {return '}';}
-"+" {return '+';}
-"-" {return '-';}
-"|" {return '|';}
-"*" {return '*';}
-"/" {return '/';}
-"<" {return '<';}
-">" {return '>';}
-"=" {return '=';}
-"!" {return '!';}
-"&" {return '&';}
-"%" {return '%';}
-"#" {return '#';}
-"^" {return '^';}
-"." {return '.';}		
-"$" {return '$';}
+{SPECIAL} {return yytext[0];}
 
 	/* Identifica os identificadores da linguagem */
 {ALPHA}({ALPHA}|{DIGIT})* {return TK_IDENTIFICADOR;}
