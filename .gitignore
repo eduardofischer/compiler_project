@@ -1,4 +1,5 @@
-etapa1
-lex.yy.c
+etapa*
+*.yy.*
+*.tab.*
 test*
 *.tgz
