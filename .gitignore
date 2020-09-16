@@ -1,5 +1,6 @@
 etapa*
 *.yy.*
 *.tab.*
+*.output
 test*
 *.tgz

@@ -54,27 +54,49 @@ int get_line_number();
 %token TK_IDENTIFICADOR
 %token TOKEN_ERRO
 
-%start programa
+%start program
 
 %%
 
-programa: decl;
-
-decl: TK_PR_STATIC types id_list
-	| types TK_IDENTIFICADOR id_list
+program: global_var_decl program
+	| function_def program
+	| %empty
 	;
 	
-types: TK_PR_INT
+type: TK_PR_INT
 	| TK_PR_FLOAT
 	| TK_PR_BOOL
 	| TK_PR_CHAR
 	| TK_PR_STRING
 	;
-	
+
+// Declaração de variáveis globais
+global_var_decl: TK_PR_STATIC type id_list ';'
+	| type TK_IDENTIFICADOR id_list ';'
+	;
+
 id_list: ',' TK_IDENTIFICADOR id_list
 	| ','  TK_IDENTIFICADOR '[' TK_LIT_INT ']' id_list
-	| ';'
+	| %empty
 	;
+
+// Definição de funções
+function_def: type TK_IDENTIFICADOR '(' parameter parameters_list ')' cmd_block
+	| TK_PR_STATIC type TK_IDENTIFICADOR '(' parameter parameters_list ')' cmd_block
+	;
+
+parameters_list: ',' parameter parameters_list
+	| %empty;
+	;
+
+parameter: type TK_IDENTIFICADOR
+	| TK_PR_CONST type TK_IDENTIFICADOR
+	| %empty;
+	;
+
+cmd_block: '{' '}'
+	;
+
 
 
 %%

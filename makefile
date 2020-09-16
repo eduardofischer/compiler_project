@@ -6,7 +6,7 @@ flex: scanner.l
 	flex scanner.l
 	
 bison: parser.y
-	bison -d parser.y
+	bison -d parser.y --report=state
 
 clean:
 	rm -rf etapa2 lex.yy.c parser.tab.c parser.output parser.tab.h lex.yy.o parser.tab.o
