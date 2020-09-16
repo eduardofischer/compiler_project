@@ -1,5 +1,5 @@
 %{
-	#include "tokens.h"
+	#include "parser.tab.h"
 
 	int line_number = 1;
 %}
@@ -98,6 +98,7 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$]
 . {return TOKEN_ERRO;}
 
 %%
+
 
  /* Funcao que retorna a contagem de linhas */
 int get_line_number(){
