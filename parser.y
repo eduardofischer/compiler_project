@@ -111,9 +111,16 @@ cmd_commands: local_var_decl ';'
 	| input ';'
 	| output ';'
 	| function_call ';'
+	| shift_left ';'
+	| shift_right ';'
+	| return ';'
+	| break';'
+	| continue ';'
+	| conditional_if_else 		// Acredito que pela definição esses dois não tenham ';', mas posso estar enganado
+	| iterative_for_while 
 	;
 	
-cmd_commands_list:  cmd_commands cmd_commands_list
+cmd_commands_list: cmd_commands cmd_commands_list
 	| %empty
 	;
 	
@@ -152,6 +159,32 @@ function_call: TK_IDENTIFICADOR '(' expression arguments_list ')'
 arguments_list: ',' expression arguments_list
 	| %empty
 	;
+
+// Comandos de shift
+shift_left: TK_IDENTIFICADOR TK_OC_SL TK_LIT_INT
+	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' TK_OC_SL TK_LIT_INT
+	;
+	
+shift_right: TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT
+	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' TK_OC_SR TK_LIT_INT
+	;
+
+// Comandos return, break e continue
+return: TK_PR_RETURN expression
+	;
+break: TK_PR_BREAK
+	;
+continue: TK_PR_CONTINUE
+	;
+
+// Comandos de controle de fluxo
+conditional_if_else: TK_PR_IF '(' expression ')' cmd_block
+	| TK_PR_IF '(' expression ')' cmd_block TK_PR_ELSE cmd_block
+	;
+
+iterative_for_while: TK_PR_FOR '(' var_attribution ':' expression ':' var_attribution ')' cmd_block
+	| TK_PR_WHILE '(' expression ')' cmd_block
+
 
 %%
 
