@@ -69,9 +69,17 @@ type: TK_PR_INT
 	| TK_PR_CHAR
 	| TK_PR_STRING
 	;
+	
+literal: TK_LIT_INT
+	| TK_LIT_FLOAT
+	| TK_LIT_FALSE
+	| TK_LIT_TRUE
+	| TK_LIT_CHAR
+	| TK_LIT_STRING
+	;
 
 // Declaração de variáveis globais
-global_var_decl: TK_PR_STATIC type id_list ';'
+global_var_decl: TK_PR_STATIC type TK_IDENTIFICADOR id_list ';'
 	| type TK_IDENTIFICADOR id_list ';'
 	;
 
@@ -94,10 +102,56 @@ parameter: type TK_IDENTIFICADOR
 	| %empty;
 	;
 
-cmd_block: '{' '}'
+cmd_block: '{' cmd_commands_list '}'
 	;
 
+// Definição dos comandos dos blocos
+cmd_commands: local_var_decl ';'
+	| var_attribution ';'
+	| input ';'
+	| output ';'
+	| function_call ';'
+	;
+	
+cmd_commands_list:  cmd_commands cmd_commands_list
+	| %empty
+	;
+	
+// Declaração de variaveis locais
+local_var_decl: TK_PR_STATIC type TK_IDENTIFICADOR id_list_local
+	| TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR id_list_local
+	| type TK_IDENTIFICADOR id_list_local 
+	| type TK_IDENTIFICADOR '=' expression 		// Não sabia se realmente tinha um ponto de exclamação invertido antes do igual na definição, então só deixei o '=' por enquanto
+	;
+	
+id_list_local: ',' TK_IDENTIFICADOR id_list_local
+	| %empty
+	;
 
+// Atribuição de variavel
+var_attribution: TK_IDENTIFICADOR '=' expression 
+	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' expression 
+	;
+	
+expression: TK_IDENTIFICADOR
+	| literal
+	;
+
+// Comandos de entrada e saida
+input: TK_PR_INPUT TK_IDENTIFICADOR 
+	;
+	
+output: TK_PR_OUTPUT expression 
+	;
+	
+// Chamada de Função
+function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' 
+	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' '(' expression arguments_list ')' 
+	;
+
+arguments_list: ',' expression arguments_list
+	| %empty
+	;
 
 %%
 
