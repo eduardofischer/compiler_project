@@ -167,7 +167,7 @@ id_list_local: ',' TK_IDENTIFICADOR id_list_local
 
 // Atribuição de variavel
 var_attribution: TK_IDENTIFICADOR '=' expression 
-	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' expression 
+	| TK_IDENTIFICADOR '[' expression ']' '=' expression 
 	;
 	
 // Expressões da linguagem
