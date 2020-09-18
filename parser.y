@@ -151,10 +151,14 @@ cmd_commands_list: cmd_commands cmd_commands_list
 	;
 	
 // Declaração de variaveis locais
-local_var_decl: TK_PR_STATIC type TK_IDENTIFICADOR id_list_local
-	| TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR id_list_local
-	| type TK_IDENTIFICADOR id_list_local 
-	| type TK_IDENTIFICADOR '=' expression 		// Não sabia se realmente tinha um ponto de exclamação invertido antes do igual na definição, então só deixei o '=' por enquanto
+local_var_decl: local_var_prefix type TK_IDENTIFICADOR id_list_local
+	| local_var_prefix type TK_IDENTIFICADOR '=' expression 		// Não sabia se realmente tinha um ponto de exclamação invertido antes do igual na definição, então só deixei o '=' por enquanto
+	;
+
+local_var_prefix: TK_PR_STATIC
+	| TK_PR_CONST
+	| TK_PR_STATIC TK_PR_CONST
+	| %empty
 	;
 	
 id_list_local: ',' TK_IDENTIFICADOR id_list_local
