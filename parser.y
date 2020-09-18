@@ -54,6 +54,32 @@ int get_line_number();
 %token TK_IDENTIFICADOR
 %token TOKEN_ERRO
 
+// Não cobertos por regras gerais
+%right '#'
+
+// Ternarios
+%right '?' ':'
+
+// Operadores logicos
+%left "||"
+%left "&&" 
+
+// Logicos bitwise
+%left '|'
+%left '^'
+%left '&' 
+
+// Operadores relacionais
+%left "==" "!="
+%left ">=" "<=" '<' '>' 
+
+// Operadores matematicos
+%left '+' '-'
+%left '%' '*' '/' 
+
+// Sinais
+%left '!'
+
 %start program
 
 %%
@@ -110,14 +136,14 @@ cmd_commands: local_var_decl ';'
 	| var_attribution ';'
 	| input ';'
 	| output ';'
-	| function_call ';'
 	| shift_left ';'
 	| shift_right ';'
 	| return ';'
 	| break';'
 	| continue ';'
 	| conditional_if_else 		// Acredito que pela definição esses dois não tenham ';', mas posso estar enganado
-	| iterative_for_while 
+	| iterative_for_while
+	| expression ';' 
 	;
 	
 cmd_commands_list: cmd_commands cmd_commands_list
@@ -140,15 +166,33 @@ var_attribution: TK_IDENTIFICADOR '=' expression
 	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' expression 
 	;
 	
+// Expressões da linguagem
 expression: TK_IDENTIFICADOR
+	| TK_IDENTIFICADOR '[' TK_LIT_INT ']'			// com expression dá shift/reduce conflicts, corrigir depois
+	| function_call
 	| literal
+	| expression '+' expression
+	| expression '-' expression
+	| expression '*' expression
+	| expression '/' expression
+	| expression '%' expression
+	| expression '^' expression
+	| '+' expression
+	| '-' expression
+	| '!' expression
+	| '&' expression
+	| '*' expression
+	| '?' expression
+	| '#' expression
+	| '(' expression ')'
 	;
 
 // Comandos de entrada e saida
 input: TK_PR_INPUT TK_IDENTIFICADOR 
 	;
 	
-output: TK_PR_OUTPUT expression 
+output: TK_PR_OUTPUT TK_IDENTIFICADOR 
+	| TK_PR_OUTPUT literal
 	;
 	
 // Chamada de Função
@@ -184,6 +228,7 @@ conditional_if_else: TK_PR_IF '(' expression ')' cmd_block
 
 iterative_for_while: TK_PR_FOR '(' var_attribution ':' expression ':' var_attribution ')' cmd_block
 	| TK_PR_WHILE '(' expression ')' cmd_block
+
 
 
 %%
