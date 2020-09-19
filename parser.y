@@ -148,8 +148,8 @@ cmd_commands: local_var_decl ';'
 	| return ';'
 	| break';'
 	| continue ';'
-	| conditional_if_else 		// Acredito que pela definição esses dois não tenham ';', mas posso estar enganado
-	| iterative_for_while
+	| conditional_if_else ';'
+	| iterative_for_while ';'
 	;
 	
 cmd_commands_list: cmd_commands cmd_commands_list
