@@ -54,31 +54,35 @@ int get_line_number();
 %token TK_IDENTIFICADOR
 %token TOKEN_ERRO
 
-// Não cobertos por regras gerais
-%right '#'
 
-// Ternarios
-%right '?' ':'
+// ## Associatividade e prioridade dos operadores
 
-// Operadores logicos
-%left "||"
-%left "&&" 
-
-// Logicos bitwise
-%left '|'
-%left '^'
-%left '&' 
-
-// Operadores relacionais
-%left "==" "!="
-%left ">=" "<=" '<' '>' 
-
-// Operadores matematicos
+// Operadores unários
+%left UNARY
+// Multiplicação, divisão, resto e exponenciação
+%left '*' '/' '%' '^'
+// Soma e subtração
 %left '+' '-'
-%left '%' '*' '/' 
-
-// Sinais
-%left '!'
+// Bitwise shift esquerda e direita (<< e >>)
+%left TK_OC_SL TK_OC_SR 
+// Operadores relacionais
+%left TK_OC_LE '<'
+%left TK_OC_GE '>'
+%left TK_OC_EQ TK_OC_NE
+// Operadores Bitwise
+%left '&'
+%left '|'
+// Operadores logicos
+%left TK_OC_AND
+%left TK_OC_OR
+// Expressões com operador binário
+%left BINARY
+// Expressão com operador ternário
+%left TERNARY
+// Atribuição
+%right '='
+// Virgula
+%right ','
 
 %start program
 
@@ -176,20 +180,17 @@ expression: TK_IDENTIFICADOR
 	| TK_IDENTIFICADOR '[' expression ']'			
 	| function_call
 	| literal
-	| expression '+' expression
-	| expression '-' expression
-	| expression '*' expression
-	| expression '/' expression
-	| expression '%' expression
-	| expression '^' expression
-	| '+' expression
-	| '-' expression
-	| '!' expression
-	| '&' expression
-	| '*' expression
-	| '?' expression
-	| '#' expression
+	| unary_op expression %prec UNARY
+	| expression binary_op expression %prec BINARY
 	| '(' expression ')'
+	;
+
+unary_op:  '+' | '-' | '!' | '&' | '*' | '?' | '#';
+
+binary_op: '+' | '-' | '*' | '/'	| '%'	| '^'							// Aritméticos
+	| TK_OC_LE | TK_OC_GE | TK_OC_EQ | TK_OC_NE | '<' | '>' // Relacionais
+	| TK_OC_OR | TK_OC_AND																	// Lógicos
+	| '|' | '&'																							// Bitwise
 	;
 
 // Comandos de entrada e saida
