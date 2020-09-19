@@ -107,6 +107,7 @@ literal: TK_LIT_INT
 // Declaração de variáveis globais
 global_var_decl: TK_PR_STATIC type TK_IDENTIFICADOR id_list ';'
 	| type TK_IDENTIFICADOR id_list ';'
+	| type TK_IDENTIFICADOR '[' TK_LIT_INT ']' id_list ';'
 	;
 
 id_list: ',' TK_IDENTIFICADOR id_list
