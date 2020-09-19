@@ -134,6 +134,7 @@ cmd_block: '{' cmd_commands_list '}'
 // Definição dos comandos dos blocos
 cmd_commands: local_var_decl ';'
 	| var_attribution ';'
+	| function_call ';'
 	| input ';'
 	| output ';'
 	| shift_left ';'
@@ -143,7 +144,6 @@ cmd_commands: local_var_decl ';'
 	| continue ';'
 	| conditional_if_else 		// Acredito que pela definição esses dois não tenham ';', mas posso estar enganado
 	| iterative_for_while
-	| expression ';' 
 	;
 	
 cmd_commands_list: cmd_commands cmd_commands_list
@@ -172,7 +172,7 @@ var_attribution: TK_IDENTIFICADOR '=' expression
 	
 // Expressões da linguagem
 expression: TK_IDENTIFICADOR
-	| TK_IDENTIFICADOR '[' TK_LIT_INT ']'			// com expression dá shift/reduce conflicts, corrigir depois
+	| TK_IDENTIFICADOR '[' expression ']'			
 	| function_call
 	| literal
 	| expression '+' expression
@@ -201,7 +201,7 @@ output: TK_PR_OUTPUT TK_IDENTIFICADOR
 	
 // Chamada de Função
 function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' 
-	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' '(' expression arguments_list ')' 
+	| TK_IDENTIFICADOR '[' expression ']' '(' expression arguments_list ')' 
 	;
 
 arguments_list: ',' expression arguments_list
@@ -210,11 +210,11 @@ arguments_list: ',' expression arguments_list
 
 // Comandos de shift
 shift_left: TK_IDENTIFICADOR TK_OC_SL TK_LIT_INT
-	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' TK_OC_SL TK_LIT_INT
+	| TK_IDENTIFICADOR '[' expression ']' TK_OC_SL TK_LIT_INT
 	;
 	
 shift_right: TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT
-	| TK_IDENTIFICADOR '[' TK_LIT_INT ']' TK_OC_SR TK_LIT_INT
+	| TK_IDENTIFICADOR '[' expression ']' TK_OC_SR TK_LIT_INT
 	;
 
 // Comandos return, break e continue

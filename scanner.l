@@ -9,7 +9,10 @@ DIGIT [0-9]
 ALPHA [A-Za-z_]
 SIGN [+-]
 DELIMITER [ \n[:punct:]]
-INT {SIGN}?{DIGIT}+
+
+/* Por conta da segunda etapa possuir '+-', os inteiros aqui serão naturais */
+INT {DIGIT}+	
+		
 CHAR \'[^']\'
 STRING \"[^("|\n)]*\"
 BOOL_LITERAL_TRUE "TRUE"|"true"
