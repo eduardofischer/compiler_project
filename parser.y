@@ -161,7 +161,7 @@ cmd_commands_list: cmd_commands cmd_commands_list
 	
 // Declaração de variaveis locais
 local_var_decl: local_var_prefix type TK_IDENTIFICADOR id_list_local
-	| local_var_prefix type TK_IDENTIFICADOR '=' expression 		// Não sabia se realmente tinha um ponto de exclamação invertido antes do igual na definição, então só deixei o '=' por enquanto
+	| local_var_prefix type TK_IDENTIFICADOR TK_OC_LE expression
 	;
 
 local_var_prefix: TK_PR_STATIC
@@ -180,14 +180,14 @@ var_attribution: TK_IDENTIFICADOR '=' expression
 	;
 	
 // Expressões da linguagem
-expression: TK_IDENTIFICADOR { printf("id\n"); }
-	| TK_IDENTIFICADOR '[' expression ']' { printf("vetor\n"); }
-	| function_call { printf("function call\n"); }
-	| literal { printf("literal\n"); }
-	| '(' expression ')' { printf("parentesis\n"); }
-	| unary_op expression %prec UNARY { printf("unary\n"); }
-	| expression binary_op expression %prec BINARY { printf("binary\n"); }
-	| expression '?' expression ':' expression %prec TERNARY { printf("ternary\n"); }
+expression: TK_IDENTIFICADOR
+	| TK_IDENTIFICADOR '[' expression ']'
+	| function_call
+	| literal
+	| '(' expression ')'
+	| unary_op expression %prec UNARY
+	| expression binary_op expression %prec BINARY
+	| expression '?' expression ':' expression %prec TERNARY
 	;
 
 unary_op:  '+' | '-' | '!' | '&' | '*' | '?' | '#';
