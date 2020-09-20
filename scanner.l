@@ -17,7 +17,7 @@ CHAR \'[^']\'
 STRING \"[^("|\n)]*\"
 BOOL_LITERAL_TRUE "TRUE"|"true"
 BOOL_LITERAL_FALSE "FALSE"|"false"
-SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$]
+SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 
 %x MULTILINE_COMMENT
 

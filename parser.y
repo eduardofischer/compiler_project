@@ -61,11 +61,8 @@ int get_line_number();
 %left ','
 // Atribuição
 %right '='
-// Expressão com operador ternário
-%right TERNARY
-%right '?' ':'
-// Expressões com operador binário
-%left BINARY
+// Operador Condicional
+%left '?' ':'
 // Operadores logicos
 %left TK_OC_OR
 %left TK_OC_AND
@@ -82,6 +79,11 @@ int get_line_number();
 %left '+' '-'
 // Multiplicação, divisão, resto e exponenciação
 %left '*' '/' '%' '^'
+
+// Expressão com operador ternário
+%right TERNARY
+// Expressões com operador binário
+%left BINARY
 // Expressões com operador unário
 %right UNARY
 
@@ -177,14 +179,14 @@ var_attribution: TK_IDENTIFICADOR '=' expression
 	;
 	
 // Expressões da linguagem
-expression: TK_IDENTIFICADOR
-	| TK_IDENTIFICADOR '[' expression ']'			
-	| function_call
-	| literal
-	| '(' expression ')'
-	| unary_op expression %prec UNARY
-	| expression binary_op expression %prec BINARY
-	| expression '?' expression ':' expression %prec TERNARY
+expression: TK_IDENTIFICADOR { printf("id\n"); }
+	| TK_IDENTIFICADOR '[' expression ']' { printf("vetor\n"); }
+	| function_call { printf("function call\n"); }
+	| literal { printf("literal\n"); }
+	| '(' expression ')' { printf("parentesis\n"); }
+	| unary_op expression %prec UNARY { printf("unary\n"); }
+	| expression binary_op expression %prec BINARY { printf("binary\n"); }
+	| expression '?' expression ':' expression %prec TERNARY { printf("ternary\n"); }
 	;
 
 unary_op:  '+' | '-' | '!' | '&' | '*' | '?' | '#';
