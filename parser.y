@@ -96,14 +96,14 @@ program: global_var_decl program
 	| function_def program
 	| %empty
 	;
-	
+
 type: TK_PR_INT
 	| TK_PR_FLOAT
 	| TK_PR_BOOL
 	| TK_PR_CHAR
 	| TK_PR_STRING
 	;
-	
+
 literal: TK_LIT_INT
 	| TK_LIT_FLOAT
 	| TK_LIT_FALSE
@@ -117,7 +117,6 @@ global_var_decl: TK_PR_STATIC type TK_IDENTIFICADOR id_list ';'
 	| type TK_IDENTIFICADOR id_list ';'
 	| type TK_IDENTIFICADOR '[' TK_LIT_INT ']' id_list ';'
 	;
-
 id_list: ',' TK_IDENTIFICADOR id_list
 	| ','  TK_IDENTIFICADOR '[' TK_LIT_INT ']' id_list
 	| %empty
@@ -127,16 +126,13 @@ id_list: ',' TK_IDENTIFICADOR id_list
 function_def: type TK_IDENTIFICADOR '(' parameter parameters_list ')' cmd_block
 	| TK_PR_STATIC type TK_IDENTIFICADOR '(' parameter parameters_list ')' cmd_block
 	;
-
 parameters_list: ',' parameter parameters_list
 	| %empty;
 	;
-
 parameter: type TK_IDENTIFICADOR
 	| TK_PR_CONST type TK_IDENTIFICADOR
 	| %empty;
 	;
-
 cmd_block: '{' cmd_commands_list '}'
 	;
 
@@ -154,23 +150,21 @@ cmd_commands: local_var_decl ';'
 	| conditional_if_else ';'
 	| iterative_for_while ';'
 	;
-	
 cmd_commands_list: cmd_commands cmd_commands_list
 	| %empty
 	;
 	
 // Declaração de variaveis locais
-local_var_decl: local_var_prefix type TK_IDENTIFICADOR id_list_local
-	| local_var_prefix type TK_IDENTIFICADOR TK_OC_LE expression
+local_var_decl: local_var_prefix type TK_IDENTIFICADOR local_list
+	| local_var_prefix type TK_IDENTIFICADOR TK_OC_LE expression local_list
 	;
-
 local_var_prefix: TK_PR_STATIC
 	| TK_PR_CONST
 	| TK_PR_STATIC TK_PR_CONST
 	| %empty
 	;
-	
-id_list_local: ',' TK_IDENTIFICADOR id_list_local
+local_list: ',' TK_IDENTIFICADOR local_list
+	| ',' TK_IDENTIFICADOR TK_OC_LE expression local_list
 	| %empty
 	;
 
@@ -189,9 +183,7 @@ expression: TK_IDENTIFICADOR
 	| expression binary_op expression %prec BINARY
 	| expression '?' expression ':' expression %prec TERNARY
 	;
-
 unary_op:  '+' | '-' | '!' | '&' | '*' | '?' | '#';
-
 binary_op: '+' | '-' | '*' | '/'	| '%'	| '^'							// Aritméticos
 	| TK_OC_LE | TK_OC_GE | TK_OC_EQ | TK_OC_NE | '<' | '>' // Relacionais
 	| TK_OC_OR | TK_OC_AND																	// Lógicos
@@ -201,7 +193,6 @@ binary_op: '+' | '-' | '*' | '/'	| '%'	| '^'							// Aritméticos
 // Comandos de entrada e saida
 input: TK_PR_INPUT TK_IDENTIFICADOR 
 	;
-	
 output: TK_PR_OUTPUT TK_IDENTIFICADOR 
 	| TK_PR_OUTPUT literal
 	;
@@ -210,7 +201,6 @@ output: TK_PR_OUTPUT TK_IDENTIFICADOR
 function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' 
 	| TK_IDENTIFICADOR '[' expression ']' '(' expression arguments_list ')' 
 	;
-
 arguments_list: ',' expression arguments_list
 	| %empty
 	;
@@ -218,25 +208,20 @@ arguments_list: ',' expression arguments_list
 // Comandos de shift
 shift_left: TK_IDENTIFICADOR TK_OC_SL TK_LIT_INT
 	| TK_IDENTIFICADOR '[' expression ']' TK_OC_SL TK_LIT_INT
-	;
-	
+	;	
 shift_right: TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT
 	| TK_IDENTIFICADOR '[' expression ']' TK_OC_SR TK_LIT_INT
 	;
 
 // Comandos return, break e continue
-return: TK_PR_RETURN expression
-	;
-break: TK_PR_BREAK
-	;
-continue: TK_PR_CONTINUE
-	;
+return: TK_PR_RETURN expression;
+break: TK_PR_BREAK;
+continue: TK_PR_CONTINUE;
 
 // Comandos de controle de fluxo
 conditional_if_else: TK_PR_IF '(' expression ')' cmd_block
 	| TK_PR_IF '(' expression ')' cmd_block TK_PR_ELSE cmd_block
 	;
-
 iterative_for_while: TK_PR_FOR '(' var_attribution ':' expression ':' var_attribution ')' cmd_block
 	| TK_PR_WHILE '(' expression ')' cmd_block
 
