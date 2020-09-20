@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include "main.c"
 
+#define YYERROR_VERBOSE 1
+extern int line_number, column;
+
 int yylex(void);
 void yyerror (char const *s);
-int get_line_number();
 %}
 
 %token TK_PR_INT
@@ -54,7 +56,6 @@ int get_line_number();
 %token TK_IDENTIFICADOR
 %token TOKEN_ERRO
 
-
 // ## Associatividade e prioridade dos operadores
 
 // Virgula
@@ -62,7 +63,7 @@ int get_line_number();
 // Atribuição
 %right '='
 // Operador Condicional
-%left '?' ':'
+%right '?' ':'
 // Operadores logicos
 %left TK_OC_OR
 %left TK_OC_AND
@@ -239,12 +240,10 @@ conditional_if_else: TK_PR_IF '(' expression ')' cmd_block
 iterative_for_while: TK_PR_FOR '(' var_attribution ':' expression ':' var_attribution ')' cmd_block
 	| TK_PR_WHILE '(' expression ')' cmd_block
 
-
-
 %%
 
 void yyerror(char const *s){
-	printf("%s in line number %d\n", s, get_line_number());
+	printf("%s in line %d, column %d\n", s, line_number, column);
 	exit(1);
 }
 

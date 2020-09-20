@@ -2,6 +2,8 @@
 	#include "parser.tab.h"
 
 	int line_number = 1;
+	int column = 1, next_column = 1;
+	#define YY_USER_ACTION column = next_column; next_column += yyleng; 
 %}
 
 	/* Definicao de algumas expressoes */
@@ -12,7 +14,7 @@ DELIMITER [ \n[:punct:]]
 
 /* Por conta da segunda etapa possuir '+-', os inteiros aqui serão naturais */
 INT {DIGIT}+	
-		
+
 CHAR \'[^']\'
 STRING \"[^"\n]*\"
 BOOL_LITERAL_TRUE "TRUE"|"true"
@@ -23,7 +25,7 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 
 %%
  /* Guarda o numero de linhas */
-\n {line_number++;}
+\n {line_number++; next_column=1;}
 
  /* Caracteres que devem ser ignorados */
 " " {}
@@ -101,9 +103,3 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 . {return TOKEN_ERRO;}
 
 %%
-
-
- /* Funcao que retorna a contagem de linhas */
-int get_line_number(){
-	return line_number;
-}
