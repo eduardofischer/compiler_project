@@ -14,7 +14,7 @@ DELIMITER [ \n[:punct:]]
 INT {DIGIT}+	
 		
 CHAR \'[^']\'
-STRING \"[^("|\n)]*\"
+STRING \"[^"\n]*\"
 BOOL_LITERAL_TRUE "TRUE"|"true"
 BOOL_LITERAL_FALSE "FALSE"|"false"
 SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
@@ -43,7 +43,7 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
   /* Identifica os literais da linguagem */
 {INT}/{DELIMITER} {return TK_LIT_INT;}
 
-{INT}\.({DIGIT}+|[Ee]{INT})/{DELIMITER} {return TK_LIT_FLOAT;}
+{INT}\.{INT}([Ee]{SIGN}?{INT})?/{DELIMITER} {return TK_LIT_FLOAT;}
 
 {CHAR}/{DELIMITER} {return TK_LIT_CHAR;}
 
