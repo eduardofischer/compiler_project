@@ -3,7 +3,17 @@
 
 	int line_number = 1;
 	int column = 1, next_column = 1;
-	#define YY_USER_ACTION column = next_column; next_column += yyleng; 
+	#define YY_USER_ACTION column = next_column; next_column += yyleng;
+	
+	// Estrutura para guardar o valor de um token
+	// Obs: ainda esta inacabada
+    	struct {
+    		int line_number;
+    		char* type;
+    	 	char* token_val;
+	 } lex_val;
+    	 	
+	
 %}
 
 	/* Definicao de algumas expressoes */

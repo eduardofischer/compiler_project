@@ -1,12 +1,15 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "ast.h"
 #include "main.c"
 
 extern int line_number, column;
 
 int yylex(void);
 void yyerror (char const *s);
+
+AST_NODE * root = NULL;
 %}
 
 // Habilita o output verboso
@@ -90,20 +93,22 @@ void yyerror (char const *s);
 // Expressões com operador unário
 %right UNARY
 
-%start program
+%start root
 
 %%
-
-program: global_var_decl program
+root: program			//{ root = $1; Print_Ast(root); } gera warning
+	;
+	
+program: global_var_decl program 
 	| function_def program
 	| %empty
 	;
 
-type: TK_PR_INT
-	| TK_PR_FLOAT
-	| TK_PR_BOOL
-	| TK_PR_CHAR
-	| TK_PR_STRING
+type: TK_PR_INT		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_INT, 0, 0, 0, 0); }
+	| TK_PR_FLOAT		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_FLOAT, 0, 0, 0, 0); }
+	| TK_PR_BOOL		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_BOOL, 0, 0, 0, 0); }
+	| TK_PR_CHAR		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_CHAR, 0, 0, 0, 0); }
+	| TK_PR_STRING		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_STRING, 0, 0, 0, 0); }
 	;
 
 literal: TK_LIT_INT
