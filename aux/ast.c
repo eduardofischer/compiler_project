@@ -1,9 +1,11 @@
 #include "ast.h"
 
-// Cria a ast com um numero maximo de 4 filhos no momento
+// Cria node da AST
 AST_NODE *create_node(int type) {
     AST_NODE *node = (AST_NODE*) calloc(1, sizeof(AST_NODE));
     node->type = type;
+    node->n_childs = 0;
+    node->childs = NULL;
 
     return node;
 }
@@ -14,7 +16,7 @@ void add_child(AST_NODE *parent, AST_NODE *child){
     parent->childs[parent->n_childs - 1] = child;
 }
 
-// Imprime os nodos da ast recursivamente
+// Imprime os nodos da AST recursivamente
 // Obs: precisa dos demais casos no momento, so foram implementados os 5 literais
 void print_ast_util(AST_NODE *root, int indent_level){
     if(root == NULL)

@@ -96,7 +96,7 @@ AST_NODE *ast_root = NULL;
 %start root
 
 %%
-root: program	{ ast_root = $1; Print_Ast(root); } //gera warning
+root: program	//{ ast_root = $1; Print_Ast(root); } //gera warning
 	;
 	
 program: global_var_decl program 
