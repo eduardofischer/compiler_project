@@ -43,6 +43,90 @@ void print_ast_util(AST_NODE *root, int indent_level){
         case AST_SYMBOL_TK_PR_STRING:
             printf("AST_SYMBOL_TK_PR_STRING");
             break;
+        case AST_SYMBOL_TK_PR_IF:  
+            printf("AST_SYMBOL_TK_PR_IF");
+            break;
+        case AST_SYMBOL_TK_PR_ELSE:
+            printf("AST_SYMBOL_TK_PR_ELSE");
+            break;
+        case AST_SYMBOL_TK_PR_WHILE:
+            printf("AST_SYMBOL_TK_PR_WHILE");
+            break;
+        case AST_SYMBOL_TK_PR_DO:
+            printf("AST_SYMBOL_TK_PR_DO");
+            break;
+        case AST_SYMBOL_TK_PR_INPUT:
+            printf("AST_SYMBOL_TK_PR_INPUT");
+            break;
+        case AST_SYMBOL_TK_PR_OUTPUT:  
+            printf("AST_SYMBOL_TK_PR_OUTPUT");
+            break;
+        case AST_SYMBOL_TK_PR_RETURN:
+            printf("AST_SYMBOL_TK_PR_RETURN");
+            break;
+        case AST_SYMBOL_TK_PR_CONST:
+            printf("AST_SYMBOL_TK_PR_CONST");
+            break;
+        case AST_SYMBOL_TK_PR_STATIC:
+            printf("AST_SYMBOL_TK_PR_STATIC");
+            break;
+        case AST_SYMBOL_TK_PR_FOR:
+            printf("AST_SYMBOL_TK_PR_FOR");
+            break;
+        case AST_SYMBOL_TK_PR_BREAK:
+            printf("AST_SYMBOL_TK_PR_BREAK");
+            break;
+        case AST_SYMBOL_TK_PR_CONTINUE:
+            printf("AST_SYMBOL_TK_PR_CONTINUE");
+            break;
+        case AST_SYMBOL_TK_OC_LE:
+            printf("AST_SYMBOL_TK_OC_LE");
+            break;
+        case AST_SYMBOL_TK_OC_GE:
+            printf("AST_SYMBOL_TK_OC_GE");
+            break;
+        case AST_SYMBOL_TK_OC_EQ:
+            printf("AST_SYMBOL_TK_OC_EQ");
+            break;      
+        case AST_SYMBOL_TK_OC_NE:
+            printf("AST_SYMBOL_TK_OC_NE");
+            break;
+        case AST_SYMBOL_TK_OC_AND:
+            printf("AST_SYMBOL_TK_OC_AND");
+            break;
+        case AST_SYMBOL_TK_OC_OR:
+            printf("AST_SYMBOL_TK_OC_OR");
+            break;
+        case AST_SYMBOL_TK_OC_SL:
+            printf("AST_SYMBOL_TK_OC_SL");
+            break;
+        case AST_SYMBOL_TK_OC_SR:
+            printf("AST_SYMBOL_TK_OC_SR");
+            break;
+        case AST_SYMBOL_TK_LIT_INT:
+            printf("AST_SYMBOL_TK_LIT_INT");
+            break;
+        case AST_SYMBOL_TK_LIT_FLOAT:
+            printf("AST_SYMBOL_TK_LIT_FLOAT");
+            break;
+        case AST_SYMBOL_TK_LIT_FALSE:
+            printf("AST_SYMBOL_TK_LIT_FALSE");
+            break;
+        case AST_SYMBOL_TK_LIT_TRUE:
+            printf("AST_SYMBOL_TK_LIT_TRUE");
+            break;
+        case AST_SYMBOL_TK_LIT_CHAR:
+            printf("AST_SYMBOL_TK_LIT_CHAR");
+            break;
+        case AST_SYMBOL_TK_LIT_STRING:
+            printf("AST_SYMBOL_TK_LIT_STRING");
+            break;
+        case AST_SYMBOL_TK_IDENTIFICADOR:
+            printf("AST_SYMBOL_TK_IDENTIFICADOR");
+            break;
+        case AST_SYMBOL_TOKEN_ERRO:
+            printf("AST_SYMBOL_TOKEN_ERRO");
+            break; 
         default:
             printf("AST_UNKNOWN");
             break;
