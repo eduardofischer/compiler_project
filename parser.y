@@ -3,12 +3,14 @@
 #include <stdlib.h>
 #include "main.c"
 
-#define YYERROR_VERBOSE 1
 extern int line_number, column;
 
 int yylex(void);
 void yyerror (char const *s);
 %}
+
+// Habilita o output verboso
+%define parse.error verbose
 
 %token TK_PR_INT
 %token TK_PR_FLOAT
@@ -124,20 +126,21 @@ id_list: ',' TK_IDENTIFICADOR id_list
 
 // Definição de funções
 function_def: type TK_IDENTIFICADOR '(' parameter parameters_list ')' cmd_block
+	| type TK_IDENTIFICADOR '(' ')' cmd_block
 	| TK_PR_STATIC type TK_IDENTIFICADOR '(' parameter parameters_list ')' cmd_block
+	| TK_PR_STATIC type TK_IDENTIFICADOR '(' ')' cmd_block
 	;
 parameters_list: ',' parameter parameters_list
-	| %empty;
+	| %empty
 	;
 parameter: type TK_IDENTIFICADOR
 	| TK_PR_CONST type TK_IDENTIFICADOR
-	| %empty;
 	;
-cmd_block: '{' cmd_commands_list '}'
+cmd_block: '{' command_list '}'
 	;
 
 // Definição dos comandos dos blocos
-cmd_commands: local_var_decl ';'
+commands: local_var_decl ';'
 	| var_attribution ';'
 	| function_call ';'
 	| input ';'
@@ -149,14 +152,16 @@ cmd_commands: local_var_decl ';'
 	| continue ';'
 	| conditional_if_else ';'
 	| iterative_for_while ';'
+	| cmd_block ';'
 	;
-cmd_commands_list: cmd_commands cmd_commands_list
+command_list: commands command_list
 	| %empty
 	;
 	
 // Declaração de variaveis locais
 local_var_decl: local_var_prefix type TK_IDENTIFICADOR local_list
-	| local_var_prefix type TK_IDENTIFICADOR TK_OC_LE expression local_list
+	| local_var_prefix type TK_IDENTIFICADOR TK_OC_LE TK_IDENTIFICADOR local_list
+	| local_var_prefix type TK_IDENTIFICADOR TK_OC_LE literal local_list
 	;
 local_var_prefix: TK_PR_STATIC
 	| TK_PR_CONST
@@ -164,7 +169,8 @@ local_var_prefix: TK_PR_STATIC
 	| %empty
 	;
 local_list: ',' TK_IDENTIFICADOR local_list
-	| ',' TK_IDENTIFICADOR TK_OC_LE expression local_list
+	| ',' TK_IDENTIFICADOR TK_OC_LE TK_IDENTIFICADOR local_list
+	| ',' TK_IDENTIFICADOR TK_OC_LE literal local_list
 	| %empty
 	;
 
@@ -199,7 +205,9 @@ output: TK_PR_OUTPUT TK_IDENTIFICADOR
 	
 // Chamada de Função
 function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' 
+	| TK_IDENTIFICADOR '(' ')'
 	| TK_IDENTIFICADOR '[' expression ']' '(' expression arguments_list ')' 
+	| TK_IDENTIFICADOR '[' expression ']' '(' ')' 
 	;
 arguments_list: ',' expression arguments_list
 	| %empty
@@ -223,7 +231,7 @@ conditional_if_else: TK_PR_IF '(' expression ')' cmd_block
 	| TK_PR_IF '(' expression ')' cmd_block TK_PR_ELSE cmd_block
 	;
 iterative_for_while: TK_PR_FOR '(' var_attribution ':' expression ':' var_attribution ')' cmd_block
-	| TK_PR_WHILE '(' expression ')' cmd_block
+	| TK_PR_WHILE '(' expression ')' TK_PR_DO cmd_block
 
 %%
 
