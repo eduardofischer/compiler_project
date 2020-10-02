@@ -55,9 +55,9 @@ AST_NODE *ast_root = NULL;
 %token <valor_lexico> TK_IDENTIFICADOR
 %token <valor_lexico> TOKEN_ERRO
 
-/* %type <node> root
-%type <node> program
-%type <node> type */
+/* %type <node> program
+%type <node> function_def */
+
 
 // ## Associatividade e prioridade dos operadores
 
@@ -94,19 +94,19 @@ AST_NODE *ast_root = NULL;
 %start root
 
 %%
-root: program	//{ ast_root = $1; Print_Ast(root); } //gera warning
+root: program	 //{ ast_root = $1; print_ast(ast_root); } //gera warning
 	;
 	
 program: global_var_decl program 
 	| function_def program
-	| %empty
+	| %empty //{$$ = NULL;}
 	;
 
-type: TK_PR_INT		// { $$ = create_node(AST_SYMBOL_TK_PR_INT); }
-	| TK_PR_FLOAT		//{ $$ = create_node(AST_SYMBOL_TK_PR_FLOAT); }
-	| TK_PR_BOOL		//{ $$ = create_node(AST_SYMBOL_TK_PR_BOOL); }
-	| TK_PR_CHAR		//{ $$ = create_node(AST_SYMBOL_TK_PR_CHAR); }
-	| TK_PR_STRING		//{ $$ = create_node(AST_SYMBOL_TK_PR_STRING); }
+type: TK_PR_INT
+	| TK_PR_FLOAT
+	| TK_PR_BOOL
+	| TK_PR_CHAR
+	| TK_PR_STRING
 	;
 
 literal: TK_LIT_INT
