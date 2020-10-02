@@ -1,4 +1,5 @@
 etapa*
+*.o
 *.yy.*
 *.tab.*
 *.output

@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "ast.h"
+#include "aux/ast.h"
 #include "main.c"
 
 extern int line_number, column;
@@ -9,7 +9,7 @@ extern int line_number, column;
 int yylex(void);
 void yyerror (char const *s);
 
-AST_NODE * root = NULL;
+AST_NODE *ast_root = NULL;
 %}
 
 // Habilita o output verboso
@@ -96,7 +96,7 @@ AST_NODE * root = NULL;
 %start root
 
 %%
-root: program			//{ root = $1; Print_Ast(root); } gera warning
+root: program	{ ast_root = $1; Print_Ast(root); } //gera warning
 	;
 	
 program: global_var_decl program 
@@ -104,11 +104,11 @@ program: global_var_decl program
 	| %empty
 	;
 
-type: TK_PR_INT		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_INT, 0, 0, 0, 0); }
-	| TK_PR_FLOAT		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_FLOAT, 0, 0, 0, 0); }
-	| TK_PR_BOOL		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_BOOL, 0, 0, 0, 0); }
-	| TK_PR_CHAR		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_CHAR, 0, 0, 0, 0); }
-	| TK_PR_STRING		//{ $$ = Ast_Create(AST_SYMBOL_TK_PR_STRING, 0, 0, 0, 0); }
+type: TK_PR_INT		//{ $$ = create_node(AST_SYMBOL_TK_PR_INT); }
+	| TK_PR_FLOAT		//{ $$ = create_node(AST_SYMBOL_TK_PR_FLOAT); }
+	| TK_PR_BOOL		//{ $$ = create_node(AST_SYMBOL_TK_PR_BOOL); }
+	| TK_PR_CHAR		//{ $$ = create_node(AST_SYMBOL_TK_PR_CHAR); }
+	| TK_PR_STRING		//{ $$ = create_node(AST_SYMBOL_TK_PR_STRING); }
 	;
 
 literal: TK_LIT_INT
