@@ -140,11 +140,11 @@ function_def: type TK_IDENTIFICADOR '(' parameter parameters_list ')' cmd_block
 	| TK_PR_STATIC type TK_IDENTIFICADOR '(' parameter parameters_list ')' cmd_block
 	| TK_PR_STATIC type TK_IDENTIFICADOR '(' ')' cmd_block
 	;
-parameters_list: ',' parameter parameters_list	{$$ = $2;}		// Apenas para testes de conflitos de tipos no momento
+parameters_list: ',' parameter parameters_list	{$$ = create_node(AST_SYMBOL_parameters_list); add_child($$, $2); add_child($$, $3);}		// Modelo que pensei para fazer os nodes com seus filhos
 	| %empty					{$$ = NULL;}
 	;
-parameter: type TK_IDENTIFICADOR			{$$ = $1;}
-	| TK_PR_CONST type TK_IDENTIFICADOR		{$$ = $2;}
+parameter: type TK_IDENTIFICADOR			{$$ = create_node(AST_SYMBOL_parameter); add_child($$, $1);}
+	| TK_PR_CONST type TK_IDENTIFICADOR		{$$ = create_node(AST_SYMBOL_const_parameter); add_child($$, $2);}
 	;
 cmd_block: '{' command_list '}'
 	;

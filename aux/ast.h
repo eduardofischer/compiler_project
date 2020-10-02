@@ -40,6 +40,11 @@
 #define AST_SYMBOL_TK_IDENTIFICADOR 32
 #define AST_SYMBOL_TOKEN_ERRO 33
 
+#define AST_SYMBOL_function_def 34
+#define AST_SYMBOL_parameter 35
+#define AST_SYMBOL_parameters_list 36
+#define AST_SYMBOL_const_parameter 37
+
 typedef struct ast_node {
     int type;
     TOKEN_VAL value;
