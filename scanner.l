@@ -1,19 +1,13 @@
 %{
+	#include "types.h"
+	#include "aux/ast.h"
 	#include "parser.tab.h"
 
 	int line_number = 1;
 	int column = 1, next_column = 1;
 	#define YY_USER_ACTION column = next_column; next_column += yyleng;
-	
-	// Estrutura para guardar o valor de um token
-	// Obs: ainda esta inacabada
-    	struct {
-    		int line_number;
-    		char* type;
-    	 	char* token_val;
-	 } lex_val;
-    	 	
-	
+  
+	void init_valor_lexico(int type);
 %}
 
 	/* Definicao de algumas expressoes */
@@ -53,16 +47,41 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 <MULTILINE_COMMENT>\*\/ {BEGIN(INITIAL);}    	/* Fim do comentario, retorna ao estado INITIAL */
  
   /* Identifica os literais da linguagem */
-{INT}/{DELIMITER} {return TK_LIT_INT;}
+{INT}/{DELIMITER} {
+		init_valor_lexico(LEX_TYPE_LIT);
+		yylval.valor_lexico->value.i = atoi(yytext);
+		return TK_LIT_INT;
+	}
 
-{INT}\.{INT}([Ee]{SIGN}?{INT})?/{DELIMITER} {return TK_LIT_FLOAT;}
+{INT}\.{INT}([Ee]{SIGN}?{INT})?/{DELIMITER} {
+		init_valor_lexico(LEX_TYPE_LIT);
+		yylval.valor_lexico->value.f = atof(yytext);
+		return TK_LIT_FLOAT;
+	}
 
-{CHAR}/{DELIMITER} {return TK_LIT_CHAR;}
+{CHAR}/{DELIMITER} {
+		init_valor_lexico(LEX_TYPE_LIT);
+		yylval.valor_lexico->value.c = yytext[0];
+		return TK_LIT_CHAR;
+	}
 
-{STRING}/{DELIMITER} {return TK_LIT_STRING;}
+{STRING}/{DELIMITER} {
+		init_valor_lexico(LEX_TYPE_LIT);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_LIT_STRING;
+	}
 
-{BOOL_LITERAL_TRUE}/{DELIMITER} {return TK_LIT_TRUE;}
-{BOOL_LITERAL_FALSE}/{DELIMITER} {return TK_LIT_FALSE;}
+{BOOL_LITERAL_TRUE}/{DELIMITER} {
+		init_valor_lexico(LEX_TYPE_LIT);
+		yylval.valor_lexico->value.b = 1;
+		return TK_LIT_TRUE;
+	}
+
+{BOOL_LITERAL_FALSE}/{DELIMITER} {
+		init_valor_lexico(LEX_TYPE_LIT);
+		yylval.valor_lexico->value.b = 0;
+		return TK_LIT_FALSE;
+	}
  
  /* Identifica as palavras reservadas da linguagem */
 "int" {return TK_PR_INT;}
@@ -71,7 +90,6 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 "char" {return TK_PR_CHAR;}
 "string" {return TK_PR_STRING;}
 "if" {return TK_PR_IF;}
-"then" {return TK_PR_THEN;}
 "else" {return TK_PR_ELSE;}
 "while" {return TK_PR_WHILE;}
 "do" {return TK_PR_DO;}
@@ -80,36 +98,73 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 "return" {return TK_PR_RETURN;}
 "const" {return TK_PR_CONST;}
 "static" {return TK_PR_STATIC;}
-"foreach" {return TK_PR_FOREACH;}
 "for" {return TK_PR_FOR;}
-"switch" {return TK_PR_SWITCH;}
-"case" {return TK_PR_CASE;}
 "break" {return TK_PR_BREAK;}
 "continue" {return TK_PR_CONTINUE;}
-"class" {return TK_PR_CLASS;}
-"public" {return TK_PR_PUBLIC;}
-"private" {return TK_PR_PRIVATE;}
-"protected" {return TK_PR_PROTECTED;}
-"end" {return TK_PR_END;}
-"default" {return TK_PR_DEFAULT;}
  
  /* Identifica os operadores compostos da linguagem */
-"<=" {return TK_OC_LE;}
-">=" {return TK_OC_GE;}
-"==" {return TK_OC_EQ;}
-"!=" {return TK_OC_NE;}
-"&&" {return TK_OC_AND;}
-"||" {return TK_OC_OR;}
-">>" {return TK_OC_SR;}
-"<<" {return TK_OC_SL;}
+"<=" {
+		init_valor_lexico(LEX_TYPE_COMPOUND_OP);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_OC_LE;
+	}
+">=" {
+		init_valor_lexico(LEX_TYPE_COMPOUND_OP);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_OC_GE;
+	}
+"==" {
+		init_valor_lexico(LEX_TYPE_COMPOUND_OP);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_OC_EQ;
+	}
+"!=" {
+		init_valor_lexico(LEX_TYPE_COMPOUND_OP);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_OC_NE;
+	}
+"&&" {
+		init_valor_lexico(LEX_TYPE_COMPOUND_OP);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_OC_AND;
+	}
+"||" {
+		init_valor_lexico(LEX_TYPE_COMPOUND_OP);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_OC_OR;
+	}
+">>" {
+		init_valor_lexico(LEX_TYPE_COMPOUND_OP);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_OC_SR;
+	}
+"<<" {
+		init_valor_lexico(LEX_TYPE_COMPOUND_OP);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_OC_SL;
+	}
  
  /* Identifica os caracteres especiais da linguagem */
-{SPECIAL} {return yytext[0];}
+{SPECIAL} {
+		init_valor_lexico(LEX_TYPE_SPECIAL);
+		yylval.valor_lexico->value.c = yytext[0];
+		return yytext[0];
+	}
 
 	/* Identifica os identificadores da linguagem */
-{ALPHA}({ALPHA}|{DIGIT})* {return TK_IDENTIFICADOR;}
+{ALPHA}({ALPHA}|{DIGIT})* {
+		init_valor_lexico(LEX_TYPE_ID);
+		yylval.valor_lexico->value.s = strdup(yytext);
+		return TK_IDENTIFICADOR;
+	}
 
  /* Para qualquer outro padrão, retorna o token de erro */
 . {return TOKEN_ERRO;}
 
 %%
+
+void init_valor_lexico(int type) {
+	yylval.valor_lexico = malloc(sizeof(LEX_VALUE));
+	yylval.valor_lexico->line_number = line_number;
+	yylval.valor_lexico->type = type;
+}

@@ -4,3 +4,4 @@ etapa*
 *.tab.*
 *.output
 *.tgz
+tests/test_ast
