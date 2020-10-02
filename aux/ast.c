@@ -128,7 +128,7 @@ void print_ast_util(AST_NODE *root, int indent_level){
             printf("AST_SYMBOL_TOKEN_ERRO");
             break; 
         default:
-            printf("AST_UNKNOWN");
+            printf("AST_UNKNOWN_SYMBOL");
             break;
     }
 
