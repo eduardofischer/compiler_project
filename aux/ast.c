@@ -93,17 +93,20 @@ void exporta(void* arvore){
 	AST_NODE *root = (AST_NODE*) arvore;
 	printf("Exporta\n");
 	
+	FILE *file;
+	file = fopen ("AST_Exportada.txt", "a");
+	
 	if (root == NULL)
         	return;
 
         for (int i = 0; i < root->n_childs; ++i){
-        	printf("%p, ", root);
-        	printf("%p", root->childs[i]);
-        	printf("\n");
-        	printf("%p [label=%s];", root, root->label);
-        	printf("\n");
-        	printf("%p [label=%s];", root->childs[i], root->childs[i]->label);
-        	printf("\n");
+        	fprintf(file,"%p, ", root);
+        	fprintf(file,"%p", root->childs[i]);
+        	fprintf(file,"\n");
+        	fprintf(file,"%p [label=%s];", root, root->label);
+        	fprintf(file,"\n");
+        	fprintf(file,"%p [label=%s];", root->childs[i], root->childs[i]->label);
+        	fprintf(file,"\n");
         	exporta(root->childs[i]);
         }
         
