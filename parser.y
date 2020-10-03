@@ -20,23 +20,23 @@ extern void *arvore;
 	LEX_VALUE *valor_lexico;
 }
 
-%token <valor_lexico> TK_PR_INT
-%token <valor_lexico> TK_PR_FLOAT
-%token <valor_lexico> TK_PR_BOOL
-%token <valor_lexico> TK_PR_CHAR
-%token <valor_lexico> TK_PR_STRING
-%token <valor_lexico> TK_PR_IF
-%token <valor_lexico> TK_PR_ELSE
-%token <valor_lexico> TK_PR_WHILE
-%token <valor_lexico> TK_PR_DO
-%token <valor_lexico> TK_PR_INPUT
-%token <valor_lexico> TK_PR_OUTPUT
-%token <valor_lexico> TK_PR_RETURN
-%token <valor_lexico> TK_PR_CONST
-%token <valor_lexico> TK_PR_STATIC
-%token <valor_lexico> TK_PR_FOR
-%token <valor_lexico> TK_PR_BREAK
-%token <valor_lexico> TK_PR_CONTINUE
+%token TK_PR_INT
+%token TK_PR_FLOAT
+%token TK_PR_BOOL
+%token TK_PR_CHAR
+%token TK_PR_STRING
+%token TK_PR_IF
+%token TK_PR_ELSE
+%token TK_PR_WHILE
+%token TK_PR_DO
+%token TK_PR_INPUT
+%token TK_PR_OUTPUT
+%token TK_PR_RETURN
+%token TK_PR_CONST
+%token TK_PR_STATIC
+%token TK_PR_FOR
+%token TK_PR_BREAK
+%token TK_PR_CONTINUE
 %token <valor_lexico> TK_OC_LE
 %token <valor_lexico> TK_OC_GE
 %token <valor_lexico> TK_OC_EQ
@@ -64,6 +64,7 @@ extern void *arvore;
 %type <node> command
 %type <node> local_var_decl
 %type <node> local_var_init
+%type <node> local_list
 %type <node> var_attribution
 %type <node> vector_index
 %type <node> expression
@@ -115,7 +116,7 @@ extern void *arvore;
 %start root
 
 %%
-root: program	 { arvore = (void*) $1; print_ast((AST_NODE*)arvore); } 
+root: program	 { arvore = (void*) $1; } 
 	;
 	
 program: global_var_decl program { $$ = NULL; }
@@ -147,10 +148,10 @@ id_list: ',' id id_list
 	| ',' vector_index id_list
 	| %empty
 	;
-vector_index: id '[' expression ']' { $$ = create_node("[]"); add_child($$, $1); add_child($$, $3); }
-id: TK_IDENTIFICADOR { $$ = create_node($1->value.s); }
 
-	;
+vector_index: id '[' expression ']' { $$ = create_node("[]"); add_child($$, $1); add_child($$, $3); }
+id: TK_IDENTIFICADOR { $$ = create_node_lex_value($1); }
+
 function_def: type id '(' parameter parameters_list ')' cmd_block { $$ =$2; add_child($$, $7); }
 	| type id '(' ')' cmd_block { $$ = $2; add_child($$, $5); }
 	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { $$ = $3; add_child($$, $8); }
@@ -159,8 +160,8 @@ function_def: type id '(' parameter parameters_list ')' cmd_block { $$ =$2; add_
 parameters_list: ',' parameter parameters_list
 	| %empty
 	;
-parameter: type id
-	| TK_PR_CONST type id
+parameter: type id { free_node($2); }
+	| TK_PR_CONST type id { free_node($3); }
 	;
 
 // Definição dos blocos de comandos
@@ -186,20 +187,20 @@ command: local_var_decl ';' { $$ = $1; }
 	;
 	
 // Declaração de variaveis locais
-local_var_decl: local_var_prefix type id local_list { $$ = NULL; }
+local_var_decl: local_var_prefix type id local_list { $$ = $4; free_node($3); }
 	;
-local_var_init: local_var_prefix type id TK_OC_LE id local_list { $$ = create_node("<="); add_child($$, $3); add_child($$, $5); }
-	| local_var_prefix type id TK_OC_LE literal local_list { $$ = create_node("<="); add_child($$, $3); add_child($$, $5); }
+local_var_init: local_var_prefix type id TK_OC_LE id local_list { $$ = create_node_lex_value($4); add_child($$, $3); add_child($$, $5); add_child($$, $6);}
+	| local_var_prefix type id TK_OC_LE literal local_list { $$ = create_node_lex_value($4); add_child($$, $3); add_child($$, $5); add_child($$, $6); }
 	;
 local_var_prefix: TK_PR_STATIC
 	| TK_PR_CONST
 	| TK_PR_STATIC TK_PR_CONST
 	| %empty
 	;
-local_list: ',' id local_list
-	| ',' id TK_OC_LE id local_list
-	| ',' id TK_OC_LE literal local_list
-	| %empty
+local_list: ',' id local_list { $$ = NULL; free_node($2); }
+	| ',' id TK_OC_LE id local_list { $$ = create_node_lex_value($3); add_child($$, $2); add_child($$, $4); add_child($$, $5); }
+	| ',' id TK_OC_LE literal local_list { $$ = create_node_lex_value($3); add_child($$, $2); add_child($$, $4); add_child($$, $5); }
+	| %empty { $$ = NULL; }
 	;
 
 // Atribuição de variavel
@@ -231,16 +232,16 @@ binary_op: '+' { $$ = create_node("+"); }
 	| '/'	{ $$ = create_node("/"); }
 	| '%'	{ $$ = create_node("%"); }
 	| '^'	{ $$ = create_node("^"); }
-	| TK_OC_LE { $$ = create_node("<="); }
-	| TK_OC_GE { $$ = create_node(">="); }
-	| TK_OC_EQ { $$ = create_node("=="); }
-	| TK_OC_NE { $$ = create_node("!="); }
 	| '<' { $$ = create_node("<"); }
 	| '>' { $$ = create_node(">"); }
-	| TK_OC_OR { $$ = create_node("||"); }
-	| TK_OC_AND { $$ = create_node("&&"); }
 	| '|' { $$ = create_node("|"); }
 	| '&' { $$ = create_node("&"); }													
+	| TK_OC_LE { $$ = create_node_lex_value($1); }
+	| TK_OC_GE { $$ = create_node_lex_value($1); }
+	| TK_OC_EQ { $$ = create_node_lex_value($1); }
+	| TK_OC_NE { $$ = create_node_lex_value($1); }
+	| TK_OC_OR { $$ = create_node_lex_value($1); }
+	| TK_OC_AND { $$ = create_node_lex_value($1); }
 	;
 
 // Comandos de entrada e saida
@@ -261,11 +262,11 @@ arguments_list: ',' expression arguments_list
 	;
 
 // Comandos de shift
-shift_left: id TK_OC_SL TK_LIT_INT { $$ = create_node("<<"); add_child($$, $1); add_child($$, create_node_lex_value($3)); }
-	| vector_index TK_OC_SL TK_LIT_INT { $$ = create_node("<<"); add_child($$, $1); add_child($$, create_node_lex_value($3)); }
+shift_left: id TK_OC_SL TK_LIT_INT { $$ = create_node_lex_value($2); add_child($$, $1); add_child($$, create_node_lex_value($3)); }
+	| vector_index TK_OC_SL TK_LIT_INT { $$ = create_node_lex_value($2); add_child($$, $1); add_child($$, create_node_lex_value($3)); }
 	;	
-shift_right: id TK_OC_SR TK_LIT_INT { $$ = create_node(">>"); add_child($$, $1); add_child($$, create_node_lex_value($3)); }
-	| vector_index TK_OC_SR TK_LIT_INT { $$ = create_node(">>"); add_child($$, $1); add_child($$, create_node_lex_value($3)); }
+shift_right: id TK_OC_SR TK_LIT_INT { $$ = create_node_lex_value($2); add_child($$, $1); add_child($$, create_node_lex_value($3)); }
+	| vector_index TK_OC_SR TK_LIT_INT { $$ = create_node_lex_value($2); add_child($$, $1); add_child($$, create_node_lex_value($3)); }
 	;
 
 // Comandos return, break e continue

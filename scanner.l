@@ -152,8 +152,6 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
  
  /* Identifica os caracteres especiais da linguagem */
 {SPECIAL} {
-		init_valor_lexico(TOKEN_TYPE_SPECIAL);
-		yylval.valor_lexico->value.c = yytext[0];
 		return yytext[0];
 	}
 
@@ -173,4 +171,5 @@ void init_valor_lexico(int type) {
 	yylval.valor_lexico = malloc(sizeof(LEX_VALUE));
 	yylval.valor_lexico->line_number = line_number;
 	yylval.valor_lexico->token_type = type;
+	yylval.valor_lexico->literal_type = -1;
 }

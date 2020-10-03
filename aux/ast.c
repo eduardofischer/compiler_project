@@ -115,21 +115,31 @@ void exporta(void* arvore) {
     if (label_list != NULL) free(label_list);
 }
 
+void free_node(AST_NODE *node) {
+    if (node->valor_lexico != NULL){
+        if (node->valor_lexico->literal_type == LIT_TYPE_STRING
+            || node->valor_lexico->token_type == TOKEN_TYPE_ID
+            || node->valor_lexico->token_type == TOKEN_TYPE_COMPOUND_OP)
+            free(node->valor_lexico->value.s);
+        free(node->valor_lexico);
+    }
+    if (node->label != NULL) free(node->label);
+    if (node->childs != NULL) free(node->childs);
+    free(node);
+}
+
 // Inacabada - talvez dê para usar uma pilha aqui
-void libera(void *arvore) {
-	AST_NODE *root = (AST_NODE*) arvore;
-	printf("Libera\n");
-	
-	if (root == NULL)
-        	return;
-        if (root->n_childs == 0)
-        	free(root);
+void libera_util(AST_NODE *node) {
+	if (node == NULL) return;
         	
-        for (int i = 0; i < root->n_childs; ++i){
-        	libera(root->childs[i]);
-        }
-        
-        return;
-        
+    for (int i = 0; i < node->n_childs; ++i)
+        libera_util(node->childs[i]);
+
+    free_node(node);    
+}
+
+void libera(void *arvore) {
+    AST_NODE *root = (AST_NODE*) arvore;
+    libera_util(root);
 }
 

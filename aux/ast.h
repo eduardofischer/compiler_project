@@ -23,5 +23,9 @@ void print_ast(AST_NODE *root);
 
 char *get_label(LEX_VALUE *valor_lexico);
 
+void free_node(AST_NODE *node);
+
+void libera(void *arvore);
+
 void exporta(void* arvore);
 #endif
