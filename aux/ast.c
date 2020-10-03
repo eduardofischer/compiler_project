@@ -109,7 +109,7 @@ void exporta(void* arvore){
         	fprintf(file,"\n");
         	exporta(root->childs[i]);
         }
-        
+        fclose(file);
         return;     
 }
 
