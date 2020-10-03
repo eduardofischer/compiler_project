@@ -3,7 +3,8 @@
 #include "../aux/ast.h"
 
 void *arvore_test;
-void exporta_test(void *arvore);
+void exporta_test(void *arvore_test);
+void libera_test(void *arvore_test);
 
 
 int main() {
@@ -21,12 +22,13 @@ int main() {
   	
   print_ast(root);
   exporta_test(root);
+  libera_test(root);
 
   return 0;
 }
 
-void exporta_test(void* arvore){
-	AST_NODE *root = (AST_NODE*) arvore;
+void exporta_test(void* arvore_test){
+	AST_NODE *root = (AST_NODE*) arvore_test;
 	FILE *file;
 	file = fopen ("AST_Exportada.txt", "a");
 	
@@ -45,4 +47,25 @@ void exporta_test(void* arvore){
         }
         fclose(file);
         return;     
+}
+
+void libera_test(void *arvore_test) {
+	AST_NODE *root = (AST_NODE*) arvore_test;
+	printf("Libera -> ");
+	printf("%s\n",root->label);
+	
+	if (root == NULL)
+        	return;
+        	
+        for (int i = 0; i < root->n_childs; ++i){
+        	libera_test(root->childs[i]);
+        }
+        
+        if(root->n_childs == 0){
+        	free(root);
+        	root = NULL;
+        }
+        
+        return;
+
 }
