@@ -9,8 +9,8 @@
 typedef struct ast_node {
     char *label;
     LEX_VALUE *valor_lexico;
-    int n_childs;
-    struct ast_node **childs;
+    int n_children;
+    struct ast_node **children;
 } AST_NODE;
 
 AST_NODE *create_node(char *label);

@@ -5,8 +5,8 @@ AST_NODE *create_node(char *label) {
     AST_NODE *node = (AST_NODE*) calloc(1, sizeof(AST_NODE));
     node->label = strdup(label);
     node->valor_lexico = NULL;
-    node->n_childs = 0;
-    node->childs = NULL;
+    node->n_children = 0;
+    node->children = NULL;
 
     return node;
 }
@@ -16,17 +16,17 @@ AST_NODE *create_node_lex_value(LEX_VALUE *valor_lexico) {
     AST_NODE *node = (AST_NODE*) calloc(1, sizeof(AST_NODE));
     node->valor_lexico = valor_lexico;
     node->label = get_label(valor_lexico);
-    node->n_childs = 0;
-    node->childs = NULL;
+    node->n_children = 0;
+    node->children = NULL;
 
     return node;
 }
 
 void add_child(AST_NODE *parent, AST_NODE *child){
     if (parent == NULL || child == NULL) return;
-    parent->n_childs++;
-    parent->childs = realloc(parent->childs, parent->n_childs * sizeof(AST_NODE));
-    parent->childs[parent->n_childs - 1] = child;
+    parent->n_children++;
+    parent->children = realloc(parent->children, parent->n_children * sizeof(AST_NODE));
+    parent->children[parent->n_children - 1] = child;
 }
 
 // Imprime os nodos da AST recursivamente
@@ -41,8 +41,8 @@ void print_ast_util(AST_NODE *root, int indent_level){
 
     printf("↳ %s [%p]\n", root->label, root);
 
-    for (int i = 0; i < root->n_childs; ++i)
-    	print_ast_util(root->childs[i], indent_level + 1);
+    for (int i = 0; i < root->n_children; ++i)
+    	print_ast_util(root->children[i], indent_level + 1);
 
     return;
 }
@@ -101,10 +101,10 @@ void export_util(void* arvore, char **label_list) {
     *label_list = realloc(*label_list, list_length + label_length + 31);
     sprintf(*label_list + list_length, "%p [label=\"%s\"];\n", root, root->label);
 
-    for (int i = 0; i < root->n_childs; ++i){
+    for (int i = 0; i < root->n_children; ++i){
         printf("%p, ", root);
-        printf("%p\n", root->childs[i]);
-        export_util(root->childs[i], label_list);
+        printf("%p\n", root->children[i]);
+        export_util(root->children[i], label_list);
     }
 }
 
@@ -124,7 +124,7 @@ void free_node(AST_NODE *node) {
         free(node->valor_lexico);
     }
     if (node->label != NULL) free(node->label);
-    if (node->childs != NULL) free(node->childs);
+    if (node->children != NULL) free(node->children);
     free(node);
 }
 
@@ -132,8 +132,8 @@ void free_node(AST_NODE *node) {
 void libera_util(AST_NODE *node) {
 	if (node == NULL) return;
         	
-    for (int i = 0; i < node->n_childs; ++i)
-        libera_util(node->childs[i]);
+    for (int i = 0; i < node->n_children; ++i)
+        libera_util(node->children[i]);
 
     free_node(node);    
 }

@@ -35,15 +35,15 @@ void exporta_test(void* arvore_test){
 	if (root == NULL)
         	return;
 	
-        for (int i = 0; i < root->n_childs; ++i){
+        for (int i = 0; i < root->n_children; ++i){
         	fprintf(file,"%p, ", root);
-        	fprintf(file,"%p", root->childs[i]);
+        	fprintf(file,"%p", root->children[i]);
         	fprintf(file,"\n");
         	fprintf(file,"%p [label=%s];", root, root->label);
         	fprintf(file,"\n");
-        	fprintf(file,"%p [label=%s];", root->childs[i], root->childs[i]->label);
+        	fprintf(file,"%p [label=%s];", root->children[i], root->children[i]->label);
         	fprintf(file,"\n");
-        	exporta_test(root->childs[i]);
+        	exporta_test(root->children[i]);
         }
         fclose(file);
         return;     
@@ -57,11 +57,11 @@ void libera_test(void *arvore_test) {
 	if (root == NULL)
         	return;
         	
-        for (int i = 0; i < root->n_childs; ++i){
-        	libera_test(root->childs[i]);
+        for (int i = 0; i < root->n_children; ++i){
+        	libera_test(root->children[i]);
         }
         
-        if(root->n_childs == 0){
+        if(root->n_children == 0){
         	free(root);
         	root = NULL;
         }
