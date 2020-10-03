@@ -88,3 +88,43 @@ char *get_label(LEX_VALUE *valor_lexico) {
 
     return string;
 }
+
+void exporta(void* arvore){
+	AST_NODE *root = (AST_NODE*) arvore;
+	printf("Exporta\n");
+	
+	if (root == NULL)
+        	return;
+
+        for (int i = 0; i < root->n_childs; ++i){
+        	printf("%p, ", root);
+        	printf("%p", root->childs[i]);
+        	printf("\n");
+        	printf("%p [label=%s];", root, root->label);
+        	printf("\n");
+        	printf("%p [label=%s];", root->childs[i], root->childs[i]->label);
+        	printf("\n");
+        	exporta(root->childs[i]);
+        }
+        
+        return;     
+}
+
+// Inacabada - talvez dê para usar uma pilha aqui
+void libera(void *arvore){
+	AST_NODE *root = (AST_NODE*) arvore;
+	printf("Libera\n");
+	
+	if (root == NULL)
+        	return;
+        if (root->n_childs == 0)
+        	free(root);
+        	
+        for (int i = 0; i < root->n_childs; ++i){
+        	libera(root->childs[i]);
+        }
+        
+        return;
+        
+}
+

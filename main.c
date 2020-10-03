@@ -11,8 +11,8 @@ void exporta(void *arvore);
 void libera(void *arvore);
 
 int main (int argc, char **argv) {
-  int ret = yyparse(); 
-  // exporta(arvore);
+  int ret = yyparse();
+  exporta(arvore);
   // libera(arvore);
   arvore = NULL;
   yylex_destroy();
