@@ -23,7 +23,7 @@ AST_NODE *create_node_lex_value(LEX_VALUE *valor_lexico) {
 }
 
 void add_child(AST_NODE *parent, AST_NODE *child){
-    if (parent == NULL) return;
+    if (parent == NULL || child == NULL) return;
     parent->n_childs++;
     parent->childs = realloc(parent->childs, parent->n_childs * sizeof(AST_NODE));
     parent->childs[parent->n_childs - 1] = child;
@@ -39,7 +39,7 @@ void print_ast_util(AST_NODE *root, int indent_level){
         printf("  ");
     }
 
-    printf("↳ %s\n", root->label);
+    printf("↳ %s [%p]\n", root->label, root);
 
     for (int i = 0; i < root->n_childs; ++i)
     	print_ast_util(root->childs[i], indent_level + 1);
@@ -49,6 +49,7 @@ void print_ast_util(AST_NODE *root, int indent_level){
 
 void print_ast(AST_NODE *root) {
     print_ast_util(root, 0);
+    printf("\n");
 }
 
 char *get_label(LEX_VALUE *valor_lexico) {
@@ -90,32 +91,32 @@ char *get_label(LEX_VALUE *valor_lexico) {
     return string;
 }
 
-void exporta(void* arvore){
+void export_util(void* arvore, char **label_list) {
 	AST_NODE *root = (AST_NODE*) arvore;
-	printf("Exporta\n");
-	
-	FILE *file;
-	file = fopen ("AST_Exportada.txt", "a");
-	
-	if (root == NULL)
-        	return;
+    int list_length = *label_list != NULL ? strlen(*label_list) : 0;
+    int label_length = root->label != NULL ? strlen(root->label) : 0;
+    
+	if (root == NULL) return;
 
-        for (int i = 0; i < root->n_childs; ++i){
-        	fprintf(file,"%p, ", root);
-        	fprintf(file,"%p", root->childs[i]);
-        	fprintf(file,"\n");
-        	fprintf(file,"%p [label=%s];", root, root->label);
-        	fprintf(file,"\n");
-        	fprintf(file,"%p [label=%s];", root->childs[i], root->childs[i]->label);
-        	fprintf(file,"\n");
-        	exporta(root->childs[i]);
-        }
-        fclose(file);
-        return;     
+    *label_list = realloc(*label_list, list_length + label_length + 31);
+    sprintf(*label_list + list_length, "%p [label=\"%s\"];\n", root, root->label);
+
+    for (int i = 0; i < root->n_childs; ++i){
+        printf("%p, ", root);
+        printf("%p\n", root->childs[i]);
+        export_util(root->childs[i], label_list);
+    }
+}
+
+void exporta(void* arvore) {
+    char *label_list = NULL;
+    export_util(arvore, &label_list);
+    printf("\n%s", label_list);
+    if (label_list != NULL) free(label_list);
 }
 
 // Inacabada - talvez dê para usar uma pilha aqui
-void libera(void *arvore){
+void libera(void *arvore) {
 	AST_NODE *root = (AST_NODE*) arvore;
 	printf("Libera\n");
 	

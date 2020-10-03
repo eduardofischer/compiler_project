@@ -9,7 +9,7 @@ extern int line_number, column;
 int yylex(void);
 void yyerror (char const *s);
 
-AST_NODE *ast_root = NULL;
+extern void *arvore;
 %}
 
 // Habilita o output verboso
@@ -115,7 +115,7 @@ AST_NODE *ast_root = NULL;
 %start root
 
 %%
-root: program	 { ast_root = $1; print_ast(ast_root); } 
+root: program	 { arvore = (void*) $1; print_ast((AST_NODE*)arvore); } 
 	;
 	
 program: global_var_decl program { $$ = NULL; }
