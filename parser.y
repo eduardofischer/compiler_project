@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "types.h"
 #include "aux/ast.h"
-#include "main.c"
 
 extern int line_number, column;
 
@@ -167,7 +166,7 @@ parameter: type id
 // Definição dos blocos de comandos
 cmd_block: '{' command_list '}' { $$ = $2; }
 	;
-command_list: command command_list { $$ = $1; add_child($$, $2); }
+command_list: command command_list { if ($1 != NULL) {$$ = $1; add_child($$, $2);} else {$$ = $2;} }
 	| %empty { $$ = NULL; }
 	;
 command: local_var_decl ';' { $$ = $1; }

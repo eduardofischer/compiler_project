@@ -64,14 +64,14 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 {CHAR}/{DELIMITER} {
 		init_valor_lexico(TOKEN_TYPE_LIT);
 		yylval.valor_lexico->literal_type = LIT_TYPE_CHAR;
-		yylval.valor_lexico->value.c = yytext[0];
+		yylval.valor_lexico->value.c = yytext[1];
 		return TK_LIT_CHAR;
 	}
 
 {STRING}/{DELIMITER} {
 		init_valor_lexico(TOKEN_TYPE_LIT);
 		yylval.valor_lexico->literal_type = LIT_TYPE_STRING;
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico->value.s = strndup(yytext+1, strlen(yytext)-2);
 		return TK_LIT_STRING;
 	}
 

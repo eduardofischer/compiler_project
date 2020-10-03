@@ -23,6 +23,7 @@ AST_NODE *create_node_lex_value(LEX_VALUE *valor_lexico) {
 }
 
 void add_child(AST_NODE *parent, AST_NODE *child){
+    if (parent == NULL) return;
     parent->n_childs++;
     parent->childs = realloc(parent->childs, parent->n_childs * sizeof(AST_NODE));
     parent->childs[parent->n_childs - 1] = child;
@@ -35,7 +36,7 @@ void print_ast_util(AST_NODE *root, int indent_level){
     	return;
 
     for(int i=0; i< indent_level; i++) {
-        printf("    ");
+        printf("  ");
     }
 
     printf("↳ %s\n", root->label);
