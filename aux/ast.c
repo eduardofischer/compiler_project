@@ -115,21 +115,25 @@ void exporta(void* arvore) {
     if (label_list != NULL) free(label_list);
 }
 
-// Inacabada - talvez dê para usar uma pilha aqui
+
 void libera(void *arvore) {
 	AST_NODE *root = (AST_NODE*) arvore;
-	printf("Libera\n");
+	printf("Libera -> ");
+	printf("%s\n",root->label);
 	
 	if (root == NULL)
         	return;
-        if (root->n_childs == 0)
-        	free(root);
         	
         for (int i = 0; i < root->n_childs; ++i){
         	libera(root->childs[i]);
         }
         
-        return;
+        if(root->n_childs == 0){
+        	free(root);
+        	root = NULL;
+        }
         
+        return;
+
 }
 
