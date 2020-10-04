@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "types.h"
+#include "aux/types.h"
 #include "aux/ast.h"
 
 extern int line_number, column;

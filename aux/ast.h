@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../types.h"
+#include "types.h"
 
 typedef struct ast_node {
     char *label;

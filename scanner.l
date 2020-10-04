@@ -1,5 +1,5 @@
 %{
-	#include "types.h"
+	#include "aux/types.h"
 	#include "aux/ast.h"
 	#include "parser.tab.h"
 
