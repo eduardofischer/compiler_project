@@ -17,7 +17,7 @@ extern void *arvore;
 
 %union {
 	AST_NODE *node;
-	LEX_VALUE *valor_lexico;
+	LEX_VALUE valor_lexico;
 }
 
 %token TK_PR_INT
@@ -161,8 +161,8 @@ function_def: type id '(' parameter parameters_list ')' cmd_block { $$ = $2; add
 parameters_list: ',' parameter parameters_list
 	| %empty
 	;
-parameter: type id { free_node($2); }
-	| TK_PR_CONST type id { free_node($3); }
+parameter: type id { libera($2); }
+	| TK_PR_CONST type id { libera($3); }
 	;
 
 // Definição dos blocos de comandos
@@ -188,7 +188,7 @@ command: local_var_decl ';' { $$ = $1; }
 	;
 	
 // Declaração de variaveis locais
-local_var_decl: local_var_prefix type id local_list { $$ = $4; free_node($3); }
+local_var_decl: local_var_prefix type id local_list { $$ = $4; libera($3); }
 	;
 local_var_init: local_var_prefix type id TK_OC_LE id local_list { $$ = create_node_lex_value($4); add_child($$, $3); add_child($$, $5); add_child($$, $6);}
 	| local_var_prefix type id TK_OC_LE literal local_list { $$ = create_node_lex_value($4); add_child($$, $3); add_child($$, $5); add_child($$, $6); }
@@ -198,7 +198,7 @@ local_var_prefix: TK_PR_STATIC
 	| TK_PR_STATIC TK_PR_CONST
 	| %empty
 	;
-local_list: ',' id local_list { $$ = NULL; free_node($2); }
+local_list: ',' id local_list { $$ = NULL; libera($2); }
 	| ',' id TK_OC_LE id local_list { $$ = create_node_lex_value($3); add_child($$, $2); add_child($$, $4); add_child($$, $5); }
 	| ',' id TK_OC_LE literal local_list { $$ = create_node_lex_value($3); add_child($$, $2); add_child($$, $4); add_child($$, $5); }
 	| %empty { $$ = NULL; }
@@ -253,10 +253,10 @@ output: TK_PR_OUTPUT id { $$ = create_node("output"); add_child($$, $2); }
 	;
 	
 // Chamada de Função
-function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1->value.s); add_child($$, $3); add_child($3, $4); free($1);}
-	| TK_IDENTIFICADOR '(' ')' { $$ = create_node("call "); concat_label(&($$->label), $1->value.s); free($1);}
-	| vector_index '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1->children[0]->label); add_child($$, $3); add_child($$, $4); free_node($1); }
-	| vector_index '(' ')' { $$ = create_node("call TODO"); concat_label(&($$->label), $1->children[0]->label); free_node($1); }
+function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1.value.s); add_child($$, $3); add_child($3, $4); }
+	| TK_IDENTIFICADOR '(' ')' { $$ = create_node("call "); concat_label(&($$->label), $1.value.s); }
+	| vector_index '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1->children[0]->label); add_child($$, $3); add_child($$, $4); libera($1); }
+	| vector_index '(' ')' { $$ = create_node("call "); concat_label(&($$->label), $1->children[0]->label); libera($1); }
 	;
 arguments_list: ',' expression arguments_list { $$ = $2; add_child($$, $3); }
 	| %empty { $$ = NULL; }

@@ -49,43 +49,43 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
   /* Identifica os literais da linguagem */
 {INT}/{DELIMITER} {
 		init_valor_lexico(TOKEN_TYPE_LIT);
-		yylval.valor_lexico->literal_type = LIT_TYPE_INT;
-		yylval.valor_lexico->value.i = atoi(yytext);
+		yylval.valor_lexico.literal_type = LIT_TYPE_INT;
+		yylval.valor_lexico.value.i = atoi(yytext);
 		return TK_LIT_INT;
 	}
 
 {INT}\.{INT}([Ee]{SIGN}?{INT})?/{DELIMITER} {
 		init_valor_lexico(TOKEN_TYPE_LIT);
-		yylval.valor_lexico->literal_type = LIT_TYPE_FLOAT;
-		yylval.valor_lexico->value.f = atof(yytext);
+		yylval.valor_lexico.literal_type = LIT_TYPE_FLOAT;
+		yylval.valor_lexico.value.f = atof(yytext);
 		return TK_LIT_FLOAT;
 	}
 
 {CHAR}/{DELIMITER} {
 		init_valor_lexico(TOKEN_TYPE_LIT);
-		yylval.valor_lexico->literal_type = LIT_TYPE_CHAR;
-		yylval.valor_lexico->value.c = yytext[1];
+		yylval.valor_lexico.literal_type = LIT_TYPE_CHAR;
+		yylval.valor_lexico.value.c = yytext[1];
 		return TK_LIT_CHAR;
 	}
 
 {STRING}/{DELIMITER} {
 		init_valor_lexico(TOKEN_TYPE_LIT);
-		yylval.valor_lexico->literal_type = LIT_TYPE_STRING;
-		yylval.valor_lexico->value.s = strndup(yytext+1, strlen(yytext)-2);
+		yylval.valor_lexico.literal_type = LIT_TYPE_STRING;
+		yylval.valor_lexico.value.s = strndup(yytext+1, strlen(yytext)-2);
 		return TK_LIT_STRING;
 	}
 
 {BOOL_LITERAL_TRUE}/{DELIMITER} {
 		init_valor_lexico(TOKEN_TYPE_LIT);
-		yylval.valor_lexico->literal_type = LIT_TYPE_BOOL;
-		yylval.valor_lexico->value.b = 1;
+		yylval.valor_lexico.literal_type = LIT_TYPE_BOOL;
+		yylval.valor_lexico.value.b = 1;
 		return TK_LIT_TRUE;
 	}
 
 {BOOL_LITERAL_FALSE}/{DELIMITER} {
 		init_valor_lexico(TOKEN_TYPE_LIT);
-		yylval.valor_lexico->literal_type = LIT_TYPE_BOOL;
-		yylval.valor_lexico->value.b = 0;
+		yylval.valor_lexico.literal_type = LIT_TYPE_BOOL;
+		yylval.valor_lexico.value.b = 0;
 		return TK_LIT_FALSE;
 	}
  
@@ -111,42 +111,42 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
  /* Identifica os operadores compostos da linguagem */
 "<=" {
 		init_valor_lexico(TOKEN_TYPE_COMPOUND_OP);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_OC_LE;
 	}
 ">=" {
 		init_valor_lexico(TOKEN_TYPE_COMPOUND_OP);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_OC_GE;
 	}
 "==" {
 		init_valor_lexico(TOKEN_TYPE_COMPOUND_OP);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_OC_EQ;
 	}
 "!=" {
 		init_valor_lexico(TOKEN_TYPE_COMPOUND_OP);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_OC_NE;
 	}
 "&&" {
 		init_valor_lexico(TOKEN_TYPE_COMPOUND_OP);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_OC_AND;
 	}
 "||" {
 		init_valor_lexico(TOKEN_TYPE_COMPOUND_OP);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_OC_OR;
 	}
 ">>" {
 		init_valor_lexico(TOKEN_TYPE_COMPOUND_OP);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_OC_SR;
 	}
 "<<" {
 		init_valor_lexico(TOKEN_TYPE_COMPOUND_OP);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_OC_SL;
 	}
  
@@ -158,7 +158,7 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 	/* Identifica os identificadores da linguagem */
 {ALPHA}({ALPHA}|{DIGIT})* {
 		init_valor_lexico(TOKEN_TYPE_ID);
-		yylval.valor_lexico->value.s = strdup(yytext);
+		yylval.valor_lexico.value.s = strdup(yytext);
 		return TK_IDENTIFICADOR;
 	}
 
@@ -168,8 +168,7 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 %%
 
 void init_valor_lexico(int type) {
-	yylval.valor_lexico = malloc(sizeof(LEX_VALUE));
-	yylval.valor_lexico->line_number = line_number;
-	yylval.valor_lexico->token_type = type;
-	yylval.valor_lexico->literal_type = -1;
+	yylval.valor_lexico.line_number = line_number;
+	yylval.valor_lexico.token_type = type;
+	yylval.valor_lexico.literal_type = -1;
 }

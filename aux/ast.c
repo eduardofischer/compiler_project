@@ -11,9 +11,10 @@ AST_NODE *create_node(char *label) {
 }
 
 // Cria node da AST para literais e identificadores, armazenando seu valor_lexico
-AST_NODE *create_node_lex_value(LEX_VALUE *valor_lexico) {
-    AST_NODE *node = (AST_NODE*) calloc(1, sizeof(AST_NODE));
-    node->valor_lexico = valor_lexico;
+AST_NODE *create_node_lex_value(LEX_VALUE valor_lexico) {
+    AST_NODE *node = (AST_NODE*) malloc(sizeof(AST_NODE));
+    node->valor_lexico = malloc(sizeof(LEX_VALUE));
+    node->valor_lexico = memcpy(node->valor_lexico, &valor_lexico, sizeof(LEX_VALUE));
     node->label = get_label(valor_lexico);
     node->n_children = 0;
     node->children = NULL;
@@ -57,40 +58,40 @@ void concat_label(char **str1, char *str2) {
     free(str2);
 }
 
-char *get_label(LEX_VALUE *valor_lexico) {
+char *get_label(LEX_VALUE valor_lexico) {
     char *string;
     char str[12];
-    if (valor_lexico->token_type == TOKEN_TYPE_LIT) {
-        switch(valor_lexico->literal_type) {
+    if (valor_lexico.token_type == TOKEN_TYPE_LIT) {
+        switch(valor_lexico.literal_type) {
             case LIT_TYPE_INT:
-                sprintf(str, "%d", valor_lexico->value.i);
+                sprintf(str, "%d", valor_lexico.value.i);
                 string = strdup(str);
                 break;
             case LIT_TYPE_FLOAT:
-                gcvt(valor_lexico->value.f, 4, str);
+                gcvt(valor_lexico.value.f, 4, str);
                 string = strdup(str);
                 break;
             case LIT_TYPE_BOOL:
-                if(valor_lexico->value.b == 1){
+                if(valor_lexico.value.b == 1){
                     string = strdup("true");
                 } else {
                     string = strdup("false");
                 }
                 break;
             case LIT_TYPE_CHAR:
-                str[0] = valor_lexico->value.c;
+                str[0] = valor_lexico.value.c;
                 str[1] = '\0';
                 string = strdup(str);
                 break;
             default:
-                string = strdup(valor_lexico->value.s);
+                string = strdup(valor_lexico.value.s);
         }
-    } else if (valor_lexico->token_type == TOKEN_TYPE_SPECIAL) {
-        str[0] = valor_lexico->value.c;
+    } else if (valor_lexico.token_type == TOKEN_TYPE_SPECIAL) {
+        str[0] = valor_lexico.value.c;
         str[1] = '\0';
         string = strdup(str);
     } else {
-        string = strdup(valor_lexico->value.s);
+        string = strdup(valor_lexico.value.s);
     }
 
     return string;
