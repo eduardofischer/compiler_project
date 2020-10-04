@@ -253,8 +253,8 @@ output: TK_PR_OUTPUT id { $$ = create_node("output"); add_child($$, $2); }
 	;
 	
 // Chamada de Função
-function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1.value.s); add_child($$, $3); add_child($3, $4); }
-	| TK_IDENTIFICADOR '(' ')' { $$ = create_node("call "); concat_label(&($$->label), $1.value.s); }
+function_call: id '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1->valor_lexico->value.s); add_child($$, $3); add_child($3, $4); libera($1); }
+	| id '(' ')' { $$ = create_node("call "); concat_label(&($$->label), $1->valor_lexico->value.s); libera($1); }
 	| vector_index '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1->children[0]->label); add_child($$, $3); add_child($3, $4); libera($1); }
 	| vector_index '(' ')' { $$ = create_node("call "); concat_label(&($$->label), $1->children[0]->label); libera($1); }
 	;
