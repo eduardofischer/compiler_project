@@ -52,6 +52,11 @@ void print_ast(AST_NODE *root) {
     printf("\n");
 }
 
+void concat_label(char **str1, char *str2) {
+    *str1 = realloc(*str1, strlen(*str1) + strlen(str2) + 1);
+    *str1 = strcat(*str1, str2);
+}
+
 char *get_label(LEX_VALUE *valor_lexico) {
     char *string;
     char str[12];

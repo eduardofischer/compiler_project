@@ -21,6 +21,8 @@ void add_child(AST_NODE *parent, AST_NODE *child);
 
 void print_ast(AST_NODE *root);
 
+void concat_label(char **str1, char *str2);
+
 char *get_label(LEX_VALUE *valor_lexico);
 
 void free_node(AST_NODE *node);

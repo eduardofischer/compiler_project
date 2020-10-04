@@ -73,6 +73,7 @@ extern void *arvore;
 %type <node> input
 %type <node> output
 %type <node> function_call
+%type <node> arguments_list
 %type <node> shift_left
 %type <node> shift_right
 %type <node> return
@@ -116,7 +117,7 @@ extern void *arvore;
 %start root
 
 %%
-root: program	 { arvore = (void*) $1; } 
+root: program	 { arvore = (void*) $1; print_ast((AST_NODE*)arvore); } 
 	;
 	
 program: global_var_decl program { $$ = NULL; }
@@ -152,7 +153,7 @@ id_list: ',' id id_list
 vector_index: id '[' expression ']' { $$ = create_node("[]"); add_child($$, $1); add_child($$, $3); }
 id: TK_IDENTIFICADOR { $$ = create_node_lex_value($1); }
 
-function_def: type id '(' parameter parameters_list ')' cmd_block { $$ =$2; add_child($$, $7); }
+function_def: type id '(' parameter parameters_list ')' cmd_block { $$ = $2; add_child($$, $7); }
 	| type id '(' ')' cmd_block { $$ = $2; add_child($$, $5); }
 	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { $$ = $3; add_child($$, $8); }
 	| TK_PR_STATIC type id '(' ')' cmd_block { $$ = $3; add_child($$, $6); }
@@ -252,13 +253,13 @@ output: TK_PR_OUTPUT id { $$ = create_node("output"); add_child($$, $2); }
 	;
 	
 // Chamada de Função
-function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' { $$ = create_node(strcat("call ", $1->value.s)); }
-	| TK_IDENTIFICADOR '(' ')' { $$ = create_node(strcat("call ", $1->value.s)); }
-	| vector_index '(' expression arguments_list ')' { $$ = create_node("call TODO"); }
-	| vector_index '(' ')' { $$ = create_node("call TODO"); }
+function_call: TK_IDENTIFICADOR '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1->value.s); add_child($$, $3); add_child($$, $4); }
+	| TK_IDENTIFICADOR '(' ')' { $$ = create_node("call "); concat_label(&($$->label), $1->value.s); }
+	| vector_index '(' expression arguments_list ')' { $$ = create_node("call "); concat_label(&($$->label), $1->children[0]->label); add_child($$, $3); add_child($$, $4); free_node($1); }
+	| vector_index '(' ')' { $$ = create_node("call TODO"); concat_label(&($$->label), $1->children[0]->label); free_node($1); }
 	;
-arguments_list: ',' expression arguments_list
-	| %empty
+arguments_list: ',' expression arguments_list { $$ = $2; add_child($$, $3); }
+	| %empty { $$ = NULL; }
 	;
 
 // Comandos de shift
