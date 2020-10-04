@@ -7,6 +7,7 @@ AST_NODE *create_node(char *label) {
     node->valor_lexico = NULL;
     node->n_children = 0;
     node->children = NULL;
+
     return node;
 }
 

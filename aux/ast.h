@@ -30,5 +30,5 @@ void free_node(AST_NODE *node);
 void libera(void *arvore);
 
 void exporta(void* arvore);
-void libera(void *arvore);
+
 #endif

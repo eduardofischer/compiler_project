@@ -67,5 +67,4 @@ void libera_test(void *arvore_test) {
         }
         
         return;
-
 }
