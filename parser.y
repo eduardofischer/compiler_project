@@ -197,8 +197,9 @@ parameter: type id { libera($2.ast_node); }
 	;
 
 // Definição dos blocos de comandos
-cmd_block: '{' command_list '}' { $$ = $2; }
-	;
+cmd_block_start: '{' { table_stack = new_scope(table_stack); }
+cmd_block_end: '}' { table_stack = pop(table_stack); }
+cmd_block: cmd_block_start command_list cmd_block_end { $$ = $2; }
 command_list: command command_list {
 		if ($1.ast_node != NULL) {
 			$$ = $1;
