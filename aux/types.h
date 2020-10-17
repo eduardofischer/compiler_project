@@ -12,6 +12,12 @@
 #define LIT_TYPE_CHAR 3
 #define LIT_TYPE_STRING 4
 
+#define DT_INT 0
+#define DT_FLOAT 1
+#define DT_BOOL 2
+#define DT_CHAR 3
+#define DT_STRING 4
+
 // Enumeração de entry_type (entrada tabela de símbolos)
 #define LITERAL 0
 #define VARIABLE 1

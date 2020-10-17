@@ -136,23 +136,22 @@ type: TK_PR_INT
 	;
 
 literal: TK_LIT_INT {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
-				
+			$$.table_entry = make_table_entry($1, LITERAL, DT_INT);
 	}
 	| TK_LIT_FLOAT {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+			$$.table_entry = make_table_entry($1, LITERAL, DT_FLOAT);	
 	}
 	| TK_LIT_FALSE {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+			$$.table_entry = make_table_entry($1, LITERAL, DT_BOOL);
 	}
 	| TK_LIT_TRUE {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+			$$.table_entry = make_table_entry($1, LITERAL, DT_BOOL);
 	}
 	| TK_LIT_CHAR {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+			$$.table_entry = make_table_entry($1, LITERAL, DT_CHAR);
 	}
 	| TK_LIT_STRING {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+			$$.table_entry = make_table_entry($1, LITERAL, DT_STRING);
 	}
 	;
 
