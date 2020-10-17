@@ -12,7 +12,7 @@ int yylex(void);
 void yyerror (char const *s);
 
 extern void *arvore;
-extern STACK_ITEM *global_scope;
+extern STACK_ITEM *table_stack;
 %}
 
 // Habilita o output verboso

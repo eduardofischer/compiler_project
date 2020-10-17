@@ -8,7 +8,7 @@
 extern int yyparse(void);
 extern int yylex_destroy(void);
 
-STACK_ITEM *global_scope = NULL;
+STACK_ITEM *table_stack = NULL;
 void *arvore = NULL;
 
 void exporta(void *arvore);
@@ -16,7 +16,7 @@ void libera(void *arvore);
 
 int main (int argc, char **argv) {
   // Inicializa a tabela de símbolos global
-  global_scope = new_scope(global_scope);
+  table_stack = new_scope(table_stack);
 
   int ret = yyparse();
   exporta(arvore);
@@ -25,6 +25,6 @@ int main (int argc, char **argv) {
   yylex_destroy();
 
   // Destroi a tabela de símbolos global
-  pop(global_scope);
+  pop(table_stack);
   return ret;
 }
