@@ -72,23 +72,23 @@ char *get_label(LEX_VALUE valor_lexico) {
     char *string;
     char str[12];
     if (valor_lexico.token_type == TOKEN_TYPE_LIT) {
-        switch(valor_lexico.literal_type) {
-            case LIT_TYPE_INT:
+        switch(valor_lexico.ET_LITERAL_type) {
+            case DT_INT:
                 sprintf(str, "%d", valor_lexico.value.i);
                 string = strdup(str);
                 break;
-            case LIT_TYPE_FLOAT:
+            case DT_FLOAT:
                 gcvt(valor_lexico.value.f, 4, str);
                 string = strdup(str);
                 break;
-            case LIT_TYPE_BOOL:
+            case DT_BOOL:
                 if(valor_lexico.value.b == 1){
                     string = strdup("true");
                 } else {
                     string = strdup("false");
                 }
                 break;
-            case LIT_TYPE_CHAR:
+            case DT_CHAR:
                 str[0] = valor_lexico.value.c;
                 str[1] = '\0';
                 string = strdup(str);
@@ -133,7 +133,7 @@ void exporta(void* arvore) {
 
 void free_node(AST_NODE *node) {
     if (node->valor_lexico != NULL){
-        if (node->valor_lexico->literal_type == LIT_TYPE_STRING
+        if (node->valor_lexico->ET_LITERAL_type == DT_STRING
             || node->valor_lexico->token_type == TOKEN_TYPE_ID
             || node->valor_lexico->token_type == TOKEN_TYPE_COMPOUND_OP)
             free(node->valor_lexico->value.s);

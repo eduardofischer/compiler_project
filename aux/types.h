@@ -6,12 +6,6 @@
 #define TOKEN_TYPE_ID 2
 #define TOKEN_TYPE_LIT 3
 
-#define LIT_TYPE_INT 0
-#define LIT_TYPE_FLOAT 1
-#define LIT_TYPE_BOOL 2
-#define LIT_TYPE_CHAR 3
-#define LIT_TYPE_STRING 4
-
 #define DT_INT 0
 #define DT_FLOAT 1
 #define DT_BOOL 2
@@ -19,9 +13,9 @@
 #define DT_STRING 4
 
 // Enumeração de entry_type (entrada tabela de símbolos)
-#define LITERAL 0
-#define VARIABLE 1
-#define FUNCTION 2
+#define ET_LITERAL 0
+#define ET_VARIABLE 1
+#define ET_FUNCTION 2
 
 #define NOT_DEFINED 99
 
@@ -36,7 +30,7 @@ typedef union {
 typedef struct lex_value {
   int line_number, col_number;
   int token_type;
-  int literal_type;
+  int ET_LITERAL_type;
   TOKEN_VAL value;
 } LEX_VALUE;
 
@@ -50,7 +44,7 @@ typedef struct arg_entry {
 // Entrada da tabela de símbolos
 typedef struct symbol_entry {
   int line, column;
-  int entry_type; // literal, variável, função, etc...
+  int entry_type; // ET_LITERAL, variável, função, etc...
   int data_type; // int, float, bool, etc...
   int size;
   ARG_ENTRY *arguments;

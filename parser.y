@@ -23,11 +23,11 @@ extern void *arvore;
 	LEX_VALUE valor_lexico;
 }
 
-%token TK_PR_INT
-%token TK_PR_FLOAT
-%token TK_PR_BOOL
-%token TK_PR_CHAR
-%token TK_PR_STRING
+%token <node> TK_PR_INT
+%token <node> TK_PR_FLOAT
+%token <node> TK_PR_BOOL
+%token <node> TK_PR_CHAR
+%token <node> TK_PR_STRING
 %token TK_PR_IF
 %token TK_PR_ELSE
 %token TK_PR_WHILE
@@ -59,7 +59,8 @@ extern void *arvore;
 
 // Declaração de tipos
 %type <node> program
-%type <node> literal
+%type <node> ET_LITERAL
+%type <node> type
 %type <node> id
 %type <node> function_def
 %type <node> cmd_block
@@ -128,30 +129,36 @@ program: global_var_decl program { $$.ast_node = NULL; }
 	| %empty { $$.ast_node = NULL; }
 	;
 
-type: TK_PR_INT
-	| TK_PR_FLOAT
-	| TK_PR_BOOL
-	| TK_PR_CHAR
-	| TK_PR_STRING
+type: TK_PR_INT { $$.table_entry.data_type = DT_INT; }
+	| TK_PR_FLOAT { $$.table_entry.data_type = DT_FLOAT; }
+	| TK_PR_BOOL { $$.table_entry.data_type = DT_BOOL; }
+	| TK_PR_CHAR { $$.table_entry.data_type = DT_CHAR; }
+	| TK_PR_STRING { $$.table_entry.data_type = DT_STRING; }
 	;
 
-literal: TK_LIT_INT {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, DT_INT);
+ET_LITERAL: TK_LIT_INT {
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_INT);
 	}
-	| TK_LIT_FLOAT {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, DT_FLOAT);	
+	| TK_LIT_FLOAT {
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_FLOAT);	
 	}
-	| TK_LIT_FALSE {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, DT_BOOL);
+	| TK_LIT_FALSE {
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_BOOL);
 	}
-	| TK_LIT_TRUE {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, DT_BOOL);
+	| TK_LIT_TRUE {
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_BOOL);
 	}
-	| TK_LIT_CHAR {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, DT_CHAR);
+	| TK_LIT_CHAR {
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_CHAR);
 	}
-	| TK_LIT_STRING {$$.ast_node = create_node_lex_value($1);
-			$$.table_entry = make_table_entry($1, LITERAL, DT_STRING);
+	| TK_LIT_STRING {
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_STRING);
 	}
 	;
 
@@ -174,7 +181,7 @@ vector_index: id '[' expression ']' {
 id: TK_IDENTIFICADOR {
 		$$.ast_node = create_node_lex_value($1);
 
-		$$.table_entry = make_table_entry($1, NOT_DEFINED, $$.ast_node->valor_lexico->literal_type);
+		$$.table_entry = make_table_entry($1, NOT_DEFINED, $$.ast_node->valor_lexico->ET_LITERAL_type);
 	}
 
 function_def: type id '(' parameter parameters_list ')' cmd_block { $$ = $2; add_child($$.ast_node, $7.ast_node); }
@@ -227,7 +234,7 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		add_child($$.ast_node, $5.ast_node);
 		add_child($$.ast_node, $6.ast_node);
 	}
-	| local_var_prefix type id TK_OC_LE literal local_list {
+	| local_var_prefix type id TK_OC_LE ET_LITERAL local_list {
 		$$.ast_node = create_node_lex_value($4);
 		add_child($$.ast_node, $3.ast_node);
 		add_child($$.ast_node, $5.ast_node);
@@ -246,7 +253,7 @@ local_list: ',' id local_list { $$.ast_node = NULL; libera($2.ast_node); }
 		add_child($$.ast_node, $4.ast_node); 
 		add_child($$.ast_node, $5.ast_node); 
 	}
-	| ',' id TK_OC_LE literal local_list { 
+	| ',' id TK_OC_LE ET_LITERAL local_list { 
 		$$.ast_node = create_node_lex_value($3); 
 		add_child($$.ast_node, $2.ast_node); 
 		add_child($$.ast_node, $4.ast_node); 
@@ -272,7 +279,7 @@ var_attribution: id '=' expression {
 expression: id { $$ = $1; }
 	| vector_index { $$ = $1; }
 	| function_call  { $$ = $1; }
-	| literal { $$ = $1; }
+	| ET_LITERAL { $$ = $1; }
 	| '(' expression ')'  { $$ = $2; }
 	| unary_op expression %prec UNARY {
 		$$ = $1; 
@@ -326,7 +333,7 @@ output: TK_PR_OUTPUT id {
 		$$.ast_node = create_node("output"); 
 		add_child($$.ast_node, $2.ast_node); 
 	}
-	| TK_PR_OUTPUT literal { 
+	| TK_PR_OUTPUT ET_LITERAL { 
 		$$.ast_node = create_node("output"); 
 		add_child($$.ast_node, $2.ast_node); 
 	}
