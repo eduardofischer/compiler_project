@@ -85,6 +85,7 @@ extern STACK_ITEM *table_stack;
 %type <node> continue 
 %type <node> conditional_if_else 
 %type <node> iterative_for_while 
+%type <node> global_var_decl
 
 // ## Associatividade e prioridade dos operadores
 
@@ -169,9 +170,21 @@ literal: TK_LIT_INT {
 	;
 
 // Declaração de variáveis globais
-global_var_decl: TK_PR_STATIC type id id_list ';'
-	| type id id_list ';'
-	| type vector_index id_list ';'
+global_var_decl: TK_PR_STATIC type id id_list ';' { 
+		$3.table_entry.entry_type = ET_VARIABLE;
+		$3.table_entry.data_type = $2.table_entry.data_type;
+		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);	
+	}
+	| type id id_list ';'  { 
+		$2.table_entry.entry_type = ET_VARIABLE;
+		$2.table_entry.data_type = $1.table_entry.data_type;
+		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
+	}
+	| type vector_index id_list ';' { 
+		$2.table_entry.entry_type = ET_VARIABLE;
+		$2.table_entry.data_type = $1.table_entry.data_type;
+		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
+	}
 	;
 id_list: ',' id id_list
 	| ',' vector_index id_list
@@ -214,8 +227,20 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 parameters_list: ',' parameter parameters_list
 	| %empty
 	;
-parameter: type id { libera($2.ast_node); }
-	| TK_PR_CONST type id { libera($3.ast_node); }
+parameter: type id {
+		$2.table_entry.entry_type = ET_VARIABLE;
+		$2.table_entry.data_type = $1.table_entry.data_type;
+		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry); 
+		
+		libera($2.ast_node); 	
+	}
+	| TK_PR_CONST type id {
+		$3.table_entry.entry_type = ET_VARIABLE;
+		$3.table_entry.data_type = $2.table_entry.data_type;
+		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);
+		 
+		libera($3.ast_node);
+	}
 	;
 
 // Definição dos blocos de comandos
