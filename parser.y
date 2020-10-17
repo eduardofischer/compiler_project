@@ -244,8 +244,8 @@ parameter: type id {
 	;
 
 // Definição dos blocos de comandos
-cmd_block_start: '{' {} //{ table_stack = new_scope(table_stack); }
-cmd_block_end: '}' {} //{ table_stack = pop(table_stack); }
+cmd_block_start: '{' { table_stack = new_scope(table_stack); }
+cmd_block_end: '}' { table_stack = pop(table_stack); }
 cmd_block: cmd_block_start command_list cmd_block_end { $$ = $2; }
 command_list: command command_list {
 		if ($1.ast_node != NULL) {

@@ -73,7 +73,6 @@ int free_ht(HT_ENTRY **table) {
   for (int i=0; i < HT_SIZE; i++) {
     current = table[i];
     if (current != NULL) {
-      printf("current:%p, current->next:%p, current->key:%s\n", current, current->next, current->key);
       do {
         next = current->next;
         if (current->key != NULL)
