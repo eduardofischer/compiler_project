@@ -138,32 +138,32 @@ type: TK_PR_INT { $$.table_entry.data_type = DT_INT; }
 
 literal: TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_INT);
+		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_INT);
 		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	| TK_LIT_FLOAT {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_FLOAT);
+		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_FLOAT);
 		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);	
 	}
 	| TK_LIT_FALSE {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_BOOL);
+		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_BOOL);
 		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	| TK_LIT_TRUE {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_BOOL);
+		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_BOOL);
 		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	| TK_LIT_CHAR {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_CHAR);
+		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_CHAR);
 		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	| TK_LIT_STRING {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_STRING);
+		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_STRING);
 		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	;
@@ -187,24 +187,28 @@ vector_index: id '[' expression ']' {
 id: TK_IDENTIFICADOR {
 		$$.ast_node = create_node_lex_value($1);
 
-		$$.table_entry = make_table_entry($1, NOT_DEFINED, $$.ast_node->valor_lexico->ET_LITERAL_type);
+		$$.table_entry = init_table_entry($1, NOT_DEFINED, NOT_DEFINED);
 	}
 
 function_def: type id '(' parameter parameters_list ')' cmd_block { 
 		$$ = $2; add_child($$.ast_node, $7.ast_node); 
-		$2.table_entry = make_table_entry_with_node($2.ast_node, ET_FUNCTION, $1.table_entry.data_type);	
+		$2.table_entry.entry_type = ET_FUNCTION;
+		$2.table_entry.data_type = $1.table_entry.data_type;	
 	}
 	| type id '(' ')' cmd_block { 
 			$$ = $2; add_child($$.ast_node, $5.ast_node);
-			$2.table_entry = make_table_entry_with_node($2.ast_node, ET_FUNCTION, $1.table_entry.data_type); 
+			$2.table_entry.entry_type = ET_FUNCTION;
+			$2.table_entry.data_type = $1.table_entry.data_type;
 	}
 	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { 
 			$$ = $3; add_child($$.ast_node, $8.ast_node); 
-			$3.table_entry = make_table_entry_with_node($3.ast_node, ET_FUNCTION, $2.table_entry.data_type); 		
+			$3.table_entry.entry_type = ET_FUNCTION;
+			$3.table_entry.data_type = $2.table_entry.data_type;		
 	}
 	| TK_PR_STATIC type id '(' ')' cmd_block { 
 			$$ = $3; add_child($$.ast_node, $6.ast_node); 
-			$3.table_entry = make_table_entry_with_node($3.ast_node, ET_FUNCTION, $2.table_entry.data_type); 
+			$3.table_entry.entry_type = ET_FUNCTION;
+			$3.table_entry.data_type = $2.table_entry.data_type; 
 	}
 	;
 parameters_list: ',' parameter parameters_list

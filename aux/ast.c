@@ -1,19 +1,9 @@
 #include "ast.h"
 
-SYMBOL_ENTRY make_table_entry(LEX_VALUE valor_lexico, int entry_type, int data_type){
+SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, int entry_type, int data_type){
 	SYMBOL_ENTRY table_entry;
 	table_entry.line = valor_lexico.line_number;
 	table_entry.column = valor_lexico.col_number;
-	table_entry.entry_type = entry_type;
-	table_entry.data_type = data_type;
-	
-	return table_entry;
-}
-
-SYMBOL_ENTRY make_table_entry_with_node(AST_NODE *node, int entry_type, int data_type){
-	SYMBOL_ENTRY table_entry;
-	table_entry.line = node->valor_lexico->line_number;
-	table_entry.column = node->valor_lexico->col_number;
 	table_entry.entry_type = entry_type;
 	table_entry.data_type = data_type;
 	
