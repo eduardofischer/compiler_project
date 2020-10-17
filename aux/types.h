@@ -12,6 +12,11 @@
 #define LIT_TYPE_CHAR 3
 #define LIT_TYPE_STRING 4
 
+// Enumeração de entry_type (entrada tabela de símbolos)
+#define LITERAL 0
+#define VARIABLE 1
+#define FUNCTION 2
+
 typedef union {
   int i;
   float f;
@@ -21,10 +26,47 @@ typedef union {
 } TOKEN_VAL;
 
 typedef struct lex_value {
-  int line_number;
+  int line_number, col_number;
   int token_type;
   int literal_type;
   TOKEN_VAL value;
 } LEX_VALUE;
+
+// Lista de argumentos
+typedef struct arg_entry {
+  int id;
+  int type;
+  struct arg_entry *next;
+} ARG_ENTRY;
+
+// Entrada da tabela de símbolos
+typedef struct symbol_entry {
+  int line, column;
+  int entry_type; // literal, variável, função, etc...
+  int data_type; // int, float, bool, etc...
+  int size;
+  ARG_ENTRY *arguments;
+  TOKEN_VAL value;
+} SYMBOL_ENTRY;
+
+// Lista de entradas da hash table
+typedef struct ht_entry {
+  char *key;
+  SYMBOL_ENTRY value;
+  struct ht_entry *next;
+} HT_ENTRY;
+
+// Nó da AST
+typedef struct ast_node {
+  char *label;
+  LEX_VALUE *valor_lexico;
+  int n_children;
+  struct ast_node **children;
+} AST_NODE;
+
+typedef struct prod_value {
+  AST_NODE *ast_node;
+  SYMBOL_ENTRY table_entry;
+} PROD_VALUE;
 
 #endif

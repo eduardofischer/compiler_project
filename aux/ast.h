@@ -6,13 +6,6 @@
 #include <string.h>
 #include "types.h"
 
-typedef struct ast_node {
-  char *label;
-  LEX_VALUE *valor_lexico;
-  int n_children;
-  struct ast_node **children;
-} AST_NODE;
-
 AST_NODE *create_node(char *label);
 
 AST_NODE *create_node_lex_value(LEX_VALUE valor_lexico);

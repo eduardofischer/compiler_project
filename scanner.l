@@ -169,6 +169,7 @@ SPECIAL [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 
 void init_valor_lexico(int type) {
 	yylval.valor_lexico.line_number = line_number;
+	yylval.valor_lexico.col_number = column;
 	yylval.valor_lexico.token_type = type;
 	yylval.valor_lexico.literal_type = -1;
 }

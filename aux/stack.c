@@ -19,7 +19,19 @@ HT_ENTRY **top(STACK_ITEM *stack) {
 
 // TODO: Retorna a tabela de símbolos na posição pos da pilha
 HT_ENTRY **peek(STACK_ITEM *stack, int pos) {
-  return NULL;
+  if (stack == NULL)
+    return NULL;
+
+  STACK_ITEM *item = stack;
+  
+  for (int i=0; i < pos; i++) {
+    if (item->next == NULL)
+      return NULL; // Item inexistente na posição pos
+    
+    item = item->next;
+  }
+
+  return item->table;
 }
 
 // Remove e libera a tabela de símbolos no topo da pilha

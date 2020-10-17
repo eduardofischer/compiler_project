@@ -8,35 +8,6 @@
 
 #define HT_SIZE 20
 
-// Natureza do símbolo
-#define N_LITERAL 0
-#define N_VARIABLE 1
-#define N_FUNCTION 2
-
-// Lista de argumentos
-typedef struct arg_entry {
-  int id;
-  int type;
-  struct arg_entry *next;
-} ARG_ENTRY;
-
-// Entrada da tabela de símbolos
-typedef struct symbol_entry {
-  int line, column;
-  int nature; // literal, variável, função, etc...
-  int literal_type;
-  int size;
-  ARG_ENTRY *arguments;
-  TOKEN_VAL value;
-} SYMBOL_ENTRY;
-
-// Lista de entradas da hash table
-typedef struct ht_entry {
-  char *key;
-  SYMBOL_ENTRY value;
-  struct ht_entry *next;
-} HT_ENTRY;
-
 // Calcula a posição de inserção na tabela com base na chave
 int hash(char *key);
 

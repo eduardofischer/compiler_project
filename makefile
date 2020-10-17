@@ -2,8 +2,8 @@ CC = gcc
 AUX = ./aux
 
 all: bison flex ast
-	$(CC) -c lex.yy.c parser.tab.c main.c
-	$(CC) -o etapa3 lex.yy.o parser.tab.o ast.o main.o -lfl
+	$(CC) -c lex.yy.c parser.tab.c main.c -g
+	$(CC) -o etapa3 lex.yy.o parser.tab.o ast.o main.o -lfl -g
 	
 flex: scanner.l
 	flex scanner.l
