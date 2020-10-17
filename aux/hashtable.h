@@ -2,7 +2,11 @@
 #define HASHTABLE_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "types.h"
+
+#define HT_SIZE 20
 
 // Natureza do símbolo
 #define N_LITERAL 0
@@ -13,7 +17,7 @@
 typedef struct arg_entry {
   int id;
   int type;
-  ARG_ENTRY *next;
+  struct arg_entry *next;
 } ARG_ENTRY;
 
 // Entrada da tabela de símbolos
@@ -30,22 +34,25 @@ typedef struct symbol_entry {
 typedef struct ht_entry {
   char *key;
   SYMBOL_ENTRY value;
-  HT_ENTRY *next;
+  struct ht_entry *next;
 } HT_ENTRY;
 
 // Calcula a posição de inserção na tabela com base na chave
-int hash(char *key, int table_size);
+int hash(char *key);
 
 // Recupera a entrada na hash table
-HT_ENTRY *get_ht_entry(HT_ENTRY *table, char *key);
+HT_ENTRY *get_ht_entry(HT_ENTRY **table, char *key);
 
 // Insere uma entrada na hash table
-int insert_ht_entry(HT_ENTRY *table, HT_ENTRY *entry);
+int insert_ht_entry(HT_ENTRY **table, char *key, SYMBOL_ENTRY value);
 
-// Atualiza uma entrada na hash table
-int update_ht_entry(HT_ENTRY *table, HT_ENTRY *entry);
+// TODO: Atualiza uma entrada na hash table 
+int update_ht_entry(HT_ENTRY **table, HT_ENTRY entry);
 
-// Remove uma entrada da hash table
-int remove_ht_entry(HT_ENTRY *table, HT_ENTRY *entry);
+// TODO: Remove uma entrada da hash table
+int remove_ht_entry(HT_ENTRY **table, char *key);
+
+// Libera a memória referente à hash table
+int free_ht(HT_ENTRY **table);
 
 #endif

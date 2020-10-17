@@ -4,6 +4,5 @@ etapa*
 *.tab.*
 *.output
 *.tgz
-tests/test_ast
 test_files
 .vscode

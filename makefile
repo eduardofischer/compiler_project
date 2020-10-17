@@ -14,5 +14,5 @@ bison: parser.y
 ast: $(AUX)/ast.c
 	$(CC) -c $(AUX)/ast.c
 
-clean:
+clear:
 	rm -rf etapa* lex.yy.c parser.tab.c parser.output parser.tab.h lex.yy.o parser.tab.o main.o ast.o
