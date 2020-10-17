@@ -26,4 +26,7 @@ int remove_ht_entry(HT_ENTRY **table, char *key);
 // Libera a memória referente à hash table
 int free_ht(HT_ENTRY **table);
 
+// Inicializa uma entrada da tabela
+SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, int entry_type, int data_type);
+
 #endif
