@@ -93,7 +93,7 @@ SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, int entry_type, int data_t
 	SYMBOL_ENTRY table_entry;
 	table_entry.line = valor_lexico.line_number;
 	table_entry.column = valor_lexico.col_number;
-  table_entry.arguments = NULL;
+  	table_entry.arguments = NULL;
 	table_entry.entry_type = entry_type;
 	table_entry.data_type = data_type;
 	
