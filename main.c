@@ -25,6 +25,6 @@ int main (int argc, char **argv) {
   yylex_destroy();
 
   // Destroi a tabela de símbolos global
-  pop(table_stack);
+  table_stack = pop(table_stack);
   return ret;
 }

@@ -4,6 +4,7 @@
 STACK_ITEM *new_scope(STACK_ITEM *stack) {
   STACK_ITEM *item = malloc(sizeof(STACK_ITEM));
   item->table = malloc(sizeof(HT_ENTRY) * HT_SIZE);
+  memset(item->table, 0, sizeof(HT_ENTRY) * HT_SIZE);
   item->next = stack;
   
   return item;
