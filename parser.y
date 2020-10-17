@@ -21,6 +21,7 @@ extern STACK_ITEM *table_stack;
 %union {
 	PROD_VALUE node;
 	LEX_VALUE valor_lexico;
+	ARG_LIST *argument;
 }
 
 %token <node> TK_PR_INT
@@ -86,6 +87,8 @@ extern STACK_ITEM *table_stack;
 %type <node> conditional_if_else 
 %type <node> iterative_for_while 
 %type <node> global_var_decl
+%type <argument> parameter
+%type <argument> parameters_list
 
 // ## Associatividade e prioridade dos operadores
 
@@ -170,24 +173,24 @@ literal: TK_LIT_INT {
 	;
 
 // Declaração de variáveis globais
-global_var_decl: TK_PR_STATIC type id id_list ';' { 
+global_var_decl: TK_PR_STATIC type id global_list ';' { 
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);	
 	}
-	| type id id_list ';'  { 
+	| type id global_list ';'  { 
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
 	}
-	| type vector_index id_list ';' { 
+	| type vector_index global_list ';' { 
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
 	}
 	;
-id_list: ',' id id_list
-	| ',' vector_index id_list
+global_list: ',' id global_list
+	| ',' vector_index global_list
 	| %empty
 	;
 
@@ -207,7 +210,11 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$$ = $2; add_child($$.ast_node, $7.ast_node); 
 		$2.table_entry.entry_type = ET_FUNCTION;
 		$2.table_entry.data_type = $1.table_entry.data_type;
-		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
+
+		$2.table_entry.arguments = $4;
+		$4->next = $5;
+		
+		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);
 	}
 	| type id '(' ')' cmd_block { 
 		$$ = $2; add_child($$.ast_node, $5.ast_node);
@@ -228,13 +235,20 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry); 
 	}
 	;
-parameters_list: ',' parameter parameters_list
-	| %empty
+parameters_list: ',' parameter parameters_list {
+		$$ = $2;
+		$$->next = $3;
+	}
+	| %empty { $$ = NULL; }
 	;
 parameter: type id {
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);
+
+		$$ = malloc(sizeof(ARG_LIST));
+		$$->id = $2.ast_node->label;
+		$$->type = $1.table_entry.data_type;
 		
 		libera($2.ast_node); 	
 	}
@@ -280,6 +294,7 @@ command: local_var_decl ';' { $$ = $1; }
 // Declaração de variaveis locais
 local_var_decl: local_var_prefix type id local_list { 
 		$$ = $4; 
+
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);	
@@ -317,7 +332,11 @@ local_var_prefix: TK_PR_STATIC
 	| TK_PR_STATIC TK_PR_CONST
 	| %empty
 	;
-local_list: ',' id local_list { $$.ast_node = NULL; libera($2.ast_node); }
+local_list: ',' id local_list { 
+		$$.ast_node = NULL;
+		libera($2.ast_node); 
+
+}
 	| ',' id TK_OC_LE id local_list { 
 		$$.ast_node = create_node_lex_value($3); 
 		add_child($$.ast_node, $2.ast_node); 

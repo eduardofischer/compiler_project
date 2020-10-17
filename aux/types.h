@@ -36,18 +36,18 @@ typedef struct lex_value {
 
 // Lista de argumentos
 typedef struct arg_entry {
-  int id;
+  char* id;
   int type;
   struct arg_entry *next;
-} ARG_ENTRY;
+} ARG_LIST;
 
 // Entrada da tabela de símbolos
 typedef struct symbol_entry {
   int line, column;
-  int entry_type; // ET_LITERAL, variável, função, etc...
+  int entry_type; // literal, variável, função, etc...
   int data_type; // int, float, bool, etc...
   int size;
-  ARG_ENTRY *arguments;
+  ARG_LIST *arguments;
   TOKEN_VAL value;
 } SYMBOL_ENTRY;
 

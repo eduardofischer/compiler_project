@@ -51,8 +51,8 @@ int insert_ht_entry(HT_ENTRY **table, char *key, SYMBOL_ENTRY value) {
 }
 
 // Libera a memória de uma lista de argumentos
-int _free_arg_list(ARG_ENTRY *list) {
-  ARG_ENTRY *current, *next;
+int _free_arg_list(ARG_LIST *list) {
+  ARG_LIST *current, *next;
   current = list;
 
   if (current == NULL)
