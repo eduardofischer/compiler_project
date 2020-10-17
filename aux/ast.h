@@ -26,5 +26,6 @@ void exporta(void* arvore);
 
 // Cria uma entrada na tabela
 SYMBOL_ENTRY make_table_entry(LEX_VALUE valor_lexico, int entry_type, int data_type);
+SYMBOL_ENTRY make_table_entry_with_node(AST_NODE *node, int entry_type, int data_type);
 
 #endif

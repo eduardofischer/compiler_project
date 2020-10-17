@@ -139,26 +139,32 @@ type: TK_PR_INT { $$.table_entry.data_type = DT_INT; }
 literal: TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_INT);
+		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	| TK_LIT_FLOAT {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_FLOAT);	
+		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_FLOAT);
+		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);	
 	}
 	| TK_LIT_FALSE {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_BOOL);
+		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	| TK_LIT_TRUE {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_BOOL);
+		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	| TK_LIT_CHAR {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_CHAR);
+		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	| TK_LIT_STRING {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_STRING);
+		//insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
 	}
 	;
 
@@ -184,10 +190,22 @@ id: TK_IDENTIFICADOR {
 		$$.table_entry = make_table_entry($1, NOT_DEFINED, $$.ast_node->valor_lexico->ET_LITERAL_type);
 	}
 
-function_def: type id '(' parameter parameters_list ')' cmd_block { $$ = $2; add_child($$.ast_node, $7.ast_node); }
-	| type id '(' ')' cmd_block { $$ = $2; add_child($$.ast_node, $5.ast_node); }
-	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { $$ = $3; add_child($$.ast_node, $8.ast_node); }
-	| TK_PR_STATIC type id '(' ')' cmd_block { $$ = $3; add_child($$.ast_node, $6.ast_node); }
+function_def: type id '(' parameter parameters_list ')' cmd_block { 
+		$$ = $2; add_child($$.ast_node, $7.ast_node); 
+		$2.table_entry = make_table_entry_with_node($2.ast_node, ET_FUNCTION, $1.table_entry.data_type);	
+	}
+	| type id '(' ')' cmd_block { 
+			$$ = $2; add_child($$.ast_node, $5.ast_node);
+			$2.table_entry = make_table_entry_with_node($2.ast_node, ET_FUNCTION, $1.table_entry.data_type); 
+	}
+	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { 
+			$$ = $3; add_child($$.ast_node, $8.ast_node); 
+			$3.table_entry = make_table_entry_with_node($3.ast_node, ET_FUNCTION, $2.table_entry.data_type); 		
+	}
+	| TK_PR_STATIC type id '(' ')' cmd_block { 
+			$$ = $3; add_child($$.ast_node, $6.ast_node); 
+			$3.table_entry = make_table_entry_with_node($3.ast_node, ET_FUNCTION, $2.table_entry.data_type); 
+	}
 	;
 parameters_list: ',' parameter parameters_list
 	| %empty
@@ -197,8 +215,8 @@ parameter: type id { libera($2.ast_node); }
 	;
 
 // Definição dos blocos de comandos
-cmd_block_start: '{' { table_stack = new_scope(table_stack); }
-cmd_block_end: '}' { table_stack = pop(table_stack); }
+cmd_block_start: '{' {} //{ table_stack = new_scope(table_stack); }
+cmd_block_end: '}' {} //{ table_stack = pop(table_stack); }
 cmd_block: cmd_block_start command_list cmd_block_end { $$ = $2; }
 command_list: command command_list {
 		if ($1.ast_node != NULL) {
