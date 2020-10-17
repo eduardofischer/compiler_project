@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
+#include "hashtable.h"
 
 typedef struct stack_item {
   HT_ENTRY **table;
