@@ -17,6 +17,8 @@
 #define VARIABLE 1
 #define FUNCTION 2
 
+#define NOT_DEFINED 99
+
 typedef union {
   int i;
   float f;

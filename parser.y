@@ -135,12 +135,25 @@ type: TK_PR_INT
 	| TK_PR_STRING
 	;
 
-literal: TK_LIT_INT {$$.ast_node = create_node_lex_value($1);}
-	| TK_LIT_FLOAT {$$.ast_node = create_node_lex_value($1);}
-	| TK_LIT_FALSE {$$.ast_node = create_node_lex_value($1);}
-	| TK_LIT_TRUE	{$$.ast_node = create_node_lex_value($1);}
-	| TK_LIT_CHAR	{$$.ast_node = create_node_lex_value($1);}
-	| TK_LIT_STRING	{$$.ast_node = create_node_lex_value($1);}
+literal: TK_LIT_INT {$$.ast_node = create_node_lex_value($1);
+			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+				
+	}
+	| TK_LIT_FLOAT {$$.ast_node = create_node_lex_value($1);
+			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+	}
+	| TK_LIT_FALSE {$$.ast_node = create_node_lex_value($1);
+			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+	}
+	| TK_LIT_TRUE {$$.ast_node = create_node_lex_value($1);
+			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+	}
+	| TK_LIT_CHAR {$$.ast_node = create_node_lex_value($1);
+			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+	}
+	| TK_LIT_STRING {$$.ast_node = create_node_lex_value($1);
+			$$.table_entry = make_table_entry($1, LITERAL, $$.ast_node->valor_lexico->literal_type);
+	}
 	;
 
 // Declaração de variáveis globais
@@ -162,8 +175,7 @@ vector_index: id '[' expression ']' {
 id: TK_IDENTIFICADOR {
 		$$.ast_node = create_node_lex_value($1);
 
-		$$.table_entry.line = $1.line_number;
-		$$.table_entry.column = $1.col_number;
+		$$.table_entry = make_table_entry($1, NOT_DEFINED, $$.ast_node->valor_lexico->literal_type);
 	}
 
 function_def: type id '(' parameter parameters_list ')' cmd_block { $$ = $2; add_child($$.ast_node, $7.ast_node); }
