@@ -59,7 +59,7 @@ extern STACK_ITEM *table_stack;
 
 // Declaração de tipos
 %type <node> program
-%type <node> ET_LITERAL
+%type <node> literal
 %type <node> type
 %type <node> id
 %type <node> function_def
@@ -136,7 +136,7 @@ type: TK_PR_INT { $$.table_entry.data_type = DT_INT; }
 	| TK_PR_STRING { $$.table_entry.data_type = DT_STRING; }
 	;
 
-ET_LITERAL: TK_LIT_INT {
+literal: TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = make_table_entry($1, ET_LITERAL, DT_INT);
 	}
@@ -234,7 +234,7 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		add_child($$.ast_node, $5.ast_node);
 		add_child($$.ast_node, $6.ast_node);
 	}
-	| local_var_prefix type id TK_OC_LE ET_LITERAL local_list {
+	| local_var_prefix type id TK_OC_LE literal local_list {
 		$$.ast_node = create_node_lex_value($4);
 		add_child($$.ast_node, $3.ast_node);
 		add_child($$.ast_node, $5.ast_node);
@@ -253,7 +253,7 @@ local_list: ',' id local_list { $$.ast_node = NULL; libera($2.ast_node); }
 		add_child($$.ast_node, $4.ast_node); 
 		add_child($$.ast_node, $5.ast_node); 
 	}
-	| ',' id TK_OC_LE ET_LITERAL local_list { 
+	| ',' id TK_OC_LE literal local_list { 
 		$$.ast_node = create_node_lex_value($3); 
 		add_child($$.ast_node, $2.ast_node); 
 		add_child($$.ast_node, $4.ast_node); 
@@ -279,7 +279,7 @@ var_attribution: id '=' expression {
 expression: id { $$ = $1; }
 	| vector_index { $$ = $1; }
 	| function_call  { $$ = $1; }
-	| ET_LITERAL { $$ = $1; }
+	| literal { $$ = $1; }
 	| '(' expression ')'  { $$ = $2; }
 	| unary_op expression %prec UNARY {
 		$$ = $1; 
@@ -333,7 +333,7 @@ output: TK_PR_OUTPUT id {
 		$$.ast_node = create_node("output"); 
 		add_child($$.ast_node, $2.ast_node); 
 	}
-	| TK_PR_OUTPUT ET_LITERAL { 
+	| TK_PR_OUTPUT literal { 
 		$$.ast_node = create_node("output"); 
 		add_child($$.ast_node, $2.ast_node); 
 	}
