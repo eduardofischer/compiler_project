@@ -161,6 +161,16 @@ int check_is_string_op(char *label, int data_type_arg1, int data_type_arg2){
 
 }
 
+SYMBOL_ENTRY *find_table_entry(STACK_ITEM *table_stack, char *key){
+  SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, key);
+  if (entry1 == NULL)
+    throw_error(ERR_UNDECLARED, *entry1);
+  else
+  {
+    return entry1;
+  }
+}
+
 char *print_err_msg(int err, SYMBOL_ENTRY entry) {
   switch (err) {
     case ERR_UNDECLARED:

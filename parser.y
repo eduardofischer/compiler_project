@@ -400,8 +400,10 @@ var_attribution: id '=' expression {
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node); 
 
-		//check_type($1.table_entry.key, $3.table_entry);
+		check_type($1.table_entry.key, $3.table_entry);
 		
+		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry.key)->data_type;
+		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry.key)->size;
 		if($1.table_entry.data_type == DT_STRING)
 			check_string_size($1.table_entry, $3.table_entry.size);
 	}
@@ -437,9 +439,14 @@ expression: id {
 		else
 			$$.table_entry.data_type = infer_type($1.table_entry, $3.table_entry);
 
-		printf("%d\n", $$.table_entry.data_type);
-		if(check_is_string_op($2.ast_node->label, $1.table_entry.data_type, $3.table_entry.data_type)) 
+		
+		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry.key)->data_type;
+		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry.key)->data_type;
+		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry.key)->size;
+		$3.table_entry.size = find_table_entry(table_stack, $3.table_entry.key)->size;
+		if(check_is_string_op($2.ast_node->label, $1.table_entry.data_type, $3.table_entry.data_type))
 			$$.table_entry.size = $1.table_entry.size + $3.table_entry.size;
+		
 
 	}
 	| expression '?' expression ':' expression %prec TERNARY { 

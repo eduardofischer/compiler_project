@@ -42,4 +42,6 @@ int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2);
 
 void throw_error(int err, SYMBOL_ENTRY entry);
 
+SYMBOL_ENTRY *find_table_entry(STACK_ITEM *table_stack, char *key);
+
 #endif
