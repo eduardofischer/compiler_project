@@ -338,14 +338,11 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		$3.table_entry.size = assign_size_var_init($2.table_entry.data_type, $5.ast_node->valor_lexico->value);
-		insert_ht_entry(top(table_stack), $3.table_entry);
-		
-		$5.table_entry.entry_type = ET_VARIABLE;
-		$5.table_entry.data_type = $2.table_entry.data_type;
 
 		check_declared($3.table_entry);
-		check_undeclared($5.table_entry);
-		insert_ht_entry(top(table_stack), $5.table_entry);
+		check_variable($5.table_entry);
+		check_type($3.table_entry.key, $5.table_entry);
+		insert_ht_entry(top(table_stack), $3.table_entry);
 
 		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);
 	}
@@ -360,6 +357,7 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.size = assign_size_var_init($2.table_entry.data_type, $5.ast_node->valor_lexico->value);
 
 		check_declared($3.table_entry);
+		check_type($3.table_entry.key, $5.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);	
 
 		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);	
@@ -373,8 +371,7 @@ local_var_prefix: TK_PR_STATIC
 local_list: ',' id local_list { 
 		$$.ast_node = NULL;
 		libera($2.ast_node); 
-
-}
+	}
 	| ',' id TK_OC_LE id local_list { 
 		$$.ast_node = create_node_lex_value($3); 
 		add_child($$.ast_node, $2.ast_node); 
@@ -396,7 +393,7 @@ var_attribution: id '=' expression {
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node); 
 
-		check_variable($1.table_entry);
+		check_type($1.table_entry.key, $3.table_entry);
 	}
 	| vector_index '=' expression { 
 		$$.ast_node = create_node("="); 
@@ -425,7 +422,10 @@ expression: id {
 		$$.ast_node = $2.ast_node; 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node);
-		$$.table_entry.data_type = infer_type($1.table_entry, $3.table_entry);
+		if ($2.table_entry.data_type > 0)
+			$$.table_entry.data_type = $2.table_entry.data_type;
+		else
+			$$.table_entry.data_type = infer_type($1.table_entry, $3.table_entry);
 	}
 	| expression '?' expression ':' expression %prec TERNARY { 
 		$$.ast_node = create_node("?:"); 
@@ -437,10 +437,16 @@ expression: id {
 	;
 unary_op: '+' { $$.ast_node = create_node("+"); }
 	| '-' { $$.ast_node = create_node("-"); }
-	| '!' { $$.ast_node = create_node("!"); }
+	| '!' {
+		$$.ast_node = create_node("!");
+		$$.table_entry.data_type = DT_BOOL;
+	}
 	| '&' { $$.ast_node = create_node("&"); }
 	| '*' { $$.ast_node = create_node("*"); }
-	| '?' { $$.ast_node = create_node("?"); }
+	| '?' {
+		$$.ast_node = create_node("?");
+		$$.table_entry.data_type = DT_BOOL;
+	}
 	| '#' { $$.ast_node = create_node("#"); }
 	;
 binary_op: '+' { $$.ast_node = create_node("+"); }
@@ -449,16 +455,40 @@ binary_op: '+' { $$.ast_node = create_node("+"); }
 	| '/'	{ $$.ast_node = create_node("/"); }
 	| '%'	{ $$.ast_node = create_node("%"); }
 	| '^'	{ $$.ast_node = create_node("^"); }
-	| '<' { $$.ast_node = create_node("<"); }
-	| '>' { $$.ast_node = create_node(">"); }
+	| '<' { 
+		$$.ast_node = create_node("<");
+		$$.table_entry.data_type = DT_BOOL;
+	}
+	| '>' { 
+		$$.ast_node = create_node(">");
+		$$.table_entry.data_type = DT_BOOL;
+	}
 	| '|' { $$.ast_node = create_node("|"); }
 	| '&' { $$.ast_node = create_node("&"); }													
-	| TK_OC_LE { $$.ast_node = create_node_lex_value($1); }
-	| TK_OC_GE { $$.ast_node = create_node_lex_value($1); }
-	| TK_OC_EQ { $$.ast_node = create_node_lex_value($1); }
-	| TK_OC_NE { $$.ast_node = create_node_lex_value($1); }
-	| TK_OC_OR { $$.ast_node = create_node_lex_value($1); }
-	| TK_OC_AND { $$.ast_node = create_node_lex_value($1); }
+	| TK_OC_LE { 
+		$$.ast_node = create_node_lex_value($1); 
+		$$.table_entry.data_type = DT_BOOL;
+	}
+	| TK_OC_GE { 
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry.data_type = DT_BOOL; 
+	}
+	| TK_OC_EQ { 
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry.data_type = DT_BOOL; 
+	}
+	| TK_OC_NE { 
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry.data_type = DT_BOOL; 
+	}
+	| TK_OC_OR { 
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry.data_type = DT_BOOL; 
+	}
+	| TK_OC_AND { 
+		$$.ast_node = create_node_lex_value($1);
+		$$.table_entry.data_type = DT_BOOL; 
+	}
 	;
 
 // Comandos de entrada e saida
