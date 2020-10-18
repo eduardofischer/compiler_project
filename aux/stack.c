@@ -31,7 +31,7 @@ SYMBOL_ENTRY **peek(STACK_ITEM *stack, int pos) {
     
     item = item->next;
   }
-
+  
   return item->table;
 }
 
