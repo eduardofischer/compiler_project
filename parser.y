@@ -360,8 +360,8 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.size = assign_size_var_init($2.table_entry.data_type, $5.ast_node->valor_lexico->value);
 
 		check_declared($3.table_entry);
-		check_type($3.table_entry.key, $5.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);	
+		check_type($3.table_entry.key, $5.table_entry);
 
 		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);	
 	}
