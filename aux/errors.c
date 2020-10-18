@@ -5,8 +5,7 @@ extern STACK_ITEM *table_stack;
 #define MAX_SHIFT_NUMBER 16
 
 void throw_error(int err, SYMBOL_ENTRY entry) {
-	char *err_name = get_err_name(err);
-	printf("%s: %s in line %d, column %d\n", err_name, entry.key, entry.line, entry.column);
+	print_err_msg(err, entry);
 	exit(err);
 }
 
@@ -150,41 +149,57 @@ int check_is_string_op(char *label, int data_type_arg1, int data_type_arg2){
 
 }
 
-char *get_err_name(int err) {
+char *print_err_msg(int err, SYMBOL_ENTRY entry) {
   switch (err) {
     case ERR_UNDECLARED:
-      return "ERR_UNDECLARED";
+      printf("ERR_UNDECLARED: %s (line %d, column %d) is not declared.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_DECLARED:
-      return "ERR_DECLARED";
+      printf("ERR_DECLARED: %s (line %d, column %d) was already declared.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_VARIABLE:
-      return "ERR_VARIABLE";
+      printf("ERR_VARIABLE: %s (line %d, column %d) is a VARIABLE, not a FUNCTION or a VECTOR.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_VECTOR:
-      return "ERR_VECTOR";
+      printf("ERR_VECTOR: %s (line %d, column %d) is a VECTOR, not a FUNCTION or a VARIABLE.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_FUNCTION:
-      return "ERR_FUNCTION";
+      printf("ERR_FUNCTION: %s (line %d, column %d) is a FUNCTION, not a VARIABLE or a VECTOR.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_WRONG_TYPE:
-      return "ERR_WRONG_TYPE";
+      printf("ERR_WRONG_TYPE: %s (line %d, column %d) has the wrong type.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_STRING_TO_X:
-      return "ERR_STRING_TO_X";
+      printf("ERR_STRING_TO_X: %s (line %d, column %d) is a STRING and cannot be cast.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_CHAR_TO_X:
-      return "ERR_CHAR_TO_X";
+      printf("ERR_CHAR_TO_X: %s (line %d, column %d) is a CHAR and cannot be cast.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_STRING_SIZE:
-      return "ERR_STRING_SIZE";
+      printf("ERR_STRING_SIZE: String %s (line %d, column %d) has an incompatible size.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_MISSING_ARGS:
-      return "ERR_MISSING_ARGS";
+      printf("ERR_MISSING_ARGS");
+      break;
     case ERR_EXCESS_ARGS:
-      return "ERR_EXCESS_ARGS";
+      printf("ERR_EXCESS_ARGS");
+      break;
     case ERR_WRONG_TYPE_ARGS:
-      return "ERR_WRONG_TYPE_ARGS";
+      printf("ERR_WRONG_TYPE_ARGS");
+      break;
     case ERR_WRONG_PAR_INPUT:
-      return "ERR_WRONG_PAR_INPUT";
+      printf("ERR_WRONG_PAR_INPUT: %s (line %d, column %d) should be an INT or a FLOAT.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_WRONG_PAR_OUTPUT:
-      return "ERR_WRONG_PAR_OUTPUT";
+      printf("ERR_WRONG_PAR_OUTPUT: %s (line %d, column %d) should be an INT or a FLOAT.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_WRONG_PAR_RETURN:
-      return "ERR_WRONG_PAR_RETURN";
+      printf("ERR_WRONG_PAR_RETURN: %s (line %d, column %d) has the wrong return type.\n", entry.key, entry.line, entry.column);
+      break;
     case ERR_WRONG_PAR_SHIFT:
-      return "ERR_WRONG_PAR_SHIFT";
+      printf("ERR_WRONG_PAR_SHIFT: %s (line %d, column %d) não pode ser maior que 16.\n", entry.key, entry.line, entry.column);
+      break;
     default:
-      return "UNDEFINED_ERROR";
+      printf("UNDEFINED_ERROR");
   }
 }
