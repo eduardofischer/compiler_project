@@ -9,7 +9,7 @@ flex: scanner.l
 	flex scanner.l
 	
 bison: parser.y
-	bison -d parser.y
+	bison -d parser.y --report=state
 	
 aux_ast: aux/ast.c 
 	$(CC) -c aux/ast.c -g

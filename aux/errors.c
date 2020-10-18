@@ -45,6 +45,15 @@ void check_function(char *label, SYMBOL_ENTRY symbol) {
     throw_error(ERR_FUNCTION, label , symbol);
 }
 
+// void check_type(char *label, SYMBOL_ENTRY symbol) {
+//   HT_ENTRY *entry = search_all_scopes(table_stack, label);
+//   if (entry == NULL)
+//     throw_error(ERR_UNDECLARED, label , symbol);
+
+//   if (entry->value.entry_type != ET_FUNCTION)
+//     throw_error(ERR_FUNCTION, label , symbol);
+// }
+
 char *get_err_name(int err) {
   switch (err) {
     case ERR_UNDECLARED:

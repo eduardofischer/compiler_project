@@ -188,14 +188,18 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		check_declared($2.ast_node->label, $2.table_entry);
 		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);
 	}
-	| type vector_index global_list ';' { 
-		$2.table_entry.entry_type = ET_VARIABLE;
+	| type id '[' expression ']' global_list ';' { 
+		$2.table_entry.entry_type = ET_VECTOR;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
 	}
 	;
-global_list: ',' id global_list
-	| ',' vector_index global_list
+global_list: ',' id global_list {
+		$2.table_entry.entry_type = ET_VARIABLE;
+	}
+	| ',' id '[' expression ']' global_list {
+		$2.table_entry.entry_type = ET_VECTOR;
+	}
 	| %empty
 	;
 
