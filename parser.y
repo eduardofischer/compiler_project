@@ -22,7 +22,6 @@ extern STACK_ITEM *table_stack;
 %union {
 	PROD_VALUE node;
 	LEX_VALUE valor_lexico;
-	ARG_LIST *argument;
 }
 
 %token <node> TK_PR_INT
@@ -88,8 +87,9 @@ extern STACK_ITEM *table_stack;
 %type <node> conditional_if_else 
 %type <node> iterative_for_while 
 %type <node> global_var_decl
-%type <argument> parameter
-%type <argument> parameters_list
+%type <node> global_list
+%type <node> parameter
+%type <node> parameters_list
 
 // ## Associatividade e prioridade dos operadores
 
@@ -181,6 +181,16 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		check_declared($3.table_entry);	
 		insert_ht_entry(top(table_stack), $3.table_entry);
 		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);
+		// Adiciona o resto da lista de declarações na tabela de símbolos
+		ENTRY_LIST *item = $4.list, *next_item;
+		while (item != NULL) {
+			item->entry.data_type = $2.table_entry.data_type;
+			item->entry.size = assign_size($2.table_entry.data_type);
+			insert_ht_entry(top(table_stack), item->entry);
+			next_item = item->next;
+			free(item);
+			item = next_item;
+		}
 	}
 	| type id global_list ';'  { 
 		$2.table_entry.entry_type = ET_VARIABLE;
@@ -189,6 +199,16 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);
 		printf("%s tem size %d\n", $2.ast_node->label, $2.table_entry.size);
+		// Adiciona o resto da lista de declarações na tabela de símbolos
+		ENTRY_LIST *item = $3.list, *next_item;
+		while (item != NULL) {
+			item->entry.data_type = $1.table_entry.data_type;
+			item->entry.size = assign_size($1.table_entry.data_type);
+			insert_ht_entry(top(table_stack), item->entry);
+			next_item = item->next;
+			free(item);
+			item = next_item;
+		}
 	}
 	| type id '[' expression ']' global_list ';' { 
 		$2.table_entry.entry_type = ET_VECTOR;
@@ -197,17 +217,35 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);	
 		printf("%s tem size %d\n", $2.ast_node->label, $2.table_entry.size);
+		// Adiciona o resto da lista de declarações na tabela de símbolos
+		ENTRY_LIST *item = $6.list, *next_item;
+		while (item != NULL) {
+			item->entry.data_type = $1.table_entry.data_type;
+			item->entry.size = assign_size($1.table_entry.data_type);
+			insert_ht_entry(top(table_stack), item->entry);
+			next_item = item->next;
+			free(item);
+			item = next_item;
+		}
 	}
 	;
 global_list: ',' id global_list {
 		$2.table_entry.entry_type = ET_VARIABLE;
 		check_declared($2.table_entry);
+		// Preenche a lista de argumentos
+		$$.list = malloc(sizeof(ENTRY_LIST));
+		$$.list->entry = $2.table_entry;
+		$$.list->next = $3.list;
 	}
 	| ',' id '[' expression ']' global_list {
 		$2.table_entry.entry_type = ET_VECTOR;
 		check_declared($2.table_entry);
+		// Preenche a lista de argumentos
+		$$.list = malloc(sizeof(ENTRY_LIST));
+		$$.list->entry = $2.table_entry;
+		$$.list->next = $6.list;
 	}
-	| %empty
+	| %empty { $$.list = NULL; }
 	;
 
 vector_index: id '[' expression ']' {
@@ -229,8 +267,8 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$2.table_entry.entry_type = ET_FUNCTION;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 
-		$2.table_entry.arguments = $4;
-		$4->next = $5;
+		// $2.table_entry.arguments = $4;
+		// $4->next = $5;
 		
 		check_declared($2.table_entry);
 		check_return($2.table_entry, $7.table_entry.data_type);
@@ -265,19 +303,19 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 	}
 	;
 parameters_list: ',' parameter parameters_list {
-		$$ = $2;
-		$$->next = $3;
+		// $$ = $2;
+		// $$->next = $3;
 	}
-	| %empty { $$ = NULL; }
+	| %empty { }//$$ = NULL; }
 	;
 parameter: type id {
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $2.table_entry);
 
-		$$ = malloc(sizeof(ARG_LIST));
-		$$->id = $2.ast_node->label;
-		$$->type = $1.table_entry.data_type;
+		// $$ = malloc(sizeof(ARG_LIST));
+		// $$->id = $2.ast_node->label;
+		// $$->type = $1.table_entry.data_type;
 		
 		libera($2.ast_node); 	
 	}

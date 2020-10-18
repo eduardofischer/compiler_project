@@ -36,10 +36,10 @@ typedef struct lex_value {
 } LEX_VALUE;
 
 // Lista de argumentos
-typedef struct arg_entry {
-  char* id;
+typedef struct arg_list {
+  char *id;
   int type;
-  struct arg_entry *next;
+  struct arg_list *next;
 } ARG_LIST;
 
 // Entrada da tabela de símbolos
@@ -54,6 +54,12 @@ typedef struct symbol_entry {
   struct symbol_entry *next;
 } SYMBOL_ENTRY;
 
+// Lista de argumentos
+typedef struct entry_list {
+  SYMBOL_ENTRY entry;
+  struct entry_list *next;
+} ENTRY_LIST;
+
 // Nó da AST
 typedef struct ast_node {
   char *label;
@@ -65,6 +71,7 @@ typedef struct ast_node {
 typedef struct prod_value {
   AST_NODE *ast_node;
   SYMBOL_ENTRY table_entry;
+  ENTRY_LIST *list;
 } PROD_VALUE;
 
 #endif

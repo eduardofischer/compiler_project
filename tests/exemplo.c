@@ -3,9 +3,11 @@ char asf[10];
 float sadsad[3];
 char asdasd;
 
+int edu1, edu2, edu3;
+
 int main (){
   
-  float a <= 5.556;
+  float a <= edu4;
   float ab <= 121.3;
   char v;
   string sadaw <= "aaa";
@@ -16,8 +18,8 @@ int main (){
   int asd <= 12;
 
   a << 16;
-  output a;
-  a << 6;
+  output 10;
+  a<<6;
   output 10.5;
   if (a == 100) { float b <= 10.0; };
   int q;
