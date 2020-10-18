@@ -344,8 +344,8 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 
 		check_declared($3.table_entry);
 		check_variable($5.table_entry);
-		check_type($3.table_entry.key, $5.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);
+		check_type($3.table_entry.key, $5.table_entry);
 
 		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);
 	}

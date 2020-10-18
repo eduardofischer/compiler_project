@@ -24,7 +24,7 @@
 #define ERR_WRONG_PAR_RETURN 52
 #define ERR_WRONG_PAR_SHIFT  53
 
-char *get_err_name(int err);
+char *print_err_msg(int err, SYMBOL_ENTRY entry);
 
 void check_undeclared(SYMBOL_ENTRY entry);
 void check_declared(SYMBOL_ENTRY symbol);
