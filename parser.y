@@ -209,6 +209,7 @@ vector_index: id '[' expression ']' {
 		add_child($$.ast_node, $3.ast_node);
 
 		check_vector($1.ast_node->label, $1.table_entry);
+		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->value.data_type;
 	}
 
 id: TK_IDENTIFICADOR {
@@ -382,12 +383,14 @@ var_attribution: id '=' expression {
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node); 
 
-		check_undeclared($1.ast_node->label, $1.table_entry);
+		check_variable($1.ast_node->label, $1.table_entry);
 	}
 	| vector_index '=' expression { 
 		$$.ast_node = create_node("="); 
 		add_child($$.ast_node, $1.ast_node); 
-		add_child($$.ast_node, $3.ast_node); 
+		add_child($$.ast_node, $3.ast_node);
+
+		check_type($1.ast_node->label, $3.table_entry);
 	}
 	;
 	
@@ -470,7 +473,7 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($3.ast_node, $4.ast_node);
 
 		check_function($1.ast_node->label, $1.table_entry);
-
+		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->value.data_type;
 		libera($1.ast_node); 
 	}
 	| id '(' ')' { 

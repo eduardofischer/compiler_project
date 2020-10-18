@@ -45,14 +45,30 @@ void check_function(char *label, SYMBOL_ENTRY symbol) {
     throw_error(ERR_FUNCTION, label , symbol);
 }
 
-// void check_type(char *label, SYMBOL_ENTRY symbol) {
-//   HT_ENTRY *entry = search_all_scopes(table_stack, label);
-//   if (entry == NULL)
-//     throw_error(ERR_UNDECLARED, label , symbol);
+void check_type(char *label, SYMBOL_ENTRY symbol) {
+  HT_ENTRY *entry = search_all_scopes(table_stack, label);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
 
-//   if (entry->value.entry_type != ET_FUNCTION)
-//     throw_error(ERR_FUNCTION, label , symbol);
-// }
+  switch (entry->value.data_type) {
+    case DT_INT:
+    case DT_FLOAT:
+    case DT_BOOL:
+      if (symbol.data_type != DT_INT &&
+          symbol.data_type != DT_FLOAT &&
+          symbol.data_type != DT_BOOL)
+        throw_error(ERR_WRONG_TYPE, label , symbol);
+      break;
+    case DT_CHAR:
+      if (symbol.data_type != DT_CHAR)
+        throw_error(ERR_WRONG_TYPE, label , symbol);
+      break;
+    case DT_STRING:
+      if (symbol.data_type != DT_STRING)
+        throw_error(ERR_WRONG_TYPE, label, symbol);
+      break;
+  }
+}
 
 char *get_err_name(int err) {
   switch (err) {
