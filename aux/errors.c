@@ -1,9 +1,17 @@
 #include "errors.h"
 
+extern STACK_ITEM *table_stack;
+
 void throw_error(int err, char *label, SYMBOL_ENTRY entry) {
 	char *err_name = get_err_name(err);
 	printf("%s: %s na linha %d, coluna %d\n", err_name, label, entry.line, entry.column);
 	exit(err);
+}
+
+void check_undeclared(char *label, SYMBOL_ENTRY symbol) {
+  HT_ENTRY *entry = get_ht_entry(top(table_stack), label);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
 }
 
 char *get_err_name(int err) {

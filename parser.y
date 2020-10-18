@@ -419,9 +419,7 @@ input: TK_PR_INPUT id {
 		$$.ast_node = create_node("input"); 
 		add_child($$.ast_node, $2.ast_node);
 
-		HT_ENTRY *entry = get_ht_entry(top(table_stack), $2.ast_node->label);
-		if (entry == NULL)
-			throw_error(ERR_UNDECLARED, $2.ast_node->label , $2.table_entry);
+		check_undeclared($2.ast_node->label, $2.table_entry);
 	}
 	;
 output: TK_PR_OUTPUT id { 
@@ -443,8 +441,8 @@ function_call: id '(' expression arguments_list ')' {
 		libera($1.ast_node); 
 	}
 	| id '(' ')' { 
-		// TODO: $$.ast_node = create_node("call "); 
-		concat_label(&($$.ast_node->label), $1.table_entry.value.s); 
+		$$.ast_node = create_node("call "); 
+		// TODO: concat_label(&($$.ast_node->label), $1.table_entry.value.s); 
 		libera($1.ast_node); 
 	}
 	| vector_index '(' expression arguments_list ')' { 

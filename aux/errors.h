@@ -1,6 +1,11 @@
+#ifndef ERRORS_H
+#define ERRORS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "types.h"
+#include "stack.h"
+#include "hashtable.h"
 
 #define ERR_UNDECLARED       10
 #define ERR_DECLARED         11
@@ -21,4 +26,8 @@
 
 char *get_err_name(int err);
 
+void check_undeclared(char *label, SYMBOL_ENTRY entry);
+
 void throw_error(int err, char *label, SYMBOL_ENTRY entry);
+
+#endif
