@@ -9,9 +9,17 @@ void throw_error(int err, char *label, SYMBOL_ENTRY entry) {
 }
 
 void check_undeclared(char *label, SYMBOL_ENTRY symbol) {
-  HT_ENTRY *entry = get_ht_entry(top(table_stack), label);
-  if (entry == NULL)
-    throw_error(ERR_UNDECLARED, label , symbol);
+  int i = 1;
+  HT_ENTRY **table = peek(table_stack, 0);
+
+  while (table != NULL) {
+    if (get_ht_entry(table, label) != NULL)
+      return;
+    i++;
+    table = peek(table_stack, i);
+  };
+
+  throw_error(ERR_UNDECLARED, label , symbol);
 }
 
 char *get_err_name(int err) {
