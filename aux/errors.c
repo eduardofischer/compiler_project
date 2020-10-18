@@ -115,25 +115,33 @@ void check_shift(SYMBOL_ENTRY symbol, LEX_VALUE shift_value){
 }
 
 int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2) {
-  if (s1.data_type == s2.data_type)
-    return s1.data_type;
-  if ((s1.data_type == DT_FLOAT && s2.data_type == DT_INT) ||
-      (s1.data_type == DT_INT && s2.data_type == DT_FLOAT))
+  SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, s1.key);
+  SYMBOL_ENTRY *entry2 = search_all_scopes(table_stack, s2.key);
+
+  if (entry1 == NULL)
+    throw_error(ERR_UNDECLARED, *entry1);
+  if (entry2 == NULL)
+    throw_error(ERR_UNDECLARED, *entry2);
+    
+  if (entry1->data_type == entry2->data_type)
+    return entry1->data_type;
+  if ((entry1->data_type == DT_FLOAT && entry2->data_type == DT_INT) ||
+      (entry1->data_type == DT_INT && entry2->data_type == DT_FLOAT))
     return DT_FLOAT;
-  if ((s1.data_type == DT_BOOL && s2.data_type == DT_INT) ||
-      (s1.data_type == DT_INT && s2.data_type == DT_BOOL))
+  if ((entry1->data_type == DT_BOOL && entry2->data_type == DT_INT) ||
+      (entry1->data_type == DT_INT && entry2->data_type == DT_BOOL))
     return DT_INT;
-  if ((s1.data_type == DT_BOOL && s2.data_type == DT_FLOAT) ||
-      (s1.data_type == DT_FLOAT && s2.data_type == DT_BOOL))
+  if ((entry1->data_type == DT_BOOL && entry2->data_type == DT_FLOAT) ||
+      (entry1->data_type == DT_FLOAT && entry2->data_type == DT_BOOL))
     return DT_FLOAT;
-  if (s1.data_type == DT_STRING && s2.data_type != DT_STRING)
-    throw_error(ERR_STRING_TO_X, s1);
-  if (s2.data_type == DT_STRING && s1.data_type != DT_STRING)
-    throw_error(ERR_STRING_TO_X, s2);
-  if (s1.data_type == DT_CHAR && s2.data_type != DT_CHAR)
-    throw_error(ERR_CHAR_TO_X, s1);
-  if (s2.data_type == DT_CHAR && s1.data_type != DT_CHAR)
-    throw_error(ERR_CHAR_TO_X, s2);
+  if (entry1->data_type == DT_STRING && entry2->data_type != DT_STRING)
+    throw_error(ERR_STRING_TO_X, *entry1);
+  if (s2.data_type == DT_STRING && entry1->data_type != DT_STRING)
+    throw_error(ERR_STRING_TO_X, *entry2);
+  if (s1.data_type == DT_CHAR && entry2->data_type != DT_CHAR)
+    throw_error(ERR_CHAR_TO_X, *entry1);
+  if (s2.data_type == DT_CHAR && entry1->data_type != DT_CHAR)
+    throw_error(ERR_CHAR_TO_X, *entry2);
 }
 
 void check_string_size(SYMBOL_ENTRY string1, int string2_size){
@@ -201,7 +209,7 @@ char *print_err_msg(int err, SYMBOL_ENTRY entry) {
       printf("ERR_WRONG_PAR_RETURN: %s (line %d, column %d) has the wrong return type.\n", entry.key, entry.line, entry.column);
       break;
     case ERR_WRONG_PAR_SHIFT:
-      printf("ERR_WRONG_PAR_SHIFT: %s (line %d, column %d) não pode ser maior que 16.\n", entry.key, entry.line, entry.column);
+      printf("ERR_WRONG_PAR_SHIFT: Shift in %s (line %d, column %d) cannot be greater than 16.\n", entry.key, entry.line, entry.column);
       break;
     default:
       printf("UNDEFINED_ERROR");
