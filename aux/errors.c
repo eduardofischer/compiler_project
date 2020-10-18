@@ -88,6 +88,16 @@ void check_output(char *label, SYMBOL_ENTRY symbol){
     throw_error(ERR_WRONG_PAR_OUTPUT, label , symbol);
 }
 
+void check_shift(char *label, SYMBOL_ENTRY symbol, LEX_VALUE shift_value){
+  HT_ENTRY *entry = search_all_scopes(table_stack, label);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
+
+    if (shift_value.value.i > MAX_SHIFT_NUMBER)
+      throw_error(ERR_WRONG_PAR_SHIFT, label , symbol);
+
+}
+
 char *get_err_name(int err) {
   switch (err) {
     case ERR_UNDECLARED:

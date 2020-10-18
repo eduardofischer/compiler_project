@@ -34,6 +34,7 @@ void check_function(char *label, SYMBOL_ENTRY symbol);
 void check_type(char *label, SYMBOL_ENTRY symbol);
 void check_input(char *label, SYMBOL_ENTRY symbol);
 void check_output(char *label, SYMBOL_ENTRY symbol);
+void check_shift(char *label, SYMBOL_ENTRY symbol, LEX_VALUE shift_value);
 
 void throw_error(int err, char *label, SYMBOL_ENTRY entry);
 

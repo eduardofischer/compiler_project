@@ -20,6 +20,8 @@
 
 #define NOT_DEFINED 99
 
+#define MAX_SHIFT_NUMBER 16
+
 typedef union {
   int i;
   float f;

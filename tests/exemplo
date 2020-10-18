@@ -6,6 +6,7 @@ int main (){
   float a <= 5.56;
   char v;
   
+  a << 16;
   output a;
   a<<6;
   output 10.5;
@@ -13,6 +14,7 @@ int main (){
   int q;
   q = 9;
   sad(q,c,d,a);
+  a >> 20;
   test_func1(idade, nome);
   return a + c;
   test_func2[5+3](idade, nome);

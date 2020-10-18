@@ -515,6 +515,7 @@ shift_left: id TK_OC_SL TK_LIT_INT {
 		add_child($$.ast_node, create_node_lex_value($3)); 
 
 		check_undeclared($1.ast_node->label, $1.table_entry);
+		check_shift($1.ast_node->label, $1.table_entry, $3);
 	}
 	| vector_index TK_OC_SL TK_LIT_INT { 
 		$$.ast_node = create_node_lex_value($2); 
@@ -528,6 +529,7 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 		add_child($$.ast_node, create_node_lex_value($3)); 
 
 		check_undeclared($1.ast_node->label, $1.table_entry);
+		check_shift($1.ast_node->label, $1.table_entry, $3);
 	}
 	| vector_index TK_OC_SR TK_LIT_INT { 
 		$$.ast_node = create_node_lex_value($2); 
