@@ -1,8 +1,8 @@
 #include "../aux/hashtable.h"
 
 int main() {
-  HT_ENTRY **table1 = malloc(sizeof(HT_ENTRY) * HT_SIZE);
-  HT_ENTRY *entry1;
+  SYMBOL_ENTRY **table1 = malloc(sizeof(SYMBOL_ENTRY) * HT_SIZE);
+  SYMBOL_ENTRY *entry1;
 
   char key[20] = "testechave";
   SYMBOL_ENTRY s1;

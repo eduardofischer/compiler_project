@@ -3,15 +3,15 @@
 // Cria uma nova tabela de símbolos no topo da pilha
 STACK_ITEM *new_scope(STACK_ITEM *stack) {
   STACK_ITEM *item = malloc(sizeof(STACK_ITEM));
-  item->table = malloc(sizeof(HT_ENTRY) * HT_SIZE);
-  memset(item->table, 0, sizeof(HT_ENTRY) * HT_SIZE);
+  item->table = malloc(sizeof(SYMBOL_ENTRY) * HT_SIZE);
+  memset(item->table, 0, sizeof(SYMBOL_ENTRY) * HT_SIZE);
   item->next = stack;
   
   return item;
 }
 
 // Retorna a tabela de símbolos no topo da pilha
-HT_ENTRY **top(STACK_ITEM *stack) {
+SYMBOL_ENTRY **top(STACK_ITEM *stack) {
   if (stack == NULL)
     return NULL;
 
@@ -19,7 +19,7 @@ HT_ENTRY **top(STACK_ITEM *stack) {
 }
 
 // Retorna a tabela de símbolos na posição pos da pilha
-HT_ENTRY **peek(STACK_ITEM *stack, int pos) {
+SYMBOL_ENTRY **peek(STACK_ITEM *stack, int pos) {
   if (stack == NULL)
     return NULL;
 
@@ -46,9 +46,9 @@ STACK_ITEM *pop(STACK_ITEM *stack) {
 }
 
 // Procura o símbolo em todos os escopos
-HT_ENTRY *search_all_scopes(STACK_ITEM *stack, char *key) {
+SYMBOL_ENTRY *search_all_scopes(STACK_ITEM *stack, char *key) {
   STACK_ITEM *scope = stack;
-  HT_ENTRY *entry;
+  SYMBOL_ENTRY *entry;
   while (scope != NULL) {
     if ((entry = get_ht_entry(top(scope), key)) != NULL)
       return entry;
@@ -58,8 +58,8 @@ HT_ENTRY *search_all_scopes(STACK_ITEM *stack, char *key) {
 }
 
 // Procura o símbolo em todos os escopos
-HT_ENTRY *search_local_scope(STACK_ITEM *stack, char *key) {
-  HT_ENTRY *entry;
+SYMBOL_ENTRY *search_local_scope(STACK_ITEM *stack, char *key) {
+  SYMBOL_ENTRY *entry;
   // Procura o símbolo apenas no escopo atual
   if ((entry = get_ht_entry(top(stack), key)) != NULL)
     return entry;

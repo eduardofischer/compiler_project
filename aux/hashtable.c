@@ -12,9 +12,9 @@ int hash(char *key) {
 }
 
 // Recupera a entrada na hash table
-HT_ENTRY *get_ht_entry(HT_ENTRY **table, char *key) {
+SYMBOL_ENTRY *get_ht_entry(SYMBOL_ENTRY **table, char *key) {
   int index = hash(key);
-  HT_ENTRY *entry = table[index];
+  SYMBOL_ENTRY *entry = table[index];
 
   if(entry == NULL)
     return NULL;
@@ -30,16 +30,16 @@ HT_ENTRY *get_ht_entry(HT_ENTRY **table, char *key) {
 }
 
 // Insere uma entrada na hash table
-int insert_ht_entry(HT_ENTRY **table, char *key, SYMBOL_ENTRY value) {
+int insert_ht_entry(SYMBOL_ENTRY **table, char *key, SYMBOL_ENTRY value) {
   if(get_ht_entry(table, key) != NULL)
     return -1; // Entrada já existe na tabela
   
   int index = hash(key);
 
-  HT_ENTRY *new_entry = malloc(sizeof(HT_ENTRY));
+  SYMBOL_ENTRY *new_entry = malloc(sizeof(SYMBOL_ENTRY));
+  *new_entry = value;
   new_entry->key = malloc(strlen(key) + 1);
   strcpy(new_entry->key, key);
-  new_entry->value = value;
   new_entry->next = NULL;
 
   if(table[index] != NULL)
@@ -68,8 +68,8 @@ int _free_arg_list(ARG_LIST *list) {
 }
 
 // Libera a memória da hash table
-int free_ht(HT_ENTRY **table) {
-  HT_ENTRY *current, *next;
+int free_ht(SYMBOL_ENTRY **table) {
+  SYMBOL_ENTRY *current, *next;
   for (int i=0; i < HT_SIZE; i++) {
     current = table[i];
     if (current != NULL) {
@@ -77,7 +77,7 @@ int free_ht(HT_ENTRY **table) {
         next = current->next;
         if (current->key != NULL)
           free(current->key);
-        _free_arg_list(current->value.arguments);
+        _free_arg_list(current->arguments);
         free(current);
         current = next;
       } while (next != NULL);

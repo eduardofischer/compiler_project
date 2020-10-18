@@ -2,7 +2,7 @@
 
 int main() {
   STACK_ITEM *stack = new_scope(stack);
-  HT_ENTRY **table1 = top(stack);
+  SYMBOL_ENTRY **table1 = top(stack);
 
   char key1[20] = "chave1";
   SYMBOL_ENTRY s1;
@@ -16,7 +16,7 @@ int main() {
   printf("Entrada inserida na tabela na posição %d\n", index1);
 
   stack = new_scope(stack);
-  HT_ENTRY **table2 = top(stack);
+  SYMBOL_ENTRY **table2 = top(stack);
 
   char key2[20] = "chave2";
   SYMBOL_ENTRY s2;
@@ -30,12 +30,12 @@ int main() {
   int index2 = insert_ht_entry(table2, key2, s2);
   printf("Entrada inserida na tabela na posição %d\n", index2);
 
-  HT_ENTRY **t2 = top(stack);
-  HT_ENTRY *entry2 = get_ht_entry(t2, key2);
+  SYMBOL_ENTRY **t2 = top(stack);
+  SYMBOL_ENTRY *entry2 = get_ht_entry(t2, key2);
   printf("Entrada recuperada na tabela 2. Chave: %s\n", entry2->key);
   stack = pop(stack);
-  HT_ENTRY **t1 = top(stack);
-  HT_ENTRY *entry1 = get_ht_entry(t1, key1);
+  SYMBOL_ENTRY **t1 = top(stack);
+  SYMBOL_ENTRY *entry1 = get_ht_entry(t1, key1);
   printf("Entrada recuperada na tabela 1. Chave: %s\n", entry1->key);
 
   stack = pop(stack);

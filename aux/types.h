@@ -44,20 +44,15 @@ typedef struct arg_entry {
 
 // Entrada da tabela de símbolos
 typedef struct symbol_entry {
+  char *key;
   int line, column;
   int entry_type; // literal, variável, função, etc...
   int data_type; // int, float, bool, etc...
   int size;
   ARG_LIST *arguments;
   TOKEN_VAL value;
+  struct symbol_entry *next;
 } SYMBOL_ENTRY;
-
-// Lista de entradas da hash table
-typedef struct ht_entry {
-  char *key;
-  SYMBOL_ENTRY value;
-  struct ht_entry *next;
-} HT_ENTRY;
 
 // Nó da AST
 typedef struct ast_node {

@@ -209,7 +209,7 @@ vector_index: id '[' expression ']' {
 		add_child($$.ast_node, $3.ast_node);
 
 		check_vector($1.ast_node->label, $1.table_entry);
-		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->value.data_type;
+		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->data_type;
 	}
 
 id: TK_IDENTIFICADOR {
@@ -478,7 +478,7 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($3.ast_node, $4.ast_node);
 
 		check_function($1.ast_node->label, $1.table_entry);
-		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->value.data_type;
+		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->data_type;
 		libera($1.ast_node); 
 	}
 	| id '(' ')' { 
