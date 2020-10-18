@@ -4,7 +4,7 @@ int sad(int q, int c, int d, int a){
 
 int main (){
   float a <= 5.56;
-  vector[8] = 55;
+  int vector;
   
   a<<6;
   output 10.5;
