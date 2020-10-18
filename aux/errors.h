@@ -35,6 +35,8 @@ void check_type(char *label, SYMBOL_ENTRY symbol);
 void check_input(SYMBOL_ENTRY symbol);
 void check_output(SYMBOL_ENTRY symbol);
 void check_shift(SYMBOL_ENTRY symbol, LEX_VALUE shift_value);
+void check_string_size(SYMBOL_ENTRY string1, int string2_size);
+int check_is_string_op(char *label, int data_type_arg1, int data_type_arg2);
 
 int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2);
 

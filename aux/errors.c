@@ -133,6 +133,23 @@ int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2) {
     throw_error(ERR_CHAR_TO_X, s2);
 }
 
+void check_string_size(SYMBOL_ENTRY string1, int string2_size){
+  if (string2_size > string1.size){
+    throw_error(ERR_STRING_SIZE , string1);
+  }
+}
+
+int check_is_string_op(char *label, int data_type_arg1, int data_type_arg2){
+  if ( (!strcmp(label, "+")) && (data_type_arg1==DT_STRING) && (data_type_arg2==DT_STRING) ){
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+
+}
+
 char *get_err_name(int err) {
   switch (err) {
     case ERR_UNDECLARED:

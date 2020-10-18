@@ -6,9 +6,16 @@ float as[3];
 char asf[10];
 
 int main (){
-  float a <= 5.56;
+  
+  float a <= 5.556;
+  float ab <= 121.3;
   char v;
-  string sadaw;
+  string sadaw <= "aaa";
+  string xow <= "ccc";
+  string zz <= "t";
+  zz = sadaw + xow;
+
+  int asd <= 12;
 
   a << 16;
   output a;
