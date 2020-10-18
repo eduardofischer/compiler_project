@@ -233,6 +233,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$4->next = $5;
 		
 		check_declared($2.table_entry);
+		check_return($2.table_entry, $7.table_entry.data_type);
 		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
 	| type id '(' ')' cmd_block { 
@@ -241,6 +242,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$2.table_entry.data_type = $1.table_entry.data_type;
 
 		check_declared($2.table_entry);
+		check_return($2.table_entry, $5.table_entry.data_type);
 		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
 	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { 
@@ -249,6 +251,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
 		check_declared($3.table_entry);
+		check_return($3.table_entry, $8.table_entry.data_type);
 		insert_ht_entry(top(table_stack), $3.table_entry);		
 	}
 	| TK_PR_STATIC type id '(' ')' cmd_block { 
@@ -257,6 +260,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
 		check_declared($3.table_entry);
+		check_return($3.table_entry, $6.table_entry.data_type);
 		insert_ht_entry(top(table_stack), $3.table_entry); 
 	}
 	;
@@ -606,6 +610,9 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 return: TK_PR_RETURN expression { 
 		$$.ast_node = create_node("return"); 
 		add_child($$.ast_node, $2.ast_node); 
+
+		$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry.key)->data_type;
+		printf("type return - %d\n", $$.table_entry.data_type);
 	}
 break: TK_PR_BREAK { $$.ast_node = create_node("break"); }
 continue: TK_PR_CONTINUE { $$.ast_node = create_node("continue"); }

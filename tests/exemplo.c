@@ -1,9 +1,7 @@
-int sad(int q, int c, int d, int a){
-  return a+c;
-}
 int ac[20];
 char asf[10];
 float sadsad[3];
+char asdasd;
 
 int main (){
   
@@ -24,20 +22,24 @@ int main (){
   if (a == 100) { float b <= 10.0; };
   int q;
   q = 9;
-  sad(q,c,d,a);
+  
   a >> 10;
-  return a + c;
+  
   
   string taw <= "aaa";
   string txow <= "ccc";
-  string tzz <= "taa";
+  string tzz <= "taaaaaaaaaa";
   tzz = taw + txow;
 }
-  
+int sad(int q, int c, int d, int a){
+  return a+c;
+}  
 int inc(int as, int bs){
   return as+bs;
   }
-  
+static int vreas(){
+  return asdasd;
+}
 float trial(float ver){
   int a <= 4;
  	input a;

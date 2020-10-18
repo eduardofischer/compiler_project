@@ -161,6 +161,13 @@ int check_is_string_op(char *label, int data_type_arg1, int data_type_arg2){
 
 }
 
+void check_return(SYMBOL_ENTRY id, int data_type_return){
+  if (id.data_type != data_type_return){
+    throw_error(ERR_WRONG_PAR_RETURN , id);
+  }
+
+}
+
 SYMBOL_ENTRY *find_table_entry(STACK_ITEM *table_stack, char *key){
   SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, key);
   if (entry1 == NULL)
