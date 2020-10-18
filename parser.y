@@ -367,21 +367,8 @@ local_var_decl: local_var_prefix type id local_list {
 		libera($3.ast_node); 	
 		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);	
-<<<<<<< HEAD
 
 		libera($3.ast_node); 	
-=======
-		// Adiciona o resto da lista de declarações na tabela de símbolos
-		ENTRY_LIST *item = $4.list, *next_item;
-		while (item != NULL) {
-			item->entry.data_type = $2.table_entry.data_type;
-			item->entry.size = assign_size($2.table_entry.data_type);
-			insert_ht_entry(top(table_stack), item->entry);
-			next_item = item->next;
-			free(item);
-			item = next_item;
-		}
->>>>>>> Implementa declaração de variáveis locais em lista
 }
 	;
 local_var_init: local_var_prefix type id TK_OC_LE id local_list {
@@ -397,19 +384,6 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		check_variable($5.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);
 		check_type($3.table_entry.key, $5.table_entry);
-<<<<<<< HEAD
-=======
-		// Adiciona o resto da lista de declarações na tabela de símbolos
-		ENTRY_LIST *item = $6.list, *next_item;
-		while (item != NULL) {
-			item->entry.data_type = $2.table_entry.data_type;
-			item->entry.size = assign_size($2.table_entry.data_type);
-			insert_ht_entry(top(table_stack), item->entry);
-			next_item = item->next;
-			free(item);
-			item = next_item;
-		}
->>>>>>> Implementa declaração de variáveis locais em lista
 	}
 	| local_var_prefix type id TK_OC_LE literal local_list {
 		$$.ast_node = create_node_lex_value($4);
