@@ -30,16 +30,16 @@ SYMBOL_ENTRY *get_ht_entry(SYMBOL_ENTRY **table, char *key) {
 }
 
 // Insere uma entrada na hash table
-int insert_ht_entry(SYMBOL_ENTRY **table, char *key, SYMBOL_ENTRY value) {
-  if(get_ht_entry(table, key) != NULL)
+int insert_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY value) {
+  if(get_ht_entry(table, value.key) != NULL)
     return -1; // Entrada já existe na tabela
   
-  int index = hash(key);
+  int index = hash(value.key);
 
   SYMBOL_ENTRY *new_entry = malloc(sizeof(SYMBOL_ENTRY));
   *new_entry = value;
-  new_entry->key = malloc(strlen(key) + 1);
-  strcpy(new_entry->key, key);
+  new_entry->key = malloc(strlen(value.key) + 1);
+  strcpy(new_entry->key, value.key);
   new_entry->next = NULL;
 
   if(table[index] != NULL)
@@ -89,8 +89,9 @@ int free_ht(SYMBOL_ENTRY **table) {
 }
 
 // Inicializa uma entrada da tabela
-SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, int entry_type, int data_type){
+SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, char *key, int entry_type, int data_type){
 	SYMBOL_ENTRY table_entry;
+  table_entry.key = strdup(key);
 	table_entry.line = valor_lexico.line_number;
 	table_entry.column = valor_lexico.col_number;
   	table_entry.arguments = NULL;

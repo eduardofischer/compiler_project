@@ -15,7 +15,7 @@ int hash(char *key);
 SYMBOL_ENTRY *get_ht_entry(SYMBOL_ENTRY **table, char *key);
 
 // Insere uma entrada na hash table
-int insert_ht_entry(SYMBOL_ENTRY **table, char *key, SYMBOL_ENTRY value);
+int insert_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY value);
 
 // TODO: Atualiza uma entrada na hash table 
 int update_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY entry);
@@ -27,6 +27,6 @@ int remove_ht_entry(SYMBOL_ENTRY **table, char *key);
 int free_ht(SYMBOL_ENTRY **table);
 
 // Inicializa uma entrada da tabela
-SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, int entry_type, int data_type);
+SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, char *key, int entry_type, int data_type);
 
 #endif

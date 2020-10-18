@@ -143,33 +143,33 @@ type: TK_PR_INT { $$.table_entry.data_type = DT_INT; }
 
 literal: TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_INT);
-		insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
+		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_INT);
+		insert_ht_entry(top(table_stack), $$.table_entry);
 	}
 	| TK_LIT_FLOAT {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_FLOAT);
-		insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);	
+		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_FLOAT);
+		insert_ht_entry(top(table_stack), $$.table_entry);	
 	}
 	| TK_LIT_FALSE {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_BOOL);
-		insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
+		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_BOOL);
+		insert_ht_entry(top(table_stack), $$.table_entry);
 	}
 	| TK_LIT_TRUE {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_BOOL);
-		insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
+		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_BOOL);
+		insert_ht_entry(top(table_stack), $$.table_entry);
 	}
 	| TK_LIT_CHAR {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_CHAR);
-		insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
+		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_CHAR);
+		insert_ht_entry(top(table_stack), $$.table_entry);
 	}
 	| TK_LIT_STRING {
 		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry = init_table_entry($1, ET_LITERAL, DT_STRING);
-		insert_ht_entry(top(table_stack), $$.ast_node->label, $$.table_entry);
+		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_STRING);
+		insert_ht_entry(top(table_stack), $$.table_entry);
 	}
 	;
 
@@ -177,21 +177,19 @@ literal: TK_LIT_INT {
 global_var_decl: TK_PR_STATIC type id global_list ';' { 
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
-
 		check_declared($3.ast_node->label, $3.table_entry);	
-		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);
+		insert_ht_entry(top(table_stack), $3.table_entry);
 	}
 	| type id global_list ';'  { 
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
-
 		check_declared($2.ast_node->label, $2.table_entry);
-		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);
+		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
 	| type id '[' expression ']' global_list ';' { 
 		$2.table_entry.entry_type = ET_VECTOR;
 		$2.table_entry.data_type = $1.table_entry.data_type;
-		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
+		insert_ht_entry(top(table_stack), $2.table_entry);	
 	}
 	;
 global_list: ',' id global_list {
@@ -214,8 +212,7 @@ vector_index: id '[' expression ']' {
 
 id: TK_IDENTIFICADOR {
 		$$.ast_node = create_node_lex_value($1);
-
-		$$.table_entry = init_table_entry($1, NOT_DEFINED, NOT_DEFINED);
+		$$.table_entry = init_table_entry($1, $$.ast_node->label, NOT_DEFINED, NOT_DEFINED);
 	}
 
 function_def: type id '(' parameter parameters_list ')' cmd_block { 
@@ -227,7 +224,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$4->next = $5;
 		
 		check_declared($2.ast_node->label, $2.table_entry);
-		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);
+		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
 	| type id '(' ')' cmd_block { 
 		$$ = $2; add_child($$.ast_node, $5.ast_node);
@@ -235,7 +232,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$2.table_entry.data_type = $1.table_entry.data_type;
 
 		check_declared($2.ast_node->label, $2.table_entry);
-		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);
+		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
 	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { 
 		$$ = $3; add_child($$.ast_node, $8.ast_node); 
@@ -243,7 +240,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
 		check_declared($3.ast_node->label, $3.table_entry);
-		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);		
+		insert_ht_entry(top(table_stack), $3.table_entry);		
 	}
 	| TK_PR_STATIC type id '(' ')' cmd_block { 
 		$$ = $3; add_child($$.ast_node, $6.ast_node); 
@@ -251,7 +248,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
 		check_declared($3.ast_node->label, $3.table_entry);
-		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry); 
+		insert_ht_entry(top(table_stack), $3.table_entry); 
 	}
 	;
 parameters_list: ',' parameter parameters_list {
@@ -263,7 +260,7 @@ parameters_list: ',' parameter parameters_list {
 parameter: type id {
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
-		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);
+		insert_ht_entry(top(table_stack), $2.table_entry);
 
 		$$ = malloc(sizeof(ARG_LIST));
 		$$->id = $2.ast_node->label;
@@ -274,7 +271,7 @@ parameter: type id {
 	| TK_PR_CONST type id {
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
-		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);
+		insert_ht_entry(top(table_stack), $3.table_entry);
 		 
 		libera($3.ast_node);
 	}
@@ -318,7 +315,7 @@ local_var_decl: local_var_prefix type id local_list {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
 		check_declared($3.ast_node->label, $3.table_entry);
-		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);	
+		insert_ht_entry(top(table_stack), $3.table_entry);	
 
 		libera($3.ast_node); 	
 }
@@ -331,13 +328,13 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
-		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);
+		insert_ht_entry(top(table_stack), $3.table_entry);
 		
 		$5.table_entry.entry_type = ET_VARIABLE;
 		$5.table_entry.data_type = $2.table_entry.data_type;
 
 		check_declared($3.ast_node->label, $3.table_entry);
-		insert_ht_entry(top(table_stack), $5.ast_node->label, $5.table_entry);
+		insert_ht_entry(top(table_stack), $5.table_entry);
 	}
 	| local_var_prefix type id TK_OC_LE literal local_list {
 		$$.ast_node = create_node_lex_value($4);
@@ -349,7 +346,7 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
 		check_declared($3.ast_node->label, $3.table_entry);
-		insert_ht_entry(top(table_stack), $3.ast_node->label, $3.table_entry);		
+		insert_ht_entry(top(table_stack), $3.table_entry);		
 	}
 	;
 local_var_prefix: TK_PR_STATIC
