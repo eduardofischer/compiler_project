@@ -66,3 +66,16 @@ SYMBOL_ENTRY *search_local_scope(STACK_ITEM *stack, char *key) {
 
   return NULL;
 }
+
+// Injeta os argumentos da função no seu escopo
+void inject_arguments(STACK_ITEM *stack, ARG_LIST *args) {
+  ARG_LIST *current = args;
+  SYMBOL_ENTRY entry;
+  while (current != NULL) {
+    entry.key = strdup(current->id);
+    entry.data_type = current->type;
+    entry.entry_type = ET_VARIABLE;
+    insert_ht_entry(top(stack), entry);
+    current = current->next;
+  }
+}

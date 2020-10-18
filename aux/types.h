@@ -72,6 +72,7 @@ typedef struct prod_value {
   AST_NODE *ast_node;
   SYMBOL_ENTRY table_entry;
   ENTRY_LIST *list;
+  ARG_LIST *arg_list;
 } PROD_VALUE;
 
 #endif

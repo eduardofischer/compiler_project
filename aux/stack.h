@@ -30,4 +30,7 @@ SYMBOL_ENTRY *search_all_scopes(STACK_ITEM *stack, char *key);
 // Procura o símbolo em todos os escopos
 SYMBOL_ENTRY *search_local_scope(STACK_ITEM *stack, char *key);
 
+// Injeta os argumentos da função no seu escopo
+void inject_arguments(STACK_ITEM *stack, ARG_LIST *args);
+
 #endif

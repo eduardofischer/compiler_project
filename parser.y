@@ -63,6 +63,7 @@ extern STACK_ITEM *table_stack;
 %type <node> literal
 %type <node> type
 %type <node> id
+%type <node> function_def_start
 %type <node> function_def
 %type <node> cmd_block
 %type <node> command_list
@@ -262,69 +263,64 @@ id: TK_IDENTIFICADOR {
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, NOT_DEFINED, NOT_DEFINED);
 	}
 
-function_def: type id '(' parameter parameters_list ')' cmd_block { 
-		$$ = $2; add_child($$.ast_node, $7.ast_node); 
-		$2.table_entry.entry_type = ET_FUNCTION;
-		$2.table_entry.data_type = $1.table_entry.data_type;
-
-		// $2.table_entry.arguments = $4;
-		// $4->next = $5;
-		
+function_def: function_def_start command_list cmd_block_end {
+		$$ = $1;
+		add_child($$.ast_node, $2.ast_node);
+		check_return($2.table_entry, $2.table_entry.data_type);
+		insert_ht_entry(top(table_stack), $$.table_entry);
+	}
+function_def_start: type id '(' parameter parameters_list ')' cmd_block_start { 
+		$$ = $2;
+		$$.table_entry.entry_type = ET_FUNCTION;
+		$$.table_entry.data_type = $1.table_entry.data_type;
+		$$.table_entry.arguments = $4.arg_list;
+		$$.table_entry.arguments->next = $5.arg_list;
+		// Injeta os argumentos da função no seu escopo
+		inject_arguments(table_stack, $$.table_entry.arguments);
+		check_declared($$.table_entry);
+	}
+	| type id '(' ')' cmd_block_start { 
+		$$ = $2;
+		$$.table_entry.entry_type = ET_FUNCTION;
+		$$.table_entry.data_type = $1.table_entry.data_type;
+		$$.table_entry.arguments = NULL;
 		check_declared($2.table_entry);
-		check_return($2.table_entry, $7.table_entry.data_type);
-		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
-	| type id '(' ')' cmd_block { 
-		$$ = $2; add_child($$.ast_node, $5.ast_node);
-		$2.table_entry.entry_type = ET_FUNCTION;
-		$2.table_entry.data_type = $1.table_entry.data_type;
-
-		check_declared($2.table_entry);
-		check_return($2.table_entry, $5.table_entry.data_type);
-		insert_ht_entry(top(table_stack), $2.table_entry);
-	}
-	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { 
-		$$ = $3; add_child($$.ast_node, $8.ast_node); 
-		$3.table_entry.entry_type = ET_FUNCTION;
-		$3.table_entry.data_type = $2.table_entry.data_type;
-
+	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block_start { 
+		$$ = $3;
+		$$.table_entry.entry_type = ET_FUNCTION;
+		$$.table_entry.data_type = $2.table_entry.data_type;
+		$$.table_entry.arguments = $5.arg_list;
+		$$.table_entry.arguments->next = $6.arg_list;
+		// Injeta os argumentos da função no seu escopo
+		inject_arguments(table_stack, $$.table_entry.arguments);
 		check_declared($3.table_entry);
-		check_return($3.table_entry, $8.table_entry.data_type);
-		insert_ht_entry(top(table_stack), $3.table_entry);		
 	}
-	| TK_PR_STATIC type id '(' ')' cmd_block { 
-		$$ = $3; add_child($$.ast_node, $6.ast_node); 
-		$3.table_entry.entry_type = ET_FUNCTION;
-		$3.table_entry.data_type = $2.table_entry.data_type;
-
+	| TK_PR_STATIC type id '(' ')' cmd_block_start { 
+		$$ = $3;
+		$$.table_entry.entry_type = ET_FUNCTION;
+		$$.table_entry.data_type = $2.table_entry.data_type;
+		$$.table_entry.arguments = NULL;
 		check_declared($3.table_entry);
-		check_return($3.table_entry, $6.table_entry.data_type);
-		insert_ht_entry(top(table_stack), $3.table_entry); 
 	}
 	;
 parameters_list: ',' parameter parameters_list {
-		// $$ = $2;
-		// $$->next = $3;
+		$$.arg_list = $2.arg_list;
+		$$.arg_list->next = $3.arg_list;
 	}
-	| %empty { }//$$ = NULL; }
+	| %empty { $$.arg_list = NULL; }
 	;
 parameter: type id {
-		$2.table_entry.entry_type = ET_VARIABLE;
-		$2.table_entry.data_type = $1.table_entry.data_type;
-		insert_ht_entry(top(table_stack), $2.table_entry);
-
-		// $$ = malloc(sizeof(ARG_LIST));
-		// $$->id = $2.ast_node->label;
-		// $$->type = $1.table_entry.data_type;
-		
 		libera($2.ast_node); 	
+		$$.arg_list = malloc(sizeof(ARG_LIST));
+		$$.arg_list->id = strdup($2.table_entry.key);
+		$$.arg_list->type = $1.table_entry.data_type;
 	}
 	| TK_PR_CONST type id {
-		$3.table_entry.entry_type = ET_VARIABLE;
-		$3.table_entry.data_type = $2.table_entry.data_type;
-		insert_ht_entry(top(table_stack), $3.table_entry);
-		 
 		libera($3.ast_node);
+		$$.arg_list = malloc(sizeof(ARG_LIST));
+		$$.arg_list->id = strdup($3.table_entry.key);
+		$$.arg_list->type = $2.table_entry.data_type;
 	}
 	;
 
@@ -616,7 +612,7 @@ output: TK_PR_OUTPUT id {
 // Chamada de Função
 function_call: id '(' expression arguments_list ')' { 
 		$$.ast_node = create_node("call "); 
-		// TODO: concat_label(&($$.ast_node->label), $1.table_entry.value.s); 
+		concat_label(&($$.ast_node->label), $1.table_entry.key); 
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($3.ast_node, $4.ast_node);
 

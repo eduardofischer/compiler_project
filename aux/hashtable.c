@@ -113,6 +113,7 @@ int _free_arg_list(ARG_LIST *list) {
 
   do {
     next = current->next;
+    free(current->id);
     free(current);
     current = next;
   } while (next != NULL);
@@ -130,7 +131,7 @@ int free_ht(SYMBOL_ENTRY **table) {
         next = current->next;
         if (current->key != NULL)
           free(current->key);
-        _free_arg_list(current->arguments);
+        //_free_arg_list(current->arguments);
         free(current);
         current = next;
       } while (next != NULL);
