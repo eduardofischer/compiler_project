@@ -361,15 +361,27 @@ command: local_var_decl ';' { $$ = $1; }
 // Declaração de variaveis locais
 local_var_decl: local_var_prefix type id local_list { 
 		$$ = $4; 
-
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		$3.table_entry.size = assign_size($2.table_entry.data_type);
-
+		libera($3.ast_node); 	
 		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);	
+<<<<<<< HEAD
 
 		libera($3.ast_node); 	
+=======
+		// Adiciona o resto da lista de declarações na tabela de símbolos
+		ENTRY_LIST *item = $4.list, *next_item;
+		while (item != NULL) {
+			item->entry.data_type = $2.table_entry.data_type;
+			item->entry.size = assign_size($2.table_entry.data_type);
+			insert_ht_entry(top(table_stack), item->entry);
+			next_item = item->next;
+			free(item);
+			item = next_item;
+		}
+>>>>>>> Implementa declaração de variáveis locais em lista
 }
 	;
 local_var_init: local_var_prefix type id TK_OC_LE id local_list {
@@ -381,11 +393,23 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		$3.table_entry.size = assign_size_var_init($2.table_entry.data_type, $5.ast_node->valor_lexico->value);
-
 		check_declared($3.table_entry);
 		check_variable($5.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);
 		check_type($3.table_entry.key, $5.table_entry);
+<<<<<<< HEAD
+=======
+		// Adiciona o resto da lista de declarações na tabela de símbolos
+		ENTRY_LIST *item = $6.list, *next_item;
+		while (item != NULL) {
+			item->entry.data_type = $2.table_entry.data_type;
+			item->entry.size = assign_size($2.table_entry.data_type);
+			insert_ht_entry(top(table_stack), item->entry);
+			next_item = item->next;
+			free(item);
+			item = next_item;
+		}
+>>>>>>> Implementa declaração de variáveis locais em lista
 	}
 	| local_var_prefix type id TK_OC_LE literal local_list {
 		$$.ast_node = create_node_lex_value($4);
@@ -396,7 +420,6 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		$3.table_entry.size = assign_size_var_init($2.table_entry.data_type, $5.ast_node->valor_lexico->value);
-
 		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);	
 		check_type($3.table_entry.key, $5.table_entry);
@@ -408,26 +431,41 @@ local_var_prefix: TK_PR_STATIC
 	| %empty
 	;
 local_list: ',' id local_list {
-		check_declared($2.table_entry);
 		$$.ast_node = NULL;
 		libera($2.ast_node); 
+		check_declared($2.table_entry);
+		// Preenche a lista de argumentos
+		$$.list = malloc(sizeof(ENTRY_LIST));
+		$$.list->entry = $2.table_entry;
+		$$.list->next = $3.list;
 	}
 	| ',' id TK_OC_LE id local_list {
+		$$.ast_node = create_node_lex_value($3); 
+		add_child($$.ast_node, $2.ast_node); 
+		add_child($$.ast_node, $4.ast_node); 
+		add_child($$.ast_node, $5.ast_node);
 		check_declared($2.table_entry);
 		check_variable($4.table_entry);
-		$$.ast_node = create_node_lex_value($3); 
-		add_child($$.ast_node, $2.ast_node); 
-		add_child($$.ast_node, $4.ast_node); 
-		add_child($$.ast_node, $5.ast_node); 
+		// Preenche a lista de argumentos
+		$$.list = malloc(sizeof(ENTRY_LIST));
+		$$.list->entry = $2.table_entry;
+		$$.list->next = $5.list;
 	}
 	| ',' id TK_OC_LE literal local_list { 
-		check_declared($2.table_entry);
 		$$.ast_node = create_node_lex_value($3); 
 		add_child($$.ast_node, $2.ast_node); 
 		add_child($$.ast_node, $4.ast_node); 
 		add_child($$.ast_node, $5.ast_node); 
+		check_declared($2.table_entry);
+		// Preenche a lista de argumentos
+		$$.list = malloc(sizeof(ENTRY_LIST));
+		$$.list->entry = $2.table_entry;
+		$$.list->next = $5.list;
 	}
-	| %empty { $$.ast_node = NULL; }
+	| %empty {
+		$$.ast_node = NULL;
+		$$.list = NULL;
+	}
 	;
 
 // Atribuição de variavel

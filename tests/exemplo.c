@@ -3,11 +3,15 @@ char asf[10];
 float sadsad[3];
 char asdasd;
 
+<<<<<<< HEAD
 string sss[20];
 
 int edu1, edu2, edu3;
 
+=======
+>>>>>>> Implementa declaração de variáveis locais em lista
 int main (){
+  int edu1, edu2, edu3;
   
   float a <= edu3;
   float ab <= 121.3;
