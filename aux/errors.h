@@ -27,6 +27,7 @@
 char *get_err_name(int err);
 
 void check_undeclared(char *label, SYMBOL_ENTRY entry);
+void check_declared(char *label, SYMBOL_ENTRY symbol);
 
 void throw_error(int err, char *label, SYMBOL_ENTRY entry);
 

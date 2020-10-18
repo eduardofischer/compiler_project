@@ -4,20 +4,27 @@ extern STACK_ITEM *table_stack;
 
 void throw_error(int err, char *label, SYMBOL_ENTRY entry) {
 	char *err_name = get_err_name(err);
-	printf("%s: %s na linha %d, coluna %d\n", err_name, label, entry.line, entry.column);
+	printf("%s: %s in line %d, column %d\n", err_name, label, entry.line, entry.column);
 	exit(err);
 }
 
+
 void check_undeclared(char *label, SYMBOL_ENTRY symbol) {
   STACK_ITEM *scope = table_stack;
-
+  // Procura o símbolo em todos os escopos
   while (scope != NULL) {
     if (get_ht_entry(top(scope), label) != NULL)
       return;
     scope = scope->next;
   };
-
   throw_error(ERR_UNDECLARED, label , symbol);
+}
+
+void check_declared(char *label, SYMBOL_ENTRY symbol) {
+  STACK_ITEM *scope = table_stack;
+  // Procura o símbolo apenas no escopo atual
+  if (get_ht_entry(top(scope), label) != NULL)
+    throw_error(ERR_DECLARED, label , symbol);
 }
 
 char *get_err_name(int err) {

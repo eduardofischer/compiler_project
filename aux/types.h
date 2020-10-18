@@ -15,7 +15,8 @@
 // Enumeração de entry_type (entrada tabela de símbolos)
 #define ET_LITERAL 0
 #define ET_VARIABLE 1
-#define ET_FUNCTION 2
+#define ET_VECTOR 2
+#define ET_FUNCTION 3
 
 #define NOT_DEFINED 99
 
