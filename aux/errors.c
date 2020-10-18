@@ -9,14 +9,12 @@ void throw_error(int err, char *label, SYMBOL_ENTRY entry) {
 }
 
 void check_undeclared(char *label, SYMBOL_ENTRY symbol) {
-  int i = 1;
-  HT_ENTRY **table = peek(table_stack, 0);
+  STACK_ITEM *scope = table_stack;
 
-  while (table != NULL) {
-    if (get_ht_entry(table, label) != NULL)
+  while (scope != NULL) {
+    if (get_ht_entry(top(scope), label) != NULL)
       return;
-    i++;
-    table = peek(table_stack, i);
+    scope = scope->next;
   };
 
   throw_error(ERR_UNDECLARED, label , symbol);

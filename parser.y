@@ -129,7 +129,7 @@ extern STACK_ITEM *table_stack;
 root: program	 { arvore = (void*) $1.ast_node;  } 
 	;
 	
-program: global_var_decl program { $$.ast_node = NULL; }
+program: global_var_decl program { $$.ast_node = $2.ast_node; }
 	| function_def program	{ $$ = $1; add_child($$.ast_node, $2.ast_node); }
 	| %empty { $$.ast_node = NULL; }
 	;
@@ -183,7 +183,6 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
-		
 	}
 	| type vector_index global_list ';' { 
 		$2.table_entry.entry_type = ET_VARIABLE;
