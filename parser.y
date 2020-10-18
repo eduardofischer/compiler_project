@@ -194,15 +194,18 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.entry_type = ET_VECTOR;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		$2.table_entry.size = assign_size_vector($1.table_entry.data_type, $4.ast_node->valor_lexico->value);
+		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);	
 		printf("%s tem size %d\n", $2.ast_node->label, $2.table_entry.size);
 	}
 	;
 global_list: ',' id global_list {
 		$2.table_entry.entry_type = ET_VARIABLE;
+		check_declared($2.table_entry);
 	}
 	| ',' id '[' expression ']' global_list {
 		$2.table_entry.entry_type = ET_VECTOR;
+		check_declared($2.table_entry);
 	}
 	| %empty
 	;
@@ -368,17 +371,21 @@ local_var_prefix: TK_PR_STATIC
 	| TK_PR_STATIC TK_PR_CONST
 	| %empty
 	;
-local_list: ',' id local_list { 
+local_list: ',' id local_list {
+		check_declared($2.table_entry);
 		$$.ast_node = NULL;
 		libera($2.ast_node); 
 	}
-	| ',' id TK_OC_LE id local_list { 
+	| ',' id TK_OC_LE id local_list {
+		check_declared($2.table_entry);
+		check_variable($4.table_entry);
 		$$.ast_node = create_node_lex_value($3); 
 		add_child($$.ast_node, $2.ast_node); 
 		add_child($$.ast_node, $4.ast_node); 
 		add_child($$.ast_node, $5.ast_node); 
 	}
 	| ',' id TK_OC_LE literal local_list { 
+		check_declared($2.table_entry);
 		$$.ast_node = create_node_lex_value($3); 
 		add_child($$.ast_node, $2.ast_node); 
 		add_child($$.ast_node, $4.ast_node); 
