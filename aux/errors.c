@@ -25,8 +25,12 @@ void check_variable(SYMBOL_ENTRY symbol) {
   if (entry == NULL)
     throw_error(ERR_UNDECLARED, symbol);
 
-  if (entry->entry_type != ET_VARIABLE)
-    throw_error(ERR_VARIABLE, symbol);
+  if (entry->entry_type != ET_VARIABLE) {
+    if (entry->entry_type == ET_VECTOR)
+      throw_error(ERR_VECTOR, symbol);
+    if (entry->entry_type == ET_FUNCTION)
+      throw_error(ERR_FUNCTION, symbol);
+  }
 }
 
 void check_vector(SYMBOL_ENTRY symbol) {
@@ -34,8 +38,12 @@ void check_vector(SYMBOL_ENTRY symbol) {
   if (entry == NULL)
     throw_error(ERR_UNDECLARED, symbol);
 
-  if (entry->entry_type != ET_VECTOR)
-    throw_error(ERR_VECTOR, symbol);
+  if (entry->entry_type != ET_VECTOR) {
+    if (entry->entry_type == ET_VARIABLE)
+      throw_error(ERR_VARIABLE, symbol);
+    if (entry->entry_type == ET_FUNCTION)
+      throw_error(ERR_FUNCTION, symbol);
+  }
 }
 
 void check_function(SYMBOL_ENTRY symbol) {
@@ -43,8 +51,12 @@ void check_function(SYMBOL_ENTRY symbol) {
   if (entry == NULL)
     throw_error(ERR_UNDECLARED, symbol);
 
-  if (entry->entry_type != ET_FUNCTION)
-    throw_error(ERR_FUNCTION, symbol);
+  if (entry->entry_type != ET_FUNCTION) {
+    if (entry->entry_type == ET_VARIABLE)
+      throw_error(ERR_VARIABLE, symbol);
+    if (entry->entry_type == ET_VECTOR)
+      throw_error(ERR_VECTOR, symbol);
+  }
 }
 
 void check_type(char *expected_label, SYMBOL_ENTRY symbol) {
