@@ -1,5 +1,58 @@
 #include "hashtable.h"
 
+int assign_size(int data_type){
+  switch (data_type)
+  {
+  case DT_INT:
+    return 4;
+  case DT_FLOAT:
+    return 8;
+  case DT_BOOL:
+    return 1;
+  case DT_CHAR:
+    return 1;
+  case DT_STRING:
+    return 0;
+  default:
+    return NOT_DEFINED;
+  }
+}
+
+int assign_size_var_init(int data_type, TOKEN_VAL valor_lexico){
+  switch (data_type)
+  {
+  case DT_INT:
+    return 4;
+  case DT_FLOAT:
+    return 8;
+  case DT_BOOL:
+    return 1;
+  case DT_CHAR:
+    return 1;
+  case DT_STRING:
+    return 1*strlen(valor_lexico.s);
+  default:
+    return NOT_DEFINED;
+  }
+}
+
+int assign_size_vector(int data_type, TOKEN_VAL expression){
+  switch (data_type)
+  {
+  case DT_INT:
+    return 4*expression.i;
+  case DT_FLOAT:
+    return 8*expression.i;
+  case DT_BOOL:
+    return 1*expression.i;
+  case DT_CHAR:
+    return 1*expression.i;
+  case DT_STRING:
+    return 1*expression.i;
+  default:
+    return NOT_DEFINED;
+  }
+}
 // Calcula a posição de inserção na tabela com base na chave (Utiliza djb2)
 int hash(char *key) {
   unsigned int value = 5381;

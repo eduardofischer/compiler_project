@@ -1,11 +1,15 @@
 int sad(int q, int c, int d, int a){
   return a+c;
 }
+int ac[20];
+float as[3];
+char asf[10];
 
 int main (){
   float a <= 5.56;
   char v;
-  
+  string sadaw;
+
   a << 16;
   output a;
   a<<6;
@@ -14,7 +18,7 @@ int main (){
   int q;
   q = 9;
   sad(q,c,d,a);
-  a >> 20;
+  a >> 10;
   test_func1(idade, nome);
   return a + c;
   test_func2[5+3](idade, nome);
