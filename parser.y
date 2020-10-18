@@ -209,7 +209,7 @@ vector_index: id '[' expression ']' {
 		add_child($$.ast_node, $3.ast_node);
 
 		check_vector($1.ast_node->label, $1.table_entry);
-		$$.ast_node->data_type = search_all_scopes(table_stack, $1.ast_node->label)->value.data_type;
+		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->value.data_type;
 	}
 
 id: TK_IDENTIFICADOR {
@@ -406,20 +406,20 @@ expression: id {
 	| unary_op expression %prec UNARY {
 		$$.ast_node = $1.ast_node; 
 		add_child($$.ast_node, $2.ast_node);
-		$$.ast_node->data_type = $2.ast_node->data_type;
+		$$.table_entry = $2.table_entry;
 	}
 	| expression binary_op expression %prec BINARY { 
 		$$.ast_node = $2.ast_node; 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node);
-		$$.ast_node->data_type = infer_type($1.ast_node->data_type, $3.ast_node->data_type);
+		$$.table_entry.data_type = infer_type($1.table_entry, $3.table_entry);
 	}
 	| expression '?' expression ':' expression %prec TERNARY { 
 		$$.ast_node = create_node("?:"); 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($$.ast_node, $5.ast_node);
-		$$.ast_node->data_type = infer_type($3.ast_node->data_type, $5.ast_node->data_type);
+		$$.table_entry.data_type = infer_type($3.table_entry, $5.table_entry);
 	}
 	;
 unary_op: '+' { $$.ast_node = create_node("+"); }
@@ -478,7 +478,7 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($3.ast_node, $4.ast_node);
 
 		check_function($1.ast_node->label, $1.table_entry);
-		$$.ast_node->data_type = search_all_scopes(table_stack, $1.ast_node->label)->value.data_type;
+		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->value.data_type;
 		libera($1.ast_node); 
 	}
 	| id '(' ')' { 

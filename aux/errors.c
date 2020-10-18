@@ -2,6 +2,8 @@
 
 extern STACK_ITEM *table_stack;
 
+#define MAX_SHIFT_NUMBER 16
+
 void throw_error(int err, char *label, SYMBOL_ENTRY entry) {
 	char *err_name = get_err_name(err);
 	printf("%s: %s in line %d, column %d\n", err_name, label, entry.line, entry.column);
@@ -97,19 +99,26 @@ void check_shift(char *label, SYMBOL_ENTRY symbol, LEX_VALUE shift_value){
       throw_error(ERR_WRONG_PAR_SHIFT, label , symbol);
 }
 
-int infer_type(int t1, int t2) {
-  if (t1 == t2)
-    return t1;
-  if ((t1 == DT_FLOAT && t2 == DT_INT) ||
-      (t1 == DT_INT && t2 == DT_FLOAT))
+int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2) {
+  if (s1.data_type == s2.data_type)
+    return s1.data_type;
+  if ((s1.data_type == DT_FLOAT && s2.data_type == DT_INT) ||
+      (s1.data_type == DT_INT && s2.data_type == DT_FLOAT))
     return DT_FLOAT;
-  if ((t1 == DT_BOOL && t2 == DT_INT) ||
-      (t1 == DT_INT && t2 == DT_BOOL))
+  if ((s1.data_type == DT_BOOL && s2.data_type == DT_INT) ||
+      (s1.data_type == DT_INT && s2.data_type == DT_BOOL))
     return DT_INT;
-  if ((t1 == DT_BOOL && t2 == DT_FLOAT) ||
-      (t1 == DT_FLOAT && t2 == DT_BOOL))
+  if ((s1.data_type == DT_BOOL && s2.data_type == DT_FLOAT) ||
+      (s1.data_type == DT_FLOAT && s2.data_type == DT_BOOL))
     return DT_FLOAT;
-  
+  // if (s1.data_type == DT_STRING && s2.data_type != DT_STRING)
+  //   throw_error(ERR_STRING_TO_X, label , s1);
+  // if (s2.data_type == DT_STRING && s1.data_type != DT_STRING)
+  //   throw_error(ERR_STRING_TO_X, label , s2);
+  // if (s1.data_type == DT_CHAR && s2.data_type != DT_CHAR)
+  //   throw_error(ERR_CHAR_TO_X, label , s1);
+  // if (s2.data_type == DT_CHAR && s1.data_type != DT_CHAR)
+  //   throw_error(ERR_CHAR_TO_X, label , s2);
 }
 
 char *get_err_name(int err) {

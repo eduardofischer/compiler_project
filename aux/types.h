@@ -20,8 +20,6 @@
 
 #define NOT_DEFINED 99
 
-#define MAX_SHIFT_NUMBER 16
-
 typedef union {
   int i;
   float f;
@@ -64,7 +62,6 @@ typedef struct ht_entry {
 // Nó da AST
 typedef struct ast_node {
   char *label;
-  int data_type;
   LEX_VALUE *valor_lexico;
   int n_children;
   struct ast_node **children;

@@ -36,7 +36,7 @@ void check_input(char *label, SYMBOL_ENTRY symbol);
 void check_output(char *label, SYMBOL_ENTRY symbol);
 void check_shift(char *label, SYMBOL_ENTRY symbol, LEX_VALUE shift_value);
 
-int infer_type(int t1, int t2);
+int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2);
 
 void throw_error(int err, char *label, SYMBOL_ENTRY entry);
 
