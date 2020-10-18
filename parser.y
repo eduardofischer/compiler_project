@@ -5,6 +5,7 @@
 #include "aux/ast.h"
 #include "aux/hashtable.h"
 #include "aux/stack.h"
+#include "aux/errors.h"
 
 extern int line_number, column;
 
@@ -416,7 +417,11 @@ binary_op: '+' { $$.ast_node = create_node("+"); }
 // Comandos de entrada e saida
 input: TK_PR_INPUT id { 
 		$$.ast_node = create_node("input"); 
-		add_child($$.ast_node, $2.ast_node); 
+		add_child($$.ast_node, $2.ast_node);
+
+		HT_ENTRY *entry = get_ht_entry(top(table_stack), $2.ast_node->label);
+		if (entry == NULL)
+			throw_error(ERR_UNDECLARED, $2.ast_node->label , $2.table_entry);
 	}
 	;
 output: TK_PR_OUTPUT id { 
@@ -522,8 +527,7 @@ iterative_for_while: TK_PR_FOR '(' var_attribution ':' expression ':' var_attrib
 
 %%
 
-void yyerror(char const *s){
+void yyerror(char const *s) {
 	printf("%s in line %d, column %d\n", s, line_number, column);
 	exit(1);
 }
-
