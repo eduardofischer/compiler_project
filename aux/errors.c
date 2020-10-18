@@ -59,26 +59,30 @@ void check_function(SYMBOL_ENTRY symbol) {
 }
 
 void check_type(char *expected_label, SYMBOL_ENTRY symbol) {
-  SYMBOL_ENTRY *entry = search_all_scopes(table_stack, expected_label);
-  if (entry == NULL)
-    throw_error(ERR_UNDECLARED, symbol);
+  SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, expected_label);
+  SYMBOL_ENTRY *entry2 = search_all_scopes(table_stack, symbol.key);
 
-  switch (entry->data_type) {
+  if (entry1 == NULL)
+    throw_error(ERR_UNDECLARED, *entry1);
+  if (entry2 == NULL)
+    throw_error(ERR_UNDECLARED, *entry2);
+
+  switch (entry1->data_type) {
     case DT_INT:
     case DT_FLOAT:
     case DT_BOOL:
-      if (symbol.data_type != DT_INT &&
-          symbol.data_type != DT_FLOAT &&
-          symbol.data_type != DT_BOOL)
-        throw_error(ERR_WRONG_TYPE, symbol);
+      if (entry2->data_type != DT_INT &&
+          entry2->data_type != DT_FLOAT &&
+          entry2->data_type != DT_BOOL)
+        throw_error(ERR_WRONG_TYPE, *entry2);
       break;
     case DT_CHAR:
-      if (symbol.data_type != DT_CHAR)
-        throw_error(ERR_WRONG_TYPE, symbol);
+      if (entry2->data_type != DT_CHAR)
+        throw_error(ERR_WRONG_TYPE, *entry2);
       break;
     case DT_STRING:
-      if (symbol.data_type != DT_STRING)
-        throw_error(ERR_WRONG_TYPE, symbol);
+      if (entry2->data_type != DT_STRING)
+        throw_error(ERR_WRONG_TYPE, *entry2);
       break;
   }
 }
