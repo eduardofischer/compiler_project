@@ -1,7 +1,12 @@
+int sad(int q, int c, int d, int a){
+  return a+c;
+}
+
 int main (){
   float a <= 5.56;
   vector[8] = 55;
   
+  a<<6;
   output 10.5;
   if (a == 100) { float b <= 10.0; };
   int q;
@@ -17,6 +22,7 @@ int inc(int as, int bs){
   }
   
 float trial(float ver){
+  int a <= 4;
  	input a;
  	break;
  	

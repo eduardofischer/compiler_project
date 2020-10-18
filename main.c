@@ -19,6 +19,7 @@ int main (int argc, char **argv) {
   table_stack = new_scope(table_stack);
 
   int ret = yyparse();
+  
   exporta(arvore);
   libera(arvore);
   arvore = NULL;

@@ -183,6 +183,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		insert_ht_entry(top(table_stack), $2.ast_node->label, $2.table_entry);	
+		
 	}
 	| type vector_index global_list ';' { 
 		$2.table_entry.entry_type = ET_VARIABLE;
@@ -358,6 +359,8 @@ var_attribution: id '=' expression {
 		$$.ast_node = create_node("="); 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node); 
+
+		check_undeclared($1.ast_node->label, $1.table_entry);
 	}
 	| vector_index '=' expression { 
 		$$.ast_node = create_node("="); 
@@ -425,6 +428,8 @@ input: TK_PR_INPUT id {
 output: TK_PR_OUTPUT id { 
 		$$.ast_node = create_node("output"); 
 		add_child($$.ast_node, $2.ast_node); 
+
+		check_undeclared($2.ast_node->label, $2.table_entry);
 	}
 	| TK_PR_OUTPUT literal { 
 		$$.ast_node = create_node("output"); 
@@ -437,12 +442,18 @@ function_call: id '(' expression arguments_list ')' {
 		$$.ast_node = create_node("call "); 
 		// TODO: concat_label(&($$.ast_node->label), $1.table_entry.value.s); 
 		add_child($$.ast_node, $3.ast_node); 
-		add_child($3.ast_node, $4.ast_node); 
+		add_child($3.ast_node, $4.ast_node);
+
+		check_undeclared($1.ast_node->label, $1.table_entry);
+
 		libera($1.ast_node); 
 	}
 	| id '(' ')' { 
 		$$.ast_node = create_node("call "); 
 		// TODO: concat_label(&($$.ast_node->label), $1.table_entry.value.s); 
+
+		check_undeclared($1.ast_node->label, $1.table_entry);
+
 		libera($1.ast_node); 
 	}
 	| vector_index '(' expression arguments_list ')' { 
@@ -470,6 +481,8 @@ shift_left: id TK_OC_SL TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($2); 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, create_node_lex_value($3)); 
+
+		check_undeclared($1.ast_node->label, $1.table_entry);
 	}
 	| vector_index TK_OC_SL TK_LIT_INT { 
 		$$.ast_node = create_node_lex_value($2); 
@@ -481,6 +494,8 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($2); 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, create_node_lex_value($3)); 
+
+		check_undeclared($1.ast_node->label, $1.table_entry);
 	}
 	| vector_index TK_OC_SR TK_LIT_INT { 
 		$$.ast_node = create_node_lex_value($2); 
