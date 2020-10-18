@@ -70,6 +70,24 @@ void check_type(char *label, SYMBOL_ENTRY symbol) {
   }
 }
 
+void check_input(char *label, SYMBOL_ENTRY symbol){
+  HT_ENTRY *entry = search_all_scopes(table_stack, label);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
+
+  if (entry->value.data_type != DT_INT && entry->value.data_type != DT_FLOAT)
+    throw_error(ERR_WRONG_PAR_INPUT, label , symbol);
+}
+
+void check_output(char *label, SYMBOL_ENTRY symbol){
+  HT_ENTRY *entry = search_all_scopes(table_stack, label);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
+
+  if (entry->value.data_type != DT_INT && entry->value.data_type != DT_FLOAT)
+    throw_error(ERR_WRONG_PAR_OUTPUT, label , symbol);
+}
+
 char *get_err_name(int err) {
   switch (err) {
     case ERR_UNDECLARED:

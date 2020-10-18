@@ -4,8 +4,9 @@ int sad(int q, int c, int d, int a){
 
 int main (){
   float a <= 5.56;
-  int vector;
+  char v;
   
+  output a;
   a<<6;
   output 10.5;
   if (a == 100) { float b <= 10.0; };

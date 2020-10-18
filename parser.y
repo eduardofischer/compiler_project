@@ -451,6 +451,7 @@ input: TK_PR_INPUT id {
 		add_child($$.ast_node, $2.ast_node);
 
 		check_undeclared($2.ast_node->label, $2.table_entry);
+		check_input($2.ast_node->label, $2.table_entry);
 	}
 	;
 output: TK_PR_OUTPUT id { 
@@ -458,10 +459,13 @@ output: TK_PR_OUTPUT id {
 		add_child($$.ast_node, $2.ast_node); 
 
 		check_undeclared($2.ast_node->label, $2.table_entry);
+		check_output($2.ast_node->label, $2.table_entry);
 	}
 	| TK_PR_OUTPUT literal { 
 		$$.ast_node = create_node("output"); 
-		add_child($$.ast_node, $2.ast_node); 
+		add_child($$.ast_node, $2.ast_node);
+
+		check_output($2.ast_node->label, $2.table_entry); 
 	}
 	;
 	

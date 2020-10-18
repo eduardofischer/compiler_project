@@ -32,6 +32,8 @@ void check_variable(char *label, SYMBOL_ENTRY symbol);
 void check_vector(char *label, SYMBOL_ENTRY symbol);
 void check_function(char *label, SYMBOL_ENTRY symbol);
 void check_type(char *label, SYMBOL_ENTRY symbol);
+void check_input(char *label, SYMBOL_ENTRY symbol);
+void check_output(char *label, SYMBOL_ENTRY symbol);
 
 void throw_error(int err, char *label, SYMBOL_ENTRY entry);
 
