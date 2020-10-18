@@ -8,23 +8,41 @@ void throw_error(int err, char *label, SYMBOL_ENTRY entry) {
 	exit(err);
 }
 
-
 void check_undeclared(char *label, SYMBOL_ENTRY symbol) {
-  STACK_ITEM *scope = table_stack;
-  // Procura o símbolo em todos os escopos
-  while (scope != NULL) {
-    if (get_ht_entry(top(scope), label) != NULL)
-      return;
-    scope = scope->next;
-  };
-  throw_error(ERR_UNDECLARED, label , symbol);
+  if (search_all_scopes(table_stack, label) == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
 }
 
 void check_declared(char *label, SYMBOL_ENTRY symbol) {
-  STACK_ITEM *scope = table_stack;
-  // Procura o símbolo apenas no escopo atual
-  if (get_ht_entry(top(scope), label) != NULL)
+  if (search_local_scope(table_stack, label) != NULL)
     throw_error(ERR_DECLARED, label , symbol);
+}
+
+void check_variable(char *label, SYMBOL_ENTRY symbol) {
+  HT_ENTRY *entry = search_all_scopes(table_stack, label);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
+
+  if (entry->value.entry_type != ET_VARIABLE)
+    throw_error(ERR_VARIABLE, label , symbol);
+}
+
+void check_vector(char *label, SYMBOL_ENTRY symbol) {
+  HT_ENTRY *entry = search_all_scopes(table_stack, label);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
+
+  if (entry->value.entry_type != ET_VECTOR)
+    throw_error(ERR_VECTOR, label , symbol);
+}
+
+void check_function(char *label, SYMBOL_ENTRY symbol) {
+  HT_ENTRY *entry = search_all_scopes(table_stack, label);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, label , symbol);
+
+  if (entry->value.entry_type != ET_FUNCTION)
+    throw_error(ERR_FUNCTION, label , symbol);
 }
 
 char *get_err_name(int err) {

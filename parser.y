@@ -199,6 +199,8 @@ vector_index: id '[' expression ']' {
 		$$.ast_node = create_node("[]");
 		add_child($$.ast_node, $1.ast_node);
 		add_child($$.ast_node, $3.ast_node);
+
+		check_vector($1.ast_node->label, $1.table_entry);
 	}
 
 id: TK_IDENTIFICADOR {
@@ -369,7 +371,10 @@ var_attribution: id '=' expression {
 	;
 	
 // Expressões da linguagem
-expression: id { $$ = $1; }
+expression: id {
+		$$ = $1;
+		check_variable($1.ast_node->label, $1.table_entry);
+	}
 	| vector_index { $$ = $1; }
 	| function_call  { $$ = $1; }
 	| literal { $$ = $1; }
@@ -443,7 +448,7 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($3.ast_node, $4.ast_node);
 
-		check_undeclared($1.ast_node->label, $1.table_entry);
+		check_function($1.ast_node->label, $1.table_entry);
 
 		libera($1.ast_node); 
 	}

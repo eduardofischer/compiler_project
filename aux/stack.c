@@ -44,3 +44,25 @@ STACK_ITEM *pop(STACK_ITEM *stack) {
 
   return stack->next;
 }
+
+// Procura o símbolo em todos os escopos
+HT_ENTRY *search_all_scopes(STACK_ITEM *stack, char *key) {
+  STACK_ITEM *scope = stack;
+  HT_ENTRY *entry;
+  while (scope != NULL) {
+    if ((entry = get_ht_entry(top(scope), key)) != NULL)
+      return entry;
+    scope = scope->next;
+  };
+  return NULL;
+}
+
+// Procura o símbolo em todos os escopos
+HT_ENTRY *search_local_scope(STACK_ITEM *stack, char *key) {
+  HT_ENTRY *entry;
+  // Procura o símbolo apenas no escopo atual
+  if ((entry = get_ht_entry(top(stack), key)) != NULL)
+    return entry;
+
+  return NULL;
+}

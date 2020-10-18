@@ -24,4 +24,10 @@ HT_ENTRY **peek(STACK_ITEM *stack, int pos);
 // Remove e libera a tabela de símbolos no topo da pilha
 STACK_ITEM *pop(STACK_ITEM *stack);
 
+// Procura o símbolo em todos os escopos
+HT_ENTRY *search_all_scopes(STACK_ITEM *stack, char *key);
+
+// Procura o símbolo em todos os escopos
+HT_ENTRY *search_local_scope(STACK_ITEM *stack, char *key);
+
 #endif

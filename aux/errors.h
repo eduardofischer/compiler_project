@@ -28,6 +28,9 @@ char *get_err_name(int err);
 
 void check_undeclared(char *label, SYMBOL_ENTRY entry);
 void check_declared(char *label, SYMBOL_ENTRY symbol);
+void check_variable(char *label, SYMBOL_ENTRY symbol);
+void check_vector(char *label, SYMBOL_ENTRY symbol);
+void check_function(char *label, SYMBOL_ENTRY symbol);
 
 void throw_error(int err, char *label, SYMBOL_ENTRY entry);
 
