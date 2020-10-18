@@ -180,7 +180,6 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$3.table_entry.size = assign_size($2.table_entry.data_type);
 		check_declared($3.table_entry);	
 		insert_ht_entry(top(table_stack), $3.table_entry);
-		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);
 	}
 	| type id global_list ';'  { 
 		$2.table_entry.entry_type = ET_VARIABLE;
@@ -188,7 +187,6 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.size = assign_size($1.table_entry.data_type);
 		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);
-		printf("%s tem size %d\n", $2.ast_node->label, $2.table_entry.size);
 	}
 	| type id '[' expression ']' global_list ';' { 
 		$2.table_entry.entry_type = ET_VECTOR;
@@ -196,7 +194,6 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.size = assign_size_vector($1.table_entry.data_type, $4.ast_node->valor_lexico->value);
 		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);	
-		printf("%s tem size %d\n", $2.ast_node->label, $2.table_entry.size);
 	}
 	;
 global_list: ',' id global_list {
@@ -331,8 +328,6 @@ local_var_decl: local_var_prefix type id local_list {
 		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);	
 
-		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);
-
 		libera($3.ast_node); 	
 }
 	;
@@ -350,8 +345,6 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		check_variable($5.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);
 		check_type($3.table_entry.key, $5.table_entry);
-
-		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);
 	}
 	| local_var_prefix type id TK_OC_LE literal local_list {
 		$$.ast_node = create_node_lex_value($4);
@@ -366,8 +359,6 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);	
 		check_type($3.table_entry.key, $5.table_entry);
-
-		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);	
 	}
 	;
 local_var_prefix: TK_PR_STATIC
@@ -609,7 +600,6 @@ return: TK_PR_RETURN expression {
 		add_child($$.ast_node, $2.ast_node); 
 
 		$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry.key)->data_type;
-		printf("type return - %d\n", $$.table_entry.data_type);
 	}
 break: TK_PR_BREAK { $$.ast_node = create_node("break"); }
 continue: TK_PR_CONTINUE { $$.ast_node = create_node("continue"); }
