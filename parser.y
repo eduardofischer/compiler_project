@@ -452,8 +452,6 @@ var_attribution: id '=' expression {
 
 		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry.key)->data_type;
 		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry.key)->size;
-		printf("VECTOR - %d\n", $1.table_entry.data_type);
-		printf("%d\n", $1.table_entry.size);
 		if($1.table_entry.data_type == DT_STRING)
 			check_string_size($1.table_entry, $3.table_entry.size);
 	}
