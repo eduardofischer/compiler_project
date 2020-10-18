@@ -177,13 +177,13 @@ literal: TK_LIT_INT {
 global_var_decl: TK_PR_STATIC type id global_list ';' { 
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
-		check_declared($3.ast_node->label, $3.table_entry);	
+		check_declared($3.table_entry);	
 		insert_ht_entry(top(table_stack), $3.table_entry);
 	}
 	| type id global_list ';'  { 
 		$2.table_entry.entry_type = ET_VARIABLE;
 		$2.table_entry.data_type = $1.table_entry.data_type;
-		check_declared($2.ast_node->label, $2.table_entry);
+		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
 	| type id '[' expression ']' global_list ';' { 
@@ -206,7 +206,7 @@ vector_index: id '[' expression ']' {
 		add_child($$.ast_node, $1.ast_node);
 		add_child($$.ast_node, $3.ast_node);
 
-		check_vector($1.ast_node->label, $1.table_entry);
+		check_vector($1.table_entry);
 		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->data_type;
 	}
 
@@ -223,7 +223,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$2.table_entry.arguments = $4;
 		$4->next = $5;
 		
-		check_declared($2.ast_node->label, $2.table_entry);
+		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
 	| type id '(' ')' cmd_block { 
@@ -231,7 +231,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$2.table_entry.entry_type = ET_FUNCTION;
 		$2.table_entry.data_type = $1.table_entry.data_type;
 
-		check_declared($2.ast_node->label, $2.table_entry);
+		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);
 	}
 	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block { 
@@ -239,7 +239,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$3.table_entry.entry_type = ET_FUNCTION;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
-		check_declared($3.ast_node->label, $3.table_entry);
+		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);		
 	}
 	| TK_PR_STATIC type id '(' ')' cmd_block { 
@@ -247,7 +247,7 @@ function_def: type id '(' parameter parameters_list ')' cmd_block {
 		$3.table_entry.entry_type = ET_FUNCTION;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
-		check_declared($3.ast_node->label, $3.table_entry);
+		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry); 
 	}
 	;
@@ -314,7 +314,7 @@ local_var_decl: local_var_prefix type id local_list {
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
-		check_declared($3.ast_node->label, $3.table_entry);
+		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);	
 
 		libera($3.ast_node); 	
@@ -333,7 +333,7 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$5.table_entry.entry_type = ET_VARIABLE;
 		$5.table_entry.data_type = $2.table_entry.data_type;
 
-		check_declared($3.ast_node->label, $3.table_entry);
+		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $5.table_entry);
 	}
 	| local_var_prefix type id TK_OC_LE literal local_list {
@@ -345,7 +345,7 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.entry_type = ET_VARIABLE;
 		$3.table_entry.data_type = $2.table_entry.data_type;
 
-		check_declared($3.ast_node->label, $3.table_entry);
+		check_declared($3.table_entry);
 		insert_ht_entry(top(table_stack), $3.table_entry);		
 	}
 	;
@@ -380,7 +380,7 @@ var_attribution: id '=' expression {
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node); 
 
-		check_variable($1.ast_node->label, $1.table_entry);
+		check_variable($1.table_entry);
 	}
 	| vector_index '=' expression { 
 		$$.ast_node = create_node("="); 
@@ -394,7 +394,7 @@ var_attribution: id '=' expression {
 // Expressões da linguagem
 expression: id {
 		$$ = $1;
-		check_variable($1.ast_node->label, $1.table_entry);
+		check_variable($1.table_entry);
 	}
 	| vector_index { $$ = $1; }
 	| function_call  { $$ = $1; }
@@ -450,20 +450,20 @@ input: TK_PR_INPUT id {
 		$$.ast_node = create_node("input"); 
 		add_child($$.ast_node, $2.ast_node);
 
-		check_input($2.ast_node->label, $2.table_entry);
+		check_input($2.table_entry);
 	}
 	;
 output: TK_PR_OUTPUT id { 
 		$$.ast_node = create_node("output"); 
 		add_child($$.ast_node, $2.ast_node); 
 
-		check_output($2.ast_node->label, $2.table_entry);
+		check_output($2.table_entry);
 	}
 	| TK_PR_OUTPUT literal { 
 		$$.ast_node = create_node("output"); 
 		add_child($$.ast_node, $2.ast_node);
 
-		check_output($2.ast_node->label, $2.table_entry); 
+		check_output($2.table_entry); 
 	}
 	;
 	
@@ -474,7 +474,7 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($3.ast_node, $4.ast_node);
 
-		check_function($1.ast_node->label, $1.table_entry);
+		check_function($1.table_entry);
 		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->data_type;
 		libera($1.ast_node); 
 	}
@@ -482,7 +482,7 @@ function_call: id '(' expression arguments_list ')' {
 		$$.ast_node = create_node("call "); 
 		// TODO: concat_label(&($$.ast_node->label), $1.table_entry.value.s); 
 
-		check_undeclared($1.ast_node->label, $1.table_entry);
+		check_undeclared($1.table_entry);
 
 		libera($1.ast_node); 
 	}
@@ -512,8 +512,8 @@ shift_left: id TK_OC_SL TK_LIT_INT {
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, create_node_lex_value($3)); 
 
-		check_undeclared($1.ast_node->label, $1.table_entry);
-		check_shift($1.ast_node->label, $1.table_entry, $3);
+		check_undeclared($1.table_entry);
+		check_shift($1.table_entry, $3);
 	}
 	| vector_index TK_OC_SL TK_LIT_INT { 
 		$$.ast_node = create_node_lex_value($2); 
@@ -526,8 +526,8 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, create_node_lex_value($3)); 
 
-		check_undeclared($1.ast_node->label, $1.table_entry);
-		check_shift($1.ast_node->label, $1.table_entry, $3);
+		check_undeclared($1.table_entry);
+		check_shift($1.table_entry, $3);
 	}
 	| vector_index TK_OC_SR TK_LIT_INT { 
 		$$.ast_node = create_node_lex_value($2); 

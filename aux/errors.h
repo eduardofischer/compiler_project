@@ -26,18 +26,18 @@
 
 char *get_err_name(int err);
 
-void check_undeclared(char *label, SYMBOL_ENTRY entry);
-void check_declared(char *label, SYMBOL_ENTRY symbol);
-void check_variable(char *label, SYMBOL_ENTRY symbol);
-void check_vector(char *label, SYMBOL_ENTRY symbol);
-void check_function(char *label, SYMBOL_ENTRY symbol);
+void check_undeclared(SYMBOL_ENTRY entry);
+void check_declared(SYMBOL_ENTRY symbol);
+void check_variable(SYMBOL_ENTRY symbol);
+void check_vector(SYMBOL_ENTRY symbol);
+void check_function(SYMBOL_ENTRY symbol);
 void check_type(char *label, SYMBOL_ENTRY symbol);
-void check_input(char *label, SYMBOL_ENTRY symbol);
-void check_output(char *label, SYMBOL_ENTRY symbol);
-void check_shift(char *label, SYMBOL_ENTRY symbol, LEX_VALUE shift_value);
+void check_input(SYMBOL_ENTRY symbol);
+void check_output(SYMBOL_ENTRY symbol);
+void check_shift(SYMBOL_ENTRY symbol, LEX_VALUE shift_value);
 
 int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2);
 
-void throw_error(int err, char *label, SYMBOL_ENTRY entry);
+void throw_error(int err, SYMBOL_ENTRY entry);
 
 #endif
