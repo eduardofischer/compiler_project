@@ -95,7 +95,21 @@ void check_shift(char *label, SYMBOL_ENTRY symbol, LEX_VALUE shift_value){
 
     if (shift_value.value.i > MAX_SHIFT_NUMBER)
       throw_error(ERR_WRONG_PAR_SHIFT, label , symbol);
+}
 
+int infer_type(int t1, int t2) {
+  if (t1 == t2)
+    return t1;
+  if ((t1 == DT_FLOAT && t2 == DT_INT) ||
+      (t1 == DT_INT && t2 == DT_FLOAT))
+    return DT_FLOAT;
+  if ((t1 == DT_BOOL && t2 == DT_INT) ||
+      (t1 == DT_INT && t2 == DT_BOOL))
+    return DT_INT;
+  if ((t1 == DT_BOOL && t2 == DT_FLOAT) ||
+      (t1 == DT_FLOAT && t2 == DT_BOOL))
+    return DT_FLOAT;
+  
 }
 
 char *get_err_name(int err) {
