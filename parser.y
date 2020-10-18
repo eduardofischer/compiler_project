@@ -535,7 +535,7 @@ function_call: id '(' expression arguments_list ')' {
 		$$.ast_node = create_node("call "); 
 		// TODO: concat_label(&($$.ast_node->label), $1.table_entry.value.s); 
 
-		check_undeclared($1.table_entry);
+		check_function($1.table_entry);
 
 		libera($1.ast_node); 
 	}
@@ -565,7 +565,6 @@ shift_left: id TK_OC_SL TK_LIT_INT {
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, create_node_lex_value($3)); 
 
-		check_undeclared($1.table_entry);
 		check_shift($1.table_entry, $3);
 	}
 	| vector_index TK_OC_SL TK_LIT_INT { 
@@ -579,7 +578,6 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, create_node_lex_value($3)); 
 
-		check_undeclared($1.table_entry);
 		check_shift($1.table_entry, $3);
 	}
 	| vector_index TK_OC_SR TK_LIT_INT { 
