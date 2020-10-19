@@ -266,7 +266,8 @@ id: TK_IDENTIFICADOR {
 function_def: function_def_start command_list cmd_block_end {
 		$$ = $1;
 		add_child($$.ast_node, $2.ast_node);
-		check_return($2.table_entry, $2.table_entry.data_type);
+		
+		check_return($1.table_entry, $2.table_entry.data_type);
 		insert_ht_entry(top(table_stack), $$.table_entry);
 	}
 function_def_start: type id '(' parameter parameters_list ')' cmd_block_start { 
@@ -680,7 +681,7 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 return: TK_PR_RETURN expression { 
 		$$.ast_node = create_node("return"); 
 		add_child($$.ast_node, $2.ast_node); 
-
+		
 		$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry.key)->data_type;
 	}
 break: TK_PR_BREAK { $$.ast_node = create_node("break"); }

@@ -3,13 +3,10 @@ char asf[10];
 float sadsad[3];
 char asdasd;
 
-<<<<<<< HEAD
 string sss[20];
 
 int edu1, edu2, edu3;
 
-=======
->>>>>>> Implementa declaração de variáveis locais em lista
 int main (){
   int edu1, edu2, edu3;
   
@@ -37,16 +34,18 @@ int main (){
   
   
   string taw <= "aaa";
-  string txow <= "ccc";
+  string txow <= "caaaacc";
   string tzz <= "taaaaaaaaaa";
   tzz = taw + txow;
 }
-int sad(int q, int c, int d, int a){
-  return a+c;
-}  
+
 int inc(int as, int bs){
   return as+bs;
   }
+
+int sad(int q, int c, int d, int a){
+  return a+c;
+}  
 static int vreas(){
   return asdasd;
 }
