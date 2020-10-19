@@ -692,6 +692,8 @@ shift_left: id TK_OC_SL TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($2); 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, create_node_lex_value($3)); 
+
+		check_shift($1.table_entry, $3);
 	}
 	;	
 shift_right: id TK_OC_SR TK_LIT_INT { 
@@ -705,6 +707,8 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($2); 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, create_node_lex_value($3)); 
+
+		check_shift($1.table_entry, $3);
 	}
 	;
 

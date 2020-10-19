@@ -3,8 +3,20 @@ char asf[10];
 float sadsad[3];
 char asdasd;
 float testand;
+bool woa;
 
 string sss[10];
+
+int a[10];
+int f()
+{
+  int ccca, dddd;
+  ccca = 2;
+  dddd = 2;
+
+  a[10] >> 20;
+  return 0;
+}
 
 int edu1, edu2, edu3;
 
@@ -25,6 +37,11 @@ int wtfih(int ddddddd){
   return 0;
 }
 
+bool testds(){
+
+  return woa;
+}
+
 int main (int aaaaaaaa, int aaasd){
   int edu1, edu2, edu3;
   
@@ -42,6 +59,8 @@ int main (int aaaaaaaa, int aaasd){
   sss = zz + xow;
 
   int asd <= 12;
+  input a;
+
 
   inc(edu1, edu2);
   testaaa(test1,test2);
@@ -60,7 +79,7 @@ int main (int aaaaaaaa, int aaasd){
   string tzz <= "taaaaaaaaaa";
   tzz = taw + txow;
 
-  return asdasd;
+  return edu2;
 }
 
 
