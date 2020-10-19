@@ -255,6 +255,7 @@ vector_index: id '[' expression ']' {
 		add_child($$.ast_node, $3.ast_node);
 
 		check_vector($1.table_entry);
+		$$ = $1;
 		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->data_type;
 	}
 
