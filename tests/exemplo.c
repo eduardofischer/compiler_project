@@ -11,10 +11,23 @@ int edu1, edu2, edu3;
 int inc(int as, int bs){
   return as+bs;
 }
+int sdasdadsa(int another) {
+  int teste;
+  teste = 3;
 
-int main (){
+  return 1;
+}
+float testaaa(int sads, int sssasda){
+  return 10.8;
+}
+
+int wtfih(int ddddddd){
+  return 0;
+}
+
+int main (int aaaaaaaa, int aaasd){
   int edu1, edu2, edu3;
-
+  
   int test1;
   int test2;
 
@@ -31,7 +44,7 @@ int main (){
   int asd <= 12;
 
   inc(edu1, edu2);
-
+  testaaa(test1,test2);
   a << 16;
   output 10;
   a<<6;
@@ -42,12 +55,12 @@ int main (){
 
   input ab;
   a >> 10;
-  
-  
   string taw <= "aaa";
   string txow <= "caaaacc";
   string tzz <= "taaaaaaaaaa";
   tzz = taw + txow;
+
+  return asdasd;
 }
 
 
