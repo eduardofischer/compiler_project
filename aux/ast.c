@@ -99,6 +99,9 @@ char *get_label(LEX_VALUE valor_lexico) {
 
 void export_util(void* arvore, char **label_list) {
 	AST_NODE *root = (AST_NODE*) arvore;
+
+    if(root == NULL)
+    	return;
     
     int list_length = *label_list != NULL ? strlen(*label_list) : 0;
     int label_length = root->label != NULL ? strlen(root->label) : 0;

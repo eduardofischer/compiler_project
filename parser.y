@@ -266,11 +266,7 @@ id: TK_IDENTIFICADOR {
 function_def: function_def_start command_list cmd_block_end {
 		$$ = $1;
 		add_child($$.ast_node, $2.ast_node);
-		
-		
-		
-		
-		check_return($1.table_entry, $2.table_entry.data_type, $2.ast_node->label);
+		check_return($1.table_entry, $2.table_entry.data_type);
 		insert_ht_entry(top(table_stack), $$.table_entry);
 	}
 function_def_start: type id '(' parameter parameters_list ')' cmd_block_start { 
@@ -280,8 +276,8 @@ function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
 		$$.table_entry.arguments = $4.arg_list;
 		$$.table_entry.arguments->next = $5.arg_list;
 		// Injeta os argumentos da função no seu escopo
+		check_declared($2.table_entry);
 		inject_arguments(table_stack, $$.table_entry.arguments);
-		check_declared($$.table_entry);
 	}
 	| type id '(' ')' cmd_block_start { 
 		$$ = $2;
@@ -297,8 +293,8 @@ function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
 		$$.table_entry.arguments = $5.arg_list;
 		$$.table_entry.arguments->next = $6.arg_list;
 		// Injeta os argumentos da função no seu escopo
-		inject_arguments(table_stack, $$.table_entry.arguments);
 		check_declared($3.table_entry);
+		inject_arguments(table_stack, $$.table_entry.arguments);
 	}
 	| TK_PR_STATIC type id '(' ')' cmd_block_start { 
 		$$ = $3;
@@ -336,7 +332,15 @@ command_list: command command_list {
 			add_child($$.ast_node, $2.ast_node);
 		} else {
 			$$.ast_node = $2.ast_node;
-		} 
+		}
+		if ($1.table_entry.entry_type == ET_RETURN) {
+			$$.table_entry.entry_type = ET_RETURN;
+			$$.table_entry.data_type = $1.table_entry.data_type;
+		}
+		if ($2.table_entry.entry_type == ET_RETURN) {
+			$$.table_entry.entry_type = ET_RETURN;
+			$$.table_entry.data_type = $2.table_entry.data_type;
+		}
 	}
 	| %empty { $$.ast_node = NULL; }
 	;
@@ -348,7 +352,10 @@ command: local_var_decl ';' { $$ = $1; }
 	| output ';' { $$ = $1; }
 	| shift_left ';' { $$ = $1; }
 	| shift_right ';' { $$ = $1; }
-	| return ';' { $$ = $1; }
+	| return ';' {
+		$$ = $1;
+		$$.table_entry.entry_type = ET_RETURN;
+	}
 	| break';' { $$ = $1; }
 	| continue ';' { $$ = $1; }
 	| conditional_if_else ';' { $$ = $1; }
@@ -476,8 +483,8 @@ var_attribution: id '=' expression {
 
 		check_type($1.table_entry.key, $3.table_entry);
 		
-		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry.key)->data_type;
-		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry.key)->size;
+		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry)->data_type;
+		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry)->size;
 		if($1.table_entry.data_type == DT_STRING)
 			check_string_size($1.table_entry, $3.table_entry.size);
 	}
@@ -488,8 +495,8 @@ var_attribution: id '=' expression {
 
 		check_type($1.ast_node->label, $3.table_entry);
 
-		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry.key)->data_type;
-		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry.key)->size;
+		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry)->data_type;
+		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry)->size;
 		if($1.table_entry.data_type == DT_STRING)
 			check_string_size($1.table_entry, $3.table_entry.size);
 	}
@@ -518,10 +525,10 @@ expression: id {
 		else
 			$$.table_entry.data_type = infer_type($1.table_entry, $3.table_entry);
 
-		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry.key)->data_type;
-		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry.key)->data_type;
-		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry.key)->size;
-		$3.table_entry.size = find_table_entry(table_stack, $3.table_entry.key)->size;
+		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry)->data_type;
+		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry)->data_type;
+		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry)->size;
+		$3.table_entry.size = find_table_entry(table_stack, $3.table_entry)->size;
 		if(check_is_string_op($2.ast_node->label, $1.table_entry.data_type, $3.table_entry.data_type))
 			$$.table_entry.size = $1.table_entry.size + $3.table_entry.size;
 	}
@@ -619,7 +626,7 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($3.ast_node, $4.ast_node);
 		libera($1.ast_node);
 
-		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry.key)->data_type;
+		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry)->data_type;
 		check_function($1.table_entry);
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
@@ -643,7 +650,7 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($3.ast_node, $4.ast_node); 
 		libera($1.ast_node);
 
-		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry.key)->data_type;
+		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry)->data_type;
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $3.table_entry;
@@ -662,7 +669,7 @@ arguments_list: ',' expression arguments_list {
 		$$ = $2; 
 		add_child($$.ast_node, $3.ast_node); 
 		// Preenche a lista de argumentos
-		$2.table_entry.data_type = find_table_entry(table_stack, $2.table_entry.key)->data_type;
+		$2.table_entry.data_type = find_table_entry(table_stack, $2.table_entry)->data_type;
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
 		$$.list->next = $3.list;
@@ -705,8 +712,7 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 return: TK_PR_RETURN expression { 
 		$$.ast_node = create_node("return"); 
 		add_child($$.ast_node, $2.ast_node); 
-		$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry.key)->data_type;
-		
+		$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry)->data_type;
 	}
 break: TK_PR_BREAK { $$.ast_node = create_node("break"); }
 continue: TK_PR_CONTINUE { $$.ast_node = create_node("continue"); }

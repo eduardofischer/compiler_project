@@ -6,17 +6,18 @@
 #define TOKEN_TYPE_ID 2
 #define TOKEN_TYPE_LIT 3
 
-#define DT_INT 0
-#define DT_FLOAT 1
-#define DT_BOOL 2
-#define DT_CHAR 3
-#define DT_STRING 4
+#define DT_INT 100
+#define DT_FLOAT 101
+#define DT_BOOL 102
+#define DT_CHAR 103
+#define DT_STRING 104
 
 // Enumeração de entry_type (entrada tabela de símbolos)
-#define ET_LITERAL 0
-#define ET_VARIABLE 1
-#define ET_VECTOR 2
-#define ET_FUNCTION 3
+#define ET_LITERAL 200
+#define ET_VARIABLE 201
+#define ET_VECTOR 202
+#define ET_FUNCTION 203
+#define ET_RETURN 204
 
 #define NOT_DEFINED 99
 
@@ -73,6 +74,7 @@ typedef struct prod_value {
   SYMBOL_ENTRY table_entry;
   ENTRY_LIST *list;
   ARG_LIST *arg_list;
+  int block_return_type;
 } PROD_VALUE;
 
 #endif

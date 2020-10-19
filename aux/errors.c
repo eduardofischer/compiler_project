@@ -63,9 +63,9 @@ void check_type(char *expected_label, SYMBOL_ENTRY symbol) {
   SYMBOL_ENTRY *entry2 = search_all_scopes(table_stack, symbol.key);
 
   if (entry1 == NULL)
-    throw_error(ERR_UNDECLARED, *entry1);
+    throw_error(ERR_UNDECLARED, symbol);
   if (entry2 == NULL)
-    throw_error(ERR_UNDECLARED, *entry2);
+    throw_error(ERR_UNDECLARED, symbol);
 
   switch (entry1->data_type) {
     case DT_INT:
@@ -74,15 +74,15 @@ void check_type(char *expected_label, SYMBOL_ENTRY symbol) {
       if (entry2->data_type != DT_INT &&
           entry2->data_type != DT_FLOAT &&
           entry2->data_type != DT_BOOL)
-        throw_error(ERR_WRONG_TYPE, *entry2);
+        throw_error(ERR_WRONG_TYPE, symbol);
       break;
     case DT_CHAR:
       if (entry2->data_type != DT_CHAR)
-        throw_error(ERR_WRONG_TYPE, *entry2);
+        throw_error(ERR_WRONG_TYPE, symbol);
       break;
     case DT_STRING:
       if (entry2->data_type != DT_STRING)
-        throw_error(ERR_WRONG_TYPE, *entry2);
+        throw_error(ERR_WRONG_TYPE, symbol);
       break;
   }
 }
@@ -140,9 +140,9 @@ int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2) {
   SYMBOL_ENTRY *entry2 = search_all_scopes(table_stack, s2.key);
 
   if (entry1 == NULL)
-    throw_error(ERR_UNDECLARED, *entry1);
+    throw_error(ERR_UNDECLARED, s1);
   if (entry2 == NULL)
-    throw_error(ERR_UNDECLARED, *entry2);
+    throw_error(ERR_UNDECLARED, s2);
 
   if (entry1->data_type == entry2->data_type)
     return entry1->data_type;
@@ -156,13 +156,13 @@ int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2) {
       (entry1->data_type == DT_FLOAT && entry2->data_type == DT_BOOL))
     return DT_FLOAT;
   if (entry1->data_type == DT_STRING && entry2->data_type != DT_STRING)
-    throw_error(ERR_STRING_TO_X, *entry1);
+    throw_error(ERR_STRING_TO_X, s1);
   if (s2.data_type == DT_STRING && entry1->data_type != DT_STRING)
-    throw_error(ERR_STRING_TO_X, *entry2);
+    throw_error(ERR_STRING_TO_X, s2);
   if (s1.data_type == DT_CHAR && entry2->data_type != DT_CHAR)
-    throw_error(ERR_CHAR_TO_X, *entry1);
+    throw_error(ERR_CHAR_TO_X, s1);
   if (s2.data_type == DT_CHAR && entry1->data_type != DT_CHAR)
-    throw_error(ERR_CHAR_TO_X, *entry2);
+    throw_error(ERR_CHAR_TO_X, s2);
 }
 
 void check_string_size(SYMBOL_ENTRY string1, int string2_size){
@@ -181,22 +181,17 @@ int check_is_string_op(char *label, int data_type_arg1, int data_type_arg2){
   }
 }
 
-void check_return(SYMBOL_ENTRY id, int data_type_return, char *label){
-  if (!strcmp(label, "return"))
-    if (id.data_type != data_type_return){
-      throw_error(ERR_WRONG_PAR_RETURN , id);
-    }
-  else
-  {
-    return;
+void check_return(SYMBOL_ENTRY symbol, int data_type_return){
+  if (symbol.data_type != data_type_return){
+    throw_error(ERR_WRONG_PAR_RETURN , symbol);
   }
     
 }
 
-SYMBOL_ENTRY *find_table_entry(STACK_ITEM *table_stack, char *key){
-  SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, key);
+SYMBOL_ENTRY *find_table_entry(STACK_ITEM *table_stack, SYMBOL_ENTRY symbol) {
+  SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, symbol.key);
   if (entry1 == NULL)
-    throw_error(ERR_UNDECLARED, *entry1);
+    throw_error(ERR_UNDECLARED, symbol);
   else
   {
     return entry1;
