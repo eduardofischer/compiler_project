@@ -181,7 +181,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$3.table_entry.size = assign_size($2.table_entry.data_type);
 		check_declared($3.table_entry);	
 		insert_ht_entry(top(table_stack), $3.table_entry);
-		printf("%s tem size %d\n", $3.ast_node->label, $3.table_entry.size);
+		
 		// Adiciona o resto da lista de declarações na tabela de símbolos
 		ENTRY_LIST *item = $4.list, *next_item;
 		while (item != NULL) {
@@ -199,7 +199,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.size = assign_size($1.table_entry.data_type);
 		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);
-		printf("%s tem size %d\n", $2.ast_node->label, $2.table_entry.size);
+		
 		// Adiciona o resto da lista de declarações na tabela de símbolos
 		ENTRY_LIST *item = $3.list, *next_item;
 		while (item != NULL) {
@@ -217,7 +217,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.size = assign_size_vector($1.table_entry.data_type, $4.ast_node->valor_lexico->value);
 		check_declared($2.table_entry);
 		insert_ht_entry(top(table_stack), $2.table_entry);	
-		printf("%s tem size %d\n", $2.ast_node->label, $2.table_entry.size);
+		
 		// Adiciona o resto da lista de declarações na tabela de símbolos
 		ENTRY_LIST *item = $6.list, *next_item;
 		while (item != NULL) {
