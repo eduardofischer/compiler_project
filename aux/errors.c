@@ -87,6 +87,27 @@ void check_type(char *expected_label, SYMBOL_ENTRY symbol) {
   }
 }
 
+void check_args(SYMBOL_ENTRY symbol, ENTRY_LIST *args) {
+  SYMBOL_ENTRY *entry = search_all_scopes(table_stack, symbol.key);
+  if (entry == NULL)
+    throw_error(ERR_UNDECLARED, symbol);
+  ARG_LIST *expected = entry->arguments;
+  ENTRY_LIST *item = args, *next_item;
+  while (expected != NULL) {
+    if (item == NULL)
+      throw_error(ERR_MISSING_ARGS, symbol);
+    if (expected->type != item->entry.data_type)
+      throw_error(ERR_WRONG_TYPE_ARGS, symbol);
+
+    expected = expected->next;
+    next_item = item->next;
+    free(item);
+    item = next_item;
+  }
+  if (item != NULL)
+    throw_error(ERR_EXCESS_ARGS, symbol);
+}
+
 void check_input(SYMBOL_ENTRY symbol){
   SYMBOL_ENTRY *entry = search_all_scopes(table_stack, symbol.key);
   if (entry == NULL)
@@ -122,7 +143,7 @@ int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2) {
     throw_error(ERR_UNDECLARED, *entry1);
   if (entry2 == NULL)
     throw_error(ERR_UNDECLARED, *entry2);
-    
+
   if (entry1->data_type == entry2->data_type)
     return entry1->data_type;
   if ((entry1->data_type == DT_FLOAT && entry2->data_type == DT_INT) ||
@@ -206,13 +227,13 @@ char *print_err_msg(int err, SYMBOL_ENTRY entry) {
       printf("ERR_STRING_SIZE: String %s (line %d, column %d) has an incompatible size.\n", entry.key, entry.line, entry.column);
       break;
     case ERR_MISSING_ARGS:
-      printf("ERR_MISSING_ARGS");
+      printf("ERR_MISSING_ARGS: Function %s (line %d, column %d) has missing arguments.\n", entry.key, entry.line, entry.column);
       break;
     case ERR_EXCESS_ARGS:
-      printf("ERR_EXCESS_ARGS");
+      printf("ERR_EXCESS_ARGS: Function %s (line %d, column %d) has too many arguments.\n", entry.key, entry.line, entry.column);
       break;
     case ERR_WRONG_TYPE_ARGS:
-      printf("ERR_WRONG_TYPE_ARGS");
+      printf("ERR_WRONG_TYPE_ARGS: Function %s (line %d, column %d) arguments types does not match.\n", entry.key, entry.line, entry.column);
       break;
     case ERR_WRONG_PAR_INPUT:
       printf("ERR_WRONG_PAR_INPUT: %s (line %d, column %d) should be an INT or a FLOAT.\n", entry.key, entry.line, entry.column);

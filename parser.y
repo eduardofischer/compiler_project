@@ -304,7 +304,6 @@ function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
 		$$.table_entry.arguments = NULL;
 		check_declared($3.table_entry);
 	}
-	;
 parameters_list: ',' parameter parameters_list {
 		$$.arg_list = $2.arg_list;
 		$$.arg_list->next = $3.arg_list;
@@ -323,7 +322,6 @@ parameter: type id {
 		$$.arg_list->id = strdup($3.table_entry.key);
 		$$.arg_list->type = $2.table_entry.data_type;
 	}
-	;
 
 // Definição dos blocos de comandos
 cmd_block_start: '{' { table_stack = new_scope(table_stack); }
@@ -375,7 +373,7 @@ local_var_decl: local_var_prefix type id local_list {
 			item = next_item;
 		}
 }
-	;
+
 local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$$.ast_node = create_node_lex_value($4);
 		add_child($$.ast_node, $3.ast_node);
@@ -423,7 +421,7 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 			item = next_item;
 		}
 	}
-	;
+
 local_var_prefix: TK_PR_STATIC
 	| TK_PR_CONST
 	| TK_PR_STATIC TK_PR_CONST
@@ -616,37 +614,56 @@ function_call: id '(' expression arguments_list ')' {
 		concat_label(&($$.ast_node->label), $1.table_entry.key); 
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($3.ast_node, $4.ast_node);
+		libera($1.ast_node);
 
 		check_function($1.table_entry);
-		$$.table_entry.data_type = search_all_scopes(table_stack, $1.ast_node->label)->data_type;
-		libera($1.ast_node); 
+		// Preenche a lista de argumentos
+		$$.list = malloc(sizeof(ENTRY_LIST));
+		$$.list->entry = $3.table_entry;
+		$$.list->next = $4.list;
+		check_args($1.table_entry, $$.list);
+		$$.table_entry.data_type = search_all_scopes(table_stack, $1.table_entry.key)->data_type;
 	}
 	| id '(' ')' { 
 		$$.ast_node = create_node("call "); 
-		// TODO: concat_label(&($$.ast_node->label), $1.table_entry.value.s); 
-
-		check_function($1.table_entry);
-
+		concat_label(&($$.ast_node->label), $1.table_entry.key); 
 		libera($1.ast_node); 
+		check_function($1.table_entry);
+		check_args($1.table_entry, NULL);
 	}
 	| vector_index '(' expression arguments_list ')' { 
 		$$.ast_node = create_node("call "); 
 		// TODO: concat_label(&($$.ast_node->label), $1.ast_node->children[0]->label); 
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($3.ast_node, $4.ast_node); 
-		libera($1.ast_node); 
+		libera($1.ast_node);
+
+		// Preenche a lista de argumentos
+		$$.list = malloc(sizeof(ENTRY_LIST));
+		$$.list->entry = $3.table_entry;
+		$$.list->next = $4.list;
+		check_args($1.table_entry, $$.list);
+		$$.table_entry.data_type = search_all_scopes(table_stack, $1.table_entry.key)->data_type;
 	}
 	| vector_index '(' ')' { 
 		$$.ast_node = create_node("call "); 
 		// TODO: concat_label(&($$.ast_node->label), $1.ast_node->children[0]->label); 
 		libera($1.ast_node); 
+		check_args($1.table_entry, NULL);
 	}
 	;
 arguments_list: ',' expression arguments_list { 
 		$$ = $2; 
 		add_child($$.ast_node, $3.ast_node); 
+		// Preenche a lista de argumentos
+		$$.list = malloc(sizeof(ENTRY_LIST));
+		$$.list->entry = $2.table_entry;
+		$$.list->next = $3.list;
 	}
-	| %empty { $$.ast_node = NULL; }
+	| %empty {
+		$$.ast_node = NULL;
+		$$.list = NULL;
+	}
 	;
 
 // Comandos de shift
@@ -681,7 +698,6 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 return: TK_PR_RETURN expression { 
 		$$.ast_node = create_node("return"); 
 		add_child($$.ast_node, $2.ast_node); 
-		
 		$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry.key)->data_type;
 	}
 break: TK_PR_BREAK { $$.ast_node = create_node("break"); }

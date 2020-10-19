@@ -32,6 +32,7 @@ void check_variable(SYMBOL_ENTRY symbol);
 void check_vector(SYMBOL_ENTRY symbol);
 void check_function(SYMBOL_ENTRY symbol);
 void check_type(char *label, SYMBOL_ENTRY symbol);
+void check_args(SYMBOL_ENTRY symbol, ENTRY_LIST *args);
 void check_input(SYMBOL_ENTRY symbol);
 void check_output(SYMBOL_ENTRY symbol);
 void check_shift(SYMBOL_ENTRY symbol, LEX_VALUE shift_value);
