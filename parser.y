@@ -616,11 +616,13 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($3.ast_node, $4.ast_node);
 		libera($1.ast_node);
 
+		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry.key)->data_type;
 		check_function($1.table_entry);
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $3.table_entry;
 		$$.list->next = $4.list;
+		
 		check_args($1.table_entry, $$.list);
 		$$.table_entry.data_type = search_all_scopes(table_stack, $1.table_entry.key)->data_type;
 	}
@@ -638,6 +640,7 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($3.ast_node, $4.ast_node); 
 		libera($1.ast_node);
 
+		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry.key)->data_type;
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $3.table_entry;
@@ -656,6 +659,7 @@ arguments_list: ',' expression arguments_list {
 		$$ = $2; 
 		add_child($$.ast_node, $3.ast_node); 
 		// Preenche a lista de argumentos
+		$2.table_entry.data_type = find_table_entry(table_stack, $2.table_entry.key)->data_type;
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
 		$$.list->next = $3.list;

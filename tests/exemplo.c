@@ -8,8 +8,15 @@ string sss[10];
 
 int edu1, edu2, edu3;
 
+int inc(int as, int bs){
+  return as+bs;
+}
+
 int main (){
   int edu1, edu2, edu3;
+
+  int test1;
+  int test2;
 
   float a <= edu3;
   float ab <= 121.3;
@@ -22,6 +29,8 @@ int main (){
   sss = zz + xow;
 
   int asd <= 12;
+
+  inc(edu1, edu2);
 
   a << 16;
   output 10;
@@ -41,9 +50,7 @@ int main (){
   tzz = taw + txow;
 }
 
-int inc(int as, int bs){
-  return as+bs;
-  }
+
 
 int sad(int q, int c, int d, int a){
   return a+c;
