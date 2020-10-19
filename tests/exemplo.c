@@ -2,20 +2,21 @@ int ac[20];
 char asf[10];
 float sadsad[3];
 char asdasd;
+float testand;
 
-string sss[20];
+string sss[10];
 
 int edu1, edu2, edu3;
 
 int main (){
   int edu1, edu2, edu3;
-  
+
   float a <= edu3;
   float ab <= 121.3;
   char v;
   string sadaw <= "aaa";
   string xow <= "ccc";
-  string zz <= "taaaaaaa";
+  string zz <= "taaaaaa";
   zz = sadaw + xow;
 
   sss = zz + xow;
@@ -25,11 +26,12 @@ int main (){
   a << 16;
   output 10;
   a<<6;
-  output 10.5;
+  output ab;
   if (a == 100) { float b <= 10.0; };
   int q;
   q = 9;
-  
+
+  input ab;
   a >> 10;
   
   
@@ -46,12 +48,6 @@ int inc(int as, int bs){
 int sad(int q, int c, int d, int a){
   return a+c;
 }  
-static int vreas(){
-  return asdasd;
+float ddd(float kkk){
+  return testand;
 }
-float trial(float ver){
-  int a <= 4;
- 	input a;
- 	break;
- 	
- }
