@@ -67,6 +67,11 @@ void check_type(char *expected_label, SYMBOL_ENTRY symbol) {
   if (entry2 == NULL)
     throw_error(ERR_UNDECLARED, symbol);
 
+  if (entry1->entry_type == ET_FUNCTION && entry2->entry_type != ET_FUNCTION)
+    throw_error(ERR_FUNCTION, *entry1);
+  else if (entry1->entry_type == ET_VECTOR && entry2->entry_type != ET_VECTOR)
+    throw_error(ERR_VECTOR, *entry1);
+
   switch (entry1->data_type) {
     case DT_INT:
     case DT_FLOAT:
@@ -96,8 +101,26 @@ void check_args(SYMBOL_ENTRY symbol, ENTRY_LIST *args) {
   while (expected != NULL) {
     if (item == NULL)
       throw_error(ERR_MISSING_ARGS, symbol);
-    if (expected->type != item->entry.data_type)
-      throw_error(ERR_WRONG_TYPE_ARGS, symbol);
+    if (expected->type != item->entry.data_type) {
+      switch (expected->type) {
+        case DT_INT:
+        case DT_FLOAT:
+        case DT_BOOL:
+          if (item->entry.data_type != DT_INT &&
+              item->entry.data_type != DT_FLOAT &&
+              item->entry.data_type != DT_BOOL)
+            throw_error(ERR_WRONG_TYPE_ARGS, symbol);
+          break;
+        case DT_CHAR:
+          if (item->entry.data_type != DT_CHAR)
+            throw_error(ERR_WRONG_TYPE_ARGS, symbol);
+          break;
+        case DT_STRING:
+          if (item->entry.data_type != DT_STRING)
+            throw_error(ERR_WRONG_TYPE_ARGS, symbol);
+          break;
+      }
+    }
 
     expected = expected->next;
     next_item = item->next;
@@ -157,11 +180,11 @@ int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2) {
     return DT_FLOAT;
   if (entry1->data_type == DT_STRING && entry2->data_type != DT_STRING)
     throw_error(ERR_STRING_TO_X, s1);
-  if (s2.data_type == DT_STRING && entry1->data_type != DT_STRING)
+  if (entry2->data_type == DT_STRING && entry1->data_type != DT_STRING)
     throw_error(ERR_STRING_TO_X, s2);
-  if (s1.data_type == DT_CHAR && entry2->data_type != DT_CHAR)
+  if (entry1->data_type == DT_CHAR && entry2->data_type != DT_CHAR)
     throw_error(ERR_CHAR_TO_X, s1);
-  if (s2.data_type == DT_CHAR && entry1->data_type != DT_CHAR)
+  if (entry2->data_type == DT_CHAR && entry1->data_type != DT_CHAR)
     throw_error(ERR_CHAR_TO_X, s2);
 }
 
@@ -183,7 +206,24 @@ int check_is_string_op(char *label, int data_type_arg1, int data_type_arg2){
 
 void check_return(SYMBOL_ENTRY symbol, int data_type_return){
   if (symbol.data_type != data_type_return){
-    throw_error(ERR_WRONG_PAR_RETURN , symbol);
+    switch (symbol.data_type) {
+      case DT_INT:
+      case DT_FLOAT:
+      case DT_BOOL:
+        if (data_type_return != DT_INT &&
+            data_type_return != DT_FLOAT &&
+            data_type_return != DT_BOOL)
+          throw_error(ERR_WRONG_PAR_RETURN, symbol);
+        break;
+      case DT_CHAR:
+        if (data_type_return != DT_CHAR)
+          throw_error(ERR_WRONG_PAR_RETURN, symbol);
+        break;
+      case DT_STRING:
+        if (data_type_return != DT_STRING)
+          throw_error(ERR_WRONG_PAR_RETURN, symbol);
+        break;
+    }
   }
     
 }
