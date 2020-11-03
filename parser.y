@@ -168,6 +168,7 @@ literal: TK_LIT_INT {
 	| TK_LIT_STRING {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_STRING);
+		$$.table_entry.size = assign_size_var_init($$.table_entry.data_type, $$.ast_node->valor_lexico->value);
 		insert_ht_entry(top(table_stack), $$.table_entry);
 	}
 	;
@@ -520,6 +521,7 @@ expression: id {
 		PROD_VALUE op;
 		op.ast_node = create_node("+");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		$$.table_entry.size = $1.table_entry.size + $3.table_entry.size;
 	}
 	| expression '-' expression {
 		PROD_VALUE op;
