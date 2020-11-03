@@ -11,6 +11,7 @@ extern int line_number, column;
 
 int yylex(void);
 void yyerror (char const *s);
+void process_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2);
 
 extern void *arvore;
 extern STACK_ITEM *table_stack;
@@ -75,7 +76,6 @@ extern STACK_ITEM *table_stack;
 %type <node> vector_index
 %type <node> expression
 %type <node> unary_op
-%type <node> binary_op
 %type <node> input
 %type <node> output
 %type <node> function_call
@@ -92,7 +92,7 @@ extern STACK_ITEM *table_stack;
 %type <node> parameter
 %type <node> parameters_list
 
-// ## Associatividade e prioridade dos operadores
+// ## Associatividade e precedência dos operadores
 
 // Virgula
 %left ','
@@ -119,8 +119,6 @@ extern STACK_ITEM *table_stack;
 
 // Expressão com operador ternário
 %right TERNARY
-// Expressões com operador binário
-%left BINARY
 // Expressões com operador unário
 %right UNARY
 
@@ -517,21 +515,92 @@ expression: id {
 		add_child($$.ast_node, $2.ast_node);
 		$$.table_entry = $2.table_entry;
 	}
-	| expression binary_op expression %prec BINARY { 
-		$$.ast_node = $2.ast_node;
-		add_child($$.ast_node, $1.ast_node); 
-		add_child($$.ast_node, $3.ast_node);
-		if ($2.table_entry.data_type > 0)
-			$$.table_entry.data_type = $2.table_entry.data_type;
-		else
-			$$.table_entry.data_type = infer_type($1.table_entry, $3.table_entry);
-
-		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry)->data_type;
-		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry)->data_type;
-		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry)->size;
-		$3.table_entry.size = find_table_entry(table_stack, $3.table_entry)->size;
-		if(check_is_string_op($2.ast_node->label, $1.table_entry.data_type, $3.table_entry.data_type))
-			$$.table_entry.size = $1.table_entry.size + $3.table_entry.size;
+	// Expressões binárias
+	| expression '+' expression {
+		PROD_VALUE op;
+		op.ast_node = create_node("+");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '-' expression {
+		PROD_VALUE op;
+		op.ast_node = create_node("-");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '*' expression {
+		PROD_VALUE op;
+		op.ast_node = create_node("*");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '/' expression	{
+		PROD_VALUE op;
+		op.ast_node = create_node("/");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '%' expression	{
+		PROD_VALUE op;
+		op.ast_node = create_node("%");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '^' expression	{
+		PROD_VALUE op;
+		op.ast_node = create_node("^");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '<' expression { 
+		PROD_VALUE op;
+		op.ast_node = create_node("<");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '>' expression { 
+		PROD_VALUE op;
+		op.ast_node = create_node(">");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '|' expression {
+		PROD_VALUE op;
+		op.ast_node = create_node("|");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression '&' expression {
+		PROD_VALUE op;
+		op.ast_node = create_node("&");
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}													
+	| expression TK_OC_LE expression { 
+		PROD_VALUE op;
+		op.ast_node = create_node_lex_value($2); 
+		op.table_entry.data_type = DT_BOOL;
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression TK_OC_GE expression { 
+		PROD_VALUE op;
+		op.ast_node = create_node_lex_value($2);
+		op.table_entry.data_type = DT_BOOL; 
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression TK_OC_EQ expression { 
+		PROD_VALUE op;
+		op.ast_node = create_node_lex_value($2);
+		op.table_entry.data_type = DT_BOOL; 
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression TK_OC_NE expression { 
+		PROD_VALUE op;
+		op.ast_node = create_node_lex_value($2);
+		op.table_entry.data_type = DT_BOOL; 
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression TK_OC_OR expression { 
+		PROD_VALUE op;
+		op.ast_node = create_node_lex_value($2);
+		op.table_entry.data_type = DT_BOOL; 
+		process_binary_exp(&$$, &$1, &op, &$3);
+	}
+	| expression TK_OC_AND expression { 
+		PROD_VALUE op;
+		op.ast_node = create_node_lex_value($2);
+		op.table_entry.data_type = DT_BOOL; 
+		process_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '?' expression ':' expression %prec TERNARY { 
 		$$.ast_node = create_node("?:"); 
@@ -555,48 +624,6 @@ unary_op: '+' { $$.ast_node = create_node("+"); }
 	}
 	| '#' { $$.ast_node = create_node("#"); }
 	;
-binary_op: '+' { $$.ast_node = create_node("+"); }
-	| '-' { $$.ast_node = create_node("-"); }
-	| '*' { $$.ast_node = create_node("*"); }
-	| '/'	{ $$.ast_node = create_node("/"); }
-	| '%'	{ $$.ast_node = create_node("%"); }
-	| '^'	{ $$.ast_node = create_node("^"); }
-	| '<' { 
-		$$.ast_node = create_node("<");
-		$$.table_entry.data_type = DT_BOOL;
-	}
-	| '>' { 
-		$$.ast_node = create_node(">");
-		$$.table_entry.data_type = DT_BOOL;
-	}
-	| '|' { $$.ast_node = create_node("|"); }
-	| '&' { $$.ast_node = create_node("&"); }													
-	| TK_OC_LE { 
-		$$.ast_node = create_node_lex_value($1); 
-		$$.table_entry.data_type = DT_BOOL;
-	}
-	| TK_OC_GE { 
-		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry.data_type = DT_BOOL; 
-	}
-	| TK_OC_EQ { 
-		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry.data_type = DT_BOOL; 
-	}
-	| TK_OC_NE { 
-		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry.data_type = DT_BOOL; 
-	}
-	| TK_OC_OR { 
-		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry.data_type = DT_BOOL; 
-	}
-	| TK_OC_AND { 
-		$$.ast_node = create_node_lex_value($1);
-		$$.table_entry.data_type = DT_BOOL; 
-	}
-	;
-
 // Comandos de entrada e saida
 input: TK_PR_INPUT id { 
 		$$.ast_node = create_node("input"); 
@@ -753,4 +780,21 @@ iterative_for_while: TK_PR_FOR '(' var_attribution ':' expression ':' var_attrib
 void yyerror(char const *s) {
 	printf("%s in line %d, column %d\n", s, line_number, column);
 	exit(1);
+}
+
+void process_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
+	exp->ast_node = operator->ast_node;
+	add_child(exp->ast_node, op1->ast_node); 
+	add_child(exp->ast_node, op2->ast_node);
+	if (operator->table_entry.data_type > 0)
+		exp->table_entry.data_type = operator->table_entry.data_type;
+	else
+		exp->table_entry.data_type = infer_type(op1->table_entry, op2->table_entry);
+
+	op1->table_entry.data_type = find_table_entry(table_stack, op1->table_entry)->data_type;
+	op2->table_entry.data_type = find_table_entry(table_stack, op2->table_entry)->data_type;
+	op1->table_entry.size = find_table_entry(table_stack, op1->table_entry)->size;
+	op2->table_entry.size = find_table_entry(table_stack, op2->table_entry)->size;
+	if(check_is_string_op(operator->ast_node->label, op1->table_entry.data_type, op2->table_entry.data_type))
+		exp->table_entry.size = op1->table_entry.size + op2->table_entry.size;
 }
