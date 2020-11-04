@@ -1,0 +1,6 @@
+//ERR_WRONG_TYPE
+int f() {
+    int a;
+    a = "universo";
+    return 0;
+}

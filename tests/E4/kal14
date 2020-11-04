@@ -1,0 +1,5 @@
+char v[10];
+int f() {
+    v[3] = 'd';
+    return 0;
+}

@@ -1,0 +1,6 @@
+//ERR_STRING_SIZE
+int f() {
+    string a <= "universo";
+    a = "o" + "universo";
+    return 0;
+}

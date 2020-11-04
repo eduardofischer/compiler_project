@@ -1,0 +1,5 @@
+char a;
+int f() {
+    a = 'b';
+    return 0;
+}

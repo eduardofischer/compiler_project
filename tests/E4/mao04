@@ -1,0 +1,10 @@
+//ERR_WRONG_TYPE
+int f() {
+    char a;
+    a = '2';
+    int b;
+    float c;
+    bool d;
+    a = b + c * d;
+    return 0;
+}

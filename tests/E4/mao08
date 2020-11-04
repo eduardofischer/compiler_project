@@ -1,0 +1,8 @@
+//ERR_STRING_TO_X
+string g() { return "universo"; }
+int f() {
+    int a;
+    int b;
+    a = b + g();
+    return 0;
+}

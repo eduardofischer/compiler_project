@@ -1,0 +1,5 @@
+//ERR_WRONG_PAR_RETURN
+int f(){
+    string a <= "universo";
+    return a;
+}

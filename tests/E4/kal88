@@ -1,0 +1,6 @@
+//ERR_WRONG_PAR_RETURN
+int f(){
+    char a;
+    a = '2';
+    return a;
+}

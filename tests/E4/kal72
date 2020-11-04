@@ -1,0 +1,6 @@
+//ERR_WRONG_TYPE_ARGS
+int g(float b, int c, string oi) { return 0; }
+int f() {
+    g(4.5, false, 'v');
+    return 0;
+}
