@@ -494,6 +494,7 @@ var_attribution: id '=' expression {
 		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry)->size;
 		if($1.table_entry.data_type == DT_STRING)
 			check_string_size($1.table_entry, $3.table_entry.size);
+		free_entry($1.table_entry);
 	}
 	| vector_index '=' expression { 
 		$$.ast_node = create_node("="); 
@@ -506,6 +507,7 @@ var_attribution: id '=' expression {
 		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry)->size;
 		if($1.table_entry.data_type == DT_STRING)
 			check_string_size($1.table_entry, $3.table_entry.size);
+		free_entry($1.table_entry);
 	}
 	;
 	
@@ -527,8 +529,8 @@ expression: id {
 	| expression '+' expression {
 		PROD_VALUE op;
 		op.ast_node = create_node("+");
+		// $$.table_entry.size = $1.table_entry.size + $3.table_entry.size; // TODO: conferir isso aqui
 		process_binary_exp(&$$, &$1, &op, &$3);
-		$$.table_entry.size = $1.table_entry.size + $3.table_entry.size;
 	}
 	| expression '-' expression {
 		PROD_VALUE op;
@@ -672,9 +674,10 @@ function_call: id '(' expression arguments_list ')' {
 		$$.table_entry.data_type = search_all_scopes(table_stack, $1.table_entry.key)->data_type;
 		libera($1.ast_node);
 	}
-	| id '(' ')' { 
+	| id '(' ')' {
+		$$.table_entry = $1.table_entry;
 		$$.ast_node = create_node("call "); 
-		concat_label(&($$.ast_node->label), $1.table_entry.key); 
+		concat_label(&($$.ast_node->label), $1.table_entry.key);
 		check_function($1.table_entry);
 		check_args($1.table_entry, NULL);
 		libera($1.ast_node);

@@ -195,13 +195,7 @@ void check_string_size(SYMBOL_ENTRY string1, int string2_size){
 }
 
 int check_is_string_op(char *label, int data_type_arg1, int data_type_arg2){
-  if ( (!strcmp(label, "+")) && (data_type_arg1==DT_STRING) && (data_type_arg2==DT_STRING) ){
-    return 1;
-  }
-  else
-  {
-    return 0;
-  }
+  return !strcmp(label, "+") && (data_type_arg1==DT_STRING) && (data_type_arg2==DT_STRING);
 }
 
 void check_return(SYMBOL_ENTRY symbol, int data_type_return){

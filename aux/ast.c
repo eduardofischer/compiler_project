@@ -133,8 +133,8 @@ void free_node(AST_NODE *node) {
             free(node->valor_lexico->value.s);
         free(node->valor_lexico);
     }
-    if (node->label != NULL) free(node->label);
-    if (node->children != NULL) free(node->children);
+    free(node->label);
+    free(node->children);
     free(node);
 }
 

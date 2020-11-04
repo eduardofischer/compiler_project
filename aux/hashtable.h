@@ -23,6 +23,8 @@ int update_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY entry);
 // TODO: Remove uma entrada da hash table
 int remove_ht_entry(SYMBOL_ENTRY **table, char *key);
 
+int free_entry(SYMBOL_ENTRY entry);
+
 // Libera a memória referente à hash table
 int free_ht(SYMBOL_ENTRY **table);
 

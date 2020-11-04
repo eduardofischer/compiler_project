@@ -31,15 +31,17 @@ SYMBOL_ENTRY *get_ht_entry(SYMBOL_ENTRY **table, char *key) {
 
 // Insere uma entrada na hash table
 int insert_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY value) {
-  if(get_ht_entry(table, value.key) != NULL)
+  if(get_ht_entry(table, value.key) != NULL) {
+    free_entry(value);
     return -1; // Entrada já existe na tabela
+  }
+   
   
   int index = hash(value.key);
 
   SYMBOL_ENTRY *new_entry = malloc(sizeof(SYMBOL_ENTRY));
   *new_entry = value;
-  new_entry->key = malloc(strlen(value.key) + 1);
-  strcpy(new_entry->key, value.key);
+  new_entry->key = value.key;
   new_entry->next = NULL;
 
   if(table[index] != NULL)
@@ -68,6 +70,11 @@ int _free_arg_list(ARG_LIST *list) {
   return 0;
 }
 
+int free_entry(SYMBOL_ENTRY entry) {
+  free(entry.key);
+  // _free_arg_list(entry.arguments);
+}
+
 // Libera a memória da hash table
 int free_ht(SYMBOL_ENTRY **table) {
   SYMBOL_ENTRY *current, *next;
@@ -76,9 +83,8 @@ int free_ht(SYMBOL_ENTRY **table) {
     if (current != NULL) {
       do {
         next = current->next;
-        if (current->key != NULL)
-          free(current->key);
-        _free_arg_list(current->arguments);
+        free(current->key);
+        // _free_arg_list(current->arguments);
         free(current);
         current = next;
       } while (next != NULL);
@@ -92,10 +98,10 @@ int free_ht(SYMBOL_ENTRY **table) {
 // Inicializa uma entrada da tabela
 SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, char *key, int entry_type, int data_type){
 	SYMBOL_ENTRY table_entry;
-  table_entry.key = key;
+  table_entry.key = strdup(key);
 	table_entry.line = valor_lexico.line_number;
 	table_entry.column = valor_lexico.col_number;
-  	table_entry.arguments = NULL;
+  table_entry.arguments = NULL;
 	table_entry.entry_type = entry_type;
 	table_entry.data_type = data_type;
 	
