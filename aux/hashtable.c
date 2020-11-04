@@ -1,58 +1,5 @@
 #include "hashtable.h"
 
-int assign_size(int data_type){
-  switch (data_type)
-  {
-  case DT_INT:
-    return 4;
-  case DT_FLOAT:
-    return 8;
-  case DT_BOOL:
-    return 1;
-  case DT_CHAR:
-    return 1;
-  case DT_STRING:
-    return 0;
-  default:
-    return NOT_DEFINED;
-  }
-}
-
-int assign_size_var_init(int data_type, TOKEN_VAL valor_lexico){
-  switch (data_type)
-  {
-  case DT_INT:
-    return 4;
-  case DT_FLOAT:
-    return 8;
-  case DT_BOOL:
-    return 1;
-  case DT_CHAR:
-    return 1;
-  case DT_STRING:
-    return 1*strlen(valor_lexico.s);
-  default:
-    return NOT_DEFINED;
-  }
-}
-
-int assign_size_vector(int data_type, TOKEN_VAL expression){
-  switch (data_type)
-  {
-  case DT_INT:
-    return 4*expression.i;
-  case DT_FLOAT:
-    return 8*expression.i;
-  case DT_BOOL:
-    return 1*expression.i;
-  case DT_CHAR:
-    return 1*expression.i;
-  case DT_STRING:
-    return 1*expression.i;
-  default:
-    return NOT_DEFINED;
-  }
-}
 // Calcula a posição de inserção na tabela com base na chave (Utiliza djb2)
 int hash(char *key) {
   unsigned int value = 5381;
@@ -131,7 +78,7 @@ int free_ht(SYMBOL_ENTRY **table) {
         next = current->next;
         if (current->key != NULL)
           free(current->key);
-        //_free_arg_list(current->arguments);
+        _free_arg_list(current->arguments);
         free(current);
         current = next;
       } while (next != NULL);
@@ -145,7 +92,7 @@ int free_ht(SYMBOL_ENTRY **table) {
 // Inicializa uma entrada da tabela
 SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, char *key, int entry_type, int data_type){
 	SYMBOL_ENTRY table_entry;
-  table_entry.key = strdup(key);
+  table_entry.key = key;
 	table_entry.line = valor_lexico.line_number;
 	table_entry.column = valor_lexico.col_number;
   	table_entry.arguments = NULL;
@@ -153,4 +100,58 @@ SYMBOL_ENTRY init_table_entry(LEX_VALUE valor_lexico, char *key, int entry_type,
 	table_entry.data_type = data_type;
 	
 	return table_entry;
+}
+
+int assign_size(int data_type){
+  switch (data_type)
+  {
+  case DT_INT:
+    return 4;
+  case DT_FLOAT:
+    return 8;
+  case DT_BOOL:
+    return 1;
+  case DT_CHAR:
+    return 1;
+  case DT_STRING:
+    return 0;
+  default:
+    return NOT_DEFINED;
+  }
+}
+
+int assign_size_var_init(int data_type, TOKEN_VAL valor_lexico){
+  switch (data_type)
+  {
+  case DT_INT:
+    return 4;
+  case DT_FLOAT:
+    return 8;
+  case DT_BOOL:
+    return 1;
+  case DT_CHAR:
+    return 1;
+  case DT_STRING:
+    return 1*strlen(valor_lexico.s);
+  default:
+    return NOT_DEFINED;
+  }
+}
+
+int assign_size_vector(int data_type, TOKEN_VAL expression){
+  switch (data_type)
+  {
+  case DT_INT:
+    return 4*expression.i;
+  case DT_FLOAT:
+    return 8*expression.i;
+  case DT_BOOL:
+    return 1*expression.i;
+  case DT_CHAR:
+    return 1*expression.i;
+  case DT_STRING:
+    return 1*expression.i;
+  default:
+    return NOT_DEFINED;
+  }
 }

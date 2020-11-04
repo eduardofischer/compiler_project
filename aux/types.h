@@ -32,7 +32,7 @@ typedef union {
 typedef struct lex_value {
   int line_number, col_number;
   int token_type;
-  int ET_LITERAL_type;
+  int data_type;
   TOKEN_VAL value;
 } LEX_VALUE;
 

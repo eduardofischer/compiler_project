@@ -58,8 +58,8 @@ void check_function(SYMBOL_ENTRY symbol) {
   }
 }
 
-void check_type(char *expected_label, SYMBOL_ENTRY symbol) {
-  SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, expected_label);
+void check_type(SYMBOL_ENTRY expected, SYMBOL_ENTRY symbol) {
+  SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, expected.key);
   SYMBOL_ENTRY *entry2 = search_all_scopes(table_stack, symbol.key);
 
   if (entry1 == NULL)
@@ -68,9 +68,9 @@ void check_type(char *expected_label, SYMBOL_ENTRY symbol) {
     throw_error(ERR_UNDECLARED, symbol);
 
   if (entry1->entry_type == ET_FUNCTION && entry2->entry_type != ET_FUNCTION)
-    throw_error(ERR_FUNCTION, *entry1);
-  else if (entry1->entry_type == ET_VECTOR && entry2->entry_type != ET_VECTOR)
-    throw_error(ERR_VECTOR, *entry1);
+    throw_error(ERR_FUNCTION, expected);
+  else if (entry1->entry_type == ET_VECTOR && entry2->entry_type != ET_VECTOR && expected.entry_type != ET_VARIABLE)
+    throw_error(ERR_VECTOR, expected);
 
   switch (entry1->data_type) {
     case DT_INT:

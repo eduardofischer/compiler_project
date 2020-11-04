@@ -37,12 +37,15 @@ SYMBOL_ENTRY **peek(STACK_ITEM *stack, int pos) {
 
 // Remove e libera a tabela de símbolos no topo da pilha
 STACK_ITEM *pop(STACK_ITEM *stack) {
+  STACK_ITEM * next;
+
   if (stack == NULL)
     return NULL; // Pilha não existente
 
   free_ht(stack->table);
-
-  return stack->next;
+  next = stack->next;
+  free(stack);
+  return next;
 }
 
 // Procura o símbolo em todos os escopos

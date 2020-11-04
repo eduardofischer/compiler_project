@@ -2,7 +2,7 @@
 
 // Cria node da AST
 AST_NODE *create_node(char *label) {
-    AST_NODE *node = (AST_NODE*) calloc(1, sizeof(AST_NODE));
+    AST_NODE *node = (AST_NODE*) malloc(sizeof(AST_NODE));
     node->label = strdup(label);
     node->valor_lexico = NULL;
     node->n_children = 0;
@@ -62,7 +62,7 @@ char *get_label(LEX_VALUE valor_lexico) {
     char *string;
     char str[12];
     if (valor_lexico.token_type == TOKEN_TYPE_LIT) {
-        switch(valor_lexico.ET_LITERAL_type) {
+        switch(valor_lexico.data_type) {
             case DT_INT:
                 sprintf(str, "%d", valor_lexico.value.i);
                 string = strdup(str);
@@ -127,7 +127,7 @@ void exporta(void* arvore) {
 
 void free_node(AST_NODE *node) {
     if (node->valor_lexico != NULL){
-        if (node->valor_lexico->ET_LITERAL_type == DT_STRING
+        if (node->valor_lexico->data_type == DT_STRING
             || node->valor_lexico->token_type == TOKEN_TYPE_ID
             || node->valor_lexico->token_type == TOKEN_TYPE_COMPOUND_OP)
             free(node->valor_lexico->value.s);
@@ -138,7 +138,6 @@ void free_node(AST_NODE *node) {
     free(node);
 }
 
-// Inacabada - talvez dê para usar uma pilha aqui
 void libera_util(AST_NODE *node) {
 	if (node == NULL) return;
         	

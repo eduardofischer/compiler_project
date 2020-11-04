@@ -31,7 +31,7 @@ void check_declared(SYMBOL_ENTRY symbol);
 void check_variable(SYMBOL_ENTRY symbol);
 void check_vector(SYMBOL_ENTRY symbol);
 void check_function(SYMBOL_ENTRY symbol);
-void check_type(char *label, SYMBOL_ENTRY symbol);
+void check_type(SYMBOL_ENTRY expected, SYMBOL_ENTRY symbol);
 void check_args(SYMBOL_ENTRY symbol, ENTRY_LIST *args);
 void check_input(SYMBOL_ENTRY symbol);
 void check_output(SYMBOL_ENTRY symbol);

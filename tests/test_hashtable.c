@@ -8,7 +8,7 @@ int main() {
   SYMBOL_ENTRY s1;
   s1.line = 10;
   s1.column = 20;
-  s1.ET_LITERAL_type = DT_INT;
+  s1.data_type = DT_INT;
   s1.size = sizeof(int);
   s1.arguments = NULL;
   s1.value.i = 30;
