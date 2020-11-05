@@ -1,9 +1,9 @@
 CC = gcc
 AUX = ./aux
 
-all: bison flex aux_ast aux_hash aux_errors aux_stack
+all: bison flex aux_ast aux_hash aux_errors aux_stack aux_iloc
 	$(CC) -c lex.yy.c parser.tab.c main.c -g
-	$(CC) -o etapa4 *.o -lfl -g
+	$(CC) -o etapa5 *.o -lfl -g
 	
 flex: scanner.l
 	flex scanner.l
@@ -23,5 +23,8 @@ aux_errors: aux/errors.c
 aux_stack: aux/stack.c
 	$(CC) -c aux/stack.c -g
 
+aux_iloc: aux/iloc_code_gen.c
+	$(CC) -c aux/iloc_code_gen.c -g
+
 clear:
-	rm -rf etapa* lex.yy.c parser.tab.c parser.output parser.tab.h lex.yy.o parser.tab.o main.o ast.o hashtable.o stack.o errors.o
+	rm -rf etapa* lex.yy.c parser.tab.c parser.output parser.tab.h lex.yy.o parser.tab.o main.o ast.o hashtable.o stack.o errors.o iloc_code_gen.o
