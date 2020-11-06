@@ -17,4 +17,12 @@ char *new_label() {
 }
 
 // Retorna um ponteiro para uma estrutura do tipo INSTRUCTION
-INSTRUCTION *new_instruction(char *code, char *arg1, char *arg2, char *arg3);
+INSTRUCTION *new_instruction(char *code, char *arg1, char *arg2, char *arg3) {
+  INSTRUCTION *inst = malloc(sizeof(INSTRUCTION));
+  inst->code = strdup(code);
+  inst->arg1 = strdup(arg1);
+  inst->arg2 = strdup(arg2);
+  inst->arg3 = strdup(arg3);
+  inst->previous = NULL;
+  return inst;
+}

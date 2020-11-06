@@ -32,7 +32,7 @@ SYMBOL_ENTRY *get_ht_entry(SYMBOL_ENTRY **table, char *key) {
 // Insere uma entrada na hash table
 int insert_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY value) {
   if(get_ht_entry(table, value.key) != NULL) {
-    free_entry(value);
+    // free_entry(value);
     return -1; // Entrada já existe na tabela
   }
    
