@@ -100,6 +100,20 @@ void gen_code_literal(PROD_VALUE *lit) {
   }
 }
 
+// Faz um remendo
+void _make_patch(INSTRUCTION *inst1, char *rot) {
+  inst1->arg3 = rot;
+  // find_holes();
+}
+
+// Gera buraco que deve ser remendado no futuro
+char* _make_hole(){
+  static int n = 0;
+  char *label = malloc(2 + floor(n/10));
+  sprintf(label, "Remendo%d", n++);
+  return label;
+}
+
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
   if (exp->table_entry.data_type == DT_INT) {
@@ -113,10 +127,23 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
       exp->code = _new_instruction("mult", op1->location, op2->location, exp->location);
     else if (strcmp(operator->ast_node->label, "/") == 0)
       exp->code = _new_instruction("div", op1->location, op2->location, exp->location);
+    else if (strcmp(operator->ast_node->label, "||") == 0){
+      char *rot = _new_label();
+      _make_patch(exp->code, rot);
+    }
+    else if (strcmp(operator->ast_node->label, "<") == 0){
+      INSTRUCTION *inst1 = _new_instruction("cmp_LT", op1->location, op2->location, exp->location);
+      exp->code = _new_instruction("cbr", exp->location, _make_hole(), _make_hole());
+      
+      _concat_inst(inst1, exp->code);
+    }
     
+
     _concat_inst(exp->code, op2->code);
     _concat_inst(op2->code, op1->code);
 
     exp->code = op1->code;
   }
 }
+
+
