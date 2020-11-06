@@ -28,7 +28,12 @@ char *_concat_code(char *code1, char *code2) {
 
 // Concatena dois trechos de código
 void _concat_inst(INSTRUCTION *inst1, INSTRUCTION *inst2) {
-  inst2->prev = inst1;
+  INSTRUCTION *first = inst2;
+  
+  while (first->prev != NULL)
+    first = first->prev;
+    
+  first->prev = inst1;
 }
 
 // Retorna um ponteiro para uma estrutura do tipo INSTRUCTION
