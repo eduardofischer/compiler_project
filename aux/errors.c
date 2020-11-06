@@ -251,9 +251,7 @@ SYMBOL_ENTRY *find_table_entry(STACK_ITEM *table_stack, SYMBOL_ENTRY symbol) {
   if (entry1 == NULL)
     throw_error(ERR_UNDECLARED, symbol);
   else
-  {
     return entry1;
-  }
 }
 
 char *print_err_msg(int err, SYMBOL_ENTRY entry) {

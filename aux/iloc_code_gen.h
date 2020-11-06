@@ -19,4 +19,7 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
 // Extrai o código ILOC de uma lista do tipo INSTRUCTION
 char *extract_code(INSTRUCTION *last_inst);
 
+// Concatena dois trechos de código
+void _concat_inst(INSTRUCTION *inst1, INSTRUCTION *inst2);
+
 #endif

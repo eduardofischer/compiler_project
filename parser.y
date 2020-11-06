@@ -126,10 +126,20 @@ extern STACK_ITEM *table_stack;
 %start root
 
 %%
-root: program	 { arvore = (void*) $1.ast_node;  } 
+root: program	 {
+		arvore = (void*) $1.ast_node;
+		printf("%s\n", extract_code($1.code));
+	} 
 	;
 	
-program: global_var_decl program { $$.ast_node = $2.ast_node; }
+program: global_var_decl program {
+		$$ = $1;
+		$$.ast_node = $2.ast_node;
+		if ($$.code != NULL)
+			_concat_inst($2.code, $$.code);
+		else
+			$$.code = $2.code;
+	}
 	| function_def program	{ $$ = $1; add_child($$.ast_node, $2.ast_node); }
 	| %empty { $$.ast_node = NULL; }
 	;
@@ -267,6 +277,8 @@ id: TK_IDENTIFICADOR {
 
 function_def: function_def_start command_list cmd_block_end {
 		$$ = $1;
+		$$.location = NULL;
+		$$.code = $2.code;
 		add_child($$.ast_node, $2.ast_node);
 		check_return($1.table_entry, $2.table_entry.data_type);
 		insert_ht_entry(table_stack, $$.table_entry);
@@ -332,8 +344,12 @@ command_list: command command_list {
 		if ($1.ast_node != NULL) {
 			$$ = $1;
 			add_child($$.ast_node, $2.ast_node);
+			if ($$.code != NULL)
+				_concat_inst($2.code, $$.code);
+			else
+				$$.code = $2.code;
 		} else {
-			$$.ast_node = $2.ast_node;
+			$$ = $2;
 		}
 		if ($1.table_entry.entry_type == ET_RETURN) {
 			$$.table_entry.entry_type = ET_RETURN;
@@ -478,18 +494,22 @@ local_list: ',' id local_list {
 	;
 
 // Atribuição de variavel
-var_attribution: id '=' expression { 
+var_attribution: id '=' expression {
 		$$.ast_node = create_node("="); 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node); 
 
 		check_type($1.table_entry, $3.table_entry);
-		
-		$1.table_entry.data_type = find_table_entry(table_stack, $1.table_entry)->data_type;
-		$1.table_entry.size = find_table_entry(table_stack, $1.table_entry)->size;
+
+		$1.table_entry = *find_table_entry(table_stack, $1.table_entry);
+		if ($3.table_entry.entry_type != ET_LITERAL)
+			$3.table_entry = *find_table_entry(table_stack, $3.table_entry);
+			
 		if($1.table_entry.data_type == DT_STRING)
 			check_string_size($1.table_entry, $3.table_entry.size);
-		free_entry($1.table_entry);
+	
+		$$.table_entry.offset= $1.table_entry.offset;
+		gen_code_attribution(&$$, &$3);
 	}
 	| vector_index '=' expression { 
 		$$.ast_node = create_node("="); 
@@ -529,8 +549,6 @@ expression: id {
 		op.ast_node = create_node("+");
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
-		if ($$.table_entry.data_type == DT_INT)
-			printf("%s", extract_code($$.code));
 	}
 	| expression '-' expression {
 		PROD_VALUE op;
