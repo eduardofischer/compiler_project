@@ -6,3 +6,4 @@ etapa*
 *.tgz
 test_files
 .vscode
+tests/E4/output
