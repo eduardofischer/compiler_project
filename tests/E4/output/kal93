@@ -1,6 +1,0 @@
-0x55d6866a77e0, 0x55d6866a7e10
-0x55d6866a7e10, 0x55d6866a7d20
-
-0x55d6866a77e0 [label="f"];
-0x55d6866a7e10 [label="return"];
-0x55d6866a7d20 [label="a"];
