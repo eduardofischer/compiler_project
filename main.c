@@ -16,7 +16,7 @@ void libera(void *arvore);
 
 int main (int argc, char **argv) {
   // Inicializa a tabela de símbolos global
-  table_stack = new_scope(table_stack);
+  table_stack = init_scope_stack();
 
   int ret = yyparse();
   
@@ -26,6 +26,6 @@ int main (int argc, char **argv) {
   yylex_destroy();
 
   // Destroi a tabela de símbolos global
-  table_stack = pop(table_stack);
+  table_stack = destroy_scope(table_stack);
   return ret;
 }

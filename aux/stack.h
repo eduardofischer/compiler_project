@@ -7,10 +7,8 @@
 #include "types.h"
 #include "hashtable.h"
 
-typedef struct stack_item {
-  SYMBOL_ENTRY **table;
-  struct stack_item *next;
-} STACK_ITEM;
+// Inicializa uma pilha de escopos
+STACK_ITEM *init_scope_stack();
 
 // Cria uma nova tabela de símbolos no topo da pilha
 STACK_ITEM *new_scope(STACK_ITEM *stack);
@@ -22,7 +20,7 @@ SYMBOL_ENTRY **top(STACK_ITEM *stack);
 SYMBOL_ENTRY **peek(STACK_ITEM *stack, int pos);
 
 // Remove e libera a tabela de símbolos no topo da pilha
-STACK_ITEM *pop(STACK_ITEM *stack);
+STACK_ITEM *destroy_scope(STACK_ITEM *stack);
 
 // Procura o símbolo em todos os escopos
 SYMBOL_ENTRY *search_all_scopes(STACK_ITEM *stack, char *key);

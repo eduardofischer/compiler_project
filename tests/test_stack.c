@@ -33,12 +33,12 @@ int main() {
   SYMBOL_ENTRY **t2 = top(stack);
   SYMBOL_ENTRY *entry2 = get_ht_entry(t2, key2);
   printf("Entrada recuperada na tabela 2. Chave: %s\n", entry2->key);
-  stack = pop(stack);
+  stack = destroy_scope(stack);
   SYMBOL_ENTRY **t1 = top(stack);
   SYMBOL_ENTRY *entry1 = get_ht_entry(t1, key1);
   printf("Entrada recuperada na tabela 1. Chave: %s\n", entry1->key);
 
-  stack = pop(stack);
+  stack = destroy_scope(stack);
 
   return 0;
 }

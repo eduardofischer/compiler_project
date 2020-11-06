@@ -50,10 +50,17 @@ typedef struct symbol_entry {
   int entry_type; // literal, variável, função, etc...
   int data_type; // int, float, bool, etc...
   int size;
+  int offset; // Deslocamento do símbolo dentro do escopo
   ARG_LIST *arguments;
   TOKEN_VAL value;
   struct symbol_entry *next;
 } SYMBOL_ENTRY;
+
+typedef struct stack_item {
+  SYMBOL_ENTRY **table;
+  int offset;
+  struct stack_item *next;
+} STACK_ITEM;
 
 // Lista de argumentos
 typedef struct entry_list {

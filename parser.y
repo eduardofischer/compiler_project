@@ -144,33 +144,33 @@ type: TK_PR_INT { $$.table_entry.data_type = DT_INT; }
 literal: TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_INT);
-		insert_ht_entry(top(table_stack), $$.table_entry);
+		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	| TK_LIT_FLOAT {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_FLOAT);
-		insert_ht_entry(top(table_stack), $$.table_entry);	
+		insert_ht_entry(table_stack, $$.table_entry);	
 	}
 	| TK_LIT_FALSE {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_BOOL);
-		insert_ht_entry(top(table_stack), $$.table_entry);
+		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	| TK_LIT_TRUE {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_BOOL);
-		insert_ht_entry(top(table_stack), $$.table_entry);
+		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	| TK_LIT_CHAR {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_CHAR);
-		insert_ht_entry(top(table_stack), $$.table_entry);
+		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	| TK_LIT_STRING {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_STRING);
 		$$.table_entry.size = assign_size_var_init($$.table_entry.data_type, $$.ast_node->valor_lexico->value);
-		insert_ht_entry(top(table_stack), $$.table_entry);
+		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	;
 
@@ -180,7 +180,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		$3.table_entry.size = assign_size($2.table_entry.data_type);
 		check_declared($3.table_entry);	
-		insert_ht_entry(top(table_stack), $3.table_entry);
+		insert_ht_entry(table_stack, $3.table_entry);
 		libera($3.ast_node);
 		
 		// Adiciona o resto da lista de declarações na tabela de símbolos
@@ -188,7 +188,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		while (item != NULL) {
 			item->entry.data_type = $2.table_entry.data_type;
 			item->entry.size = assign_size($2.table_entry.data_type);
-			insert_ht_entry(top(table_stack), item->entry);
+			insert_ht_entry(table_stack, item->entry);
 			next_item = item->next;
 			free(item);
 			item = next_item;
@@ -199,7 +199,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		$2.table_entry.size = assign_size($1.table_entry.data_type);
 		check_declared($2.table_entry);
-		insert_ht_entry(top(table_stack), $2.table_entry);
+		insert_ht_entry(table_stack, $2.table_entry);
 		libera($2.ast_node);
 		
 		// Adiciona o resto da lista de declarações na tabela de símbolos
@@ -207,7 +207,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		while (item != NULL) {
 			item->entry.data_type = $1.table_entry.data_type;
 			item->entry.size = assign_size($1.table_entry.data_type);
-			insert_ht_entry(top(table_stack), item->entry);
+			insert_ht_entry(table_stack, item->entry);
 			next_item = item->next;
 			free(item);
 			item = next_item;
@@ -218,7 +218,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		$2.table_entry.data_type = $1.table_entry.data_type;
 		$2.table_entry.size = assign_size_vector($1.table_entry.data_type, $4.ast_node->valor_lexico->value);
 		check_declared($2.table_entry);
-		insert_ht_entry(top(table_stack), $2.table_entry);
+		insert_ht_entry(table_stack, $2.table_entry);
 		libera($2.ast_node);
 		libera($4.ast_node);
 		
@@ -227,7 +227,7 @@ global_var_decl: TK_PR_STATIC type id global_list ';' {
 		while (item != NULL) {
 			item->entry.data_type = $1.table_entry.data_type;
 			item->entry.size = assign_size($1.table_entry.data_type);
-			insert_ht_entry(top(table_stack), item->entry);
+			insert_ht_entry(table_stack, item->entry);
 			next_item = item->next;
 			free(item);
 			item = next_item;
@@ -275,7 +275,7 @@ function_def: function_def_start command_list cmd_block_end {
 		$$ = $1;
 		add_child($$.ast_node, $2.ast_node);
 		check_return($1.table_entry, $2.table_entry.data_type);
-		insert_ht_entry(top(table_stack), $$.table_entry);
+		insert_ht_entry(table_stack, $$.table_entry);
 	}
 function_def_start: type id '(' parameter parameters_list ')' cmd_block_start { 
 		$$ = $2;
@@ -332,7 +332,7 @@ parameter: type id {
 
 // Definição dos blocos de comandos
 cmd_block_start: '{' { table_stack = new_scope(table_stack); }
-cmd_block_end: '}' { table_stack = pop(table_stack); }
+cmd_block_end: '}' { table_stack = destroy_scope(table_stack); }
 cmd_block: cmd_block_start command_list cmd_block_end { $$ = $2; }
 command_list: command command_list {
 		if ($1.ast_node != NULL) {
@@ -378,14 +378,14 @@ local_var_decl: local_var_prefix type id local_list {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		$3.table_entry.size = assign_size($2.table_entry.data_type);
 		check_declared($3.table_entry);
-		insert_ht_entry(top(table_stack), $3.table_entry);	
+		insert_ht_entry(table_stack, $3.table_entry);	
 		libera($3.ast_node); 	
 		// Adiciona o resto da lista de declarações na tabela de símbolos
 		ENTRY_LIST *item = $4.list, *next_item;
 		while (item != NULL) {
 			item->entry.data_type = $2.table_entry.data_type;
 			item->entry.size = assign_size($2.table_entry.data_type);
-			insert_ht_entry(top(table_stack), item->entry);
+			insert_ht_entry(table_stack, item->entry);
 			next_item = item->next;
 			free(item);
 			item = next_item;
@@ -403,14 +403,14 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.size = assign_size_var_init($2.table_entry.data_type, $5.ast_node->valor_lexico->value);
 		check_declared($3.table_entry);
 		check_variable($5.table_entry);
-		insert_ht_entry(top(table_stack), $3.table_entry);
+		insert_ht_entry(table_stack, $3.table_entry);
 		check_type($3.table_entry, $5.table_entry);
 		// Adiciona o resto da lista de declarações na tabela de símbolos
 		ENTRY_LIST *item = $6.list, *next_item;
 		while (item != NULL) {
 			item->entry.data_type = $2.table_entry.data_type;
 			item->entry.size = assign_size($2.table_entry.data_type);
-			insert_ht_entry(top(table_stack), item->entry);
+			insert_ht_entry(table_stack, item->entry);
 			next_item = item->next;
 			free(item);
 			item = next_item;
@@ -426,14 +426,14 @@ local_var_init: local_var_prefix type id TK_OC_LE id local_list {
 		$3.table_entry.data_type = $2.table_entry.data_type;
 		$3.table_entry.size = assign_size_var_init($2.table_entry.data_type, $5.ast_node->valor_lexico->value);
 		check_declared($3.table_entry);
-		insert_ht_entry(top(table_stack), $3.table_entry);	
+		insert_ht_entry(table_stack, $3.table_entry);	
 		check_type($3.table_entry, $5.table_entry);
 		// Adiciona o resto da lista de declarações na tabela de símbolos
 		ENTRY_LIST *item = $6.list, *next_item;
 		while (item != NULL) {
 			item->entry.data_type = $2.table_entry.data_type;
 			item->entry.size = assign_size($2.table_entry.data_type);
-			insert_ht_entry(top(table_stack), item->entry);
+			insert_ht_entry(table_stack, item->entry);
 			next_item = item->next;
 			free(item);
 			item = next_item;

@@ -1,10 +1,22 @@
 #include "stack.h"
 
+// Inicializa uma pilha de escopos
+STACK_ITEM *init_scope_stack() {
+  STACK_ITEM *item = malloc(sizeof(STACK_ITEM));
+  item->table = malloc(sizeof(SYMBOL_ENTRY) * HT_SIZE);
+  memset(item->table, 0, sizeof(SYMBOL_ENTRY) * HT_SIZE);
+  item->offset = 0;
+  item->next = NULL;
+  
+  return item;
+}
+
 // Cria uma nova tabela de símbolos no topo da pilha
 STACK_ITEM *new_scope(STACK_ITEM *stack) {
   STACK_ITEM *item = malloc(sizeof(STACK_ITEM));
   item->table = malloc(sizeof(SYMBOL_ENTRY) * HT_SIZE);
   memset(item->table, 0, sizeof(SYMBOL_ENTRY) * HT_SIZE);
+  item->offset = stack->offset;
   item->next = stack;
   
   return item;
@@ -36,7 +48,7 @@ SYMBOL_ENTRY **peek(STACK_ITEM *stack, int pos) {
 }
 
 // Remove e libera a tabela de símbolos no topo da pilha
-STACK_ITEM *pop(STACK_ITEM *stack) {
+STACK_ITEM *destroy_scope(STACK_ITEM *stack) {
   STACK_ITEM * next;
 
   if (stack == NULL)
@@ -44,6 +56,8 @@ STACK_ITEM *pop(STACK_ITEM *stack) {
 
   free_ht(stack->table);
   next = stack->next;
+  if (next != NULL)
+    next->offset = stack->offset;
   free(stack);
   return next;
 }
@@ -78,7 +92,7 @@ void inject_arguments(STACK_ITEM *stack, ARG_LIST *args) {
     entry.key = strdup(current->id);
     entry.data_type = current->type;
     entry.entry_type = ET_VARIABLE;
-    insert_ht_entry(top(stack), entry);
+    insert_ht_entry(stack, entry);
     current = current->next;
   }
 }

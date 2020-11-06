@@ -30,19 +30,24 @@ SYMBOL_ENTRY *get_ht_entry(SYMBOL_ENTRY **table, char *key) {
 }
 
 // Insere uma entrada na hash table
-int insert_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY value) {
+int insert_ht_entry(STACK_ITEM *scope, SYMBOL_ENTRY value) {
+  SYMBOL_ENTRY **table = top(scope);
+
   if(get_ht_entry(table, value.key) != NULL) {
     // free_entry(value);
     return -1; // Entrada já existe na tabela
   }
-   
-  
   int index = hash(value.key);
 
   SYMBOL_ENTRY *new_entry = malloc(sizeof(SYMBOL_ENTRY));
   *new_entry = value;
   new_entry->key = value.key;
   new_entry->next = NULL;
+
+  // Atualiza deslocamentos de escopo
+  new_entry->offset = scope->offset;
+  scope->offset += new_entry->size;
+  printf("DEBUG: inserindo entrada %s no endereço %d\n", new_entry->key, new_entry->offset);
 
   if(table[index] != NULL)
       new_entry->next = table[index];

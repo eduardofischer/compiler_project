@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
+#include "stack.h"
 
 #define HT_SIZE 20
 
@@ -15,13 +16,7 @@ int hash(char *key);
 SYMBOL_ENTRY *get_ht_entry(SYMBOL_ENTRY **table, char *key);
 
 // Insere uma entrada na hash table
-int insert_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY value);
-
-// TODO: Atualiza uma entrada na hash table 
-int update_ht_entry(SYMBOL_ENTRY **table, SYMBOL_ENTRY entry);
-
-// TODO: Remove uma entrada da hash table
-int remove_ht_entry(SYMBOL_ENTRY **table, char *key);
+int insert_ht_entry(STACK_ITEM *scope, SYMBOL_ENTRY value);
 
 int free_entry(SYMBOL_ENTRY entry);
 

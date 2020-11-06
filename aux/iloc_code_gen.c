@@ -102,8 +102,9 @@ void gen_code_literal(PROD_VALUE *lit) {
 
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
-  exp->location = _new_register();
-  if (exp->table_entry.data_type == DT_INT){
+  if (exp->table_entry.data_type == DT_INT) {
+    exp->location = _new_register();
+    
     if (strcmp(operator->ast_node->label, "+") == 0)
       exp->code = _new_instruction("add", op1->location, op2->location, exp->location);
     else if (strcmp(operator->ast_node->label, "-") == 0)
