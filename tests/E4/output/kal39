@@ -1,0 +1,12 @@
+0x55a13c91d7e0, 0x55a13c91ec90
+0x55a13c91ec90, 0x55a13c91e640
+0x55a13c91ec90, 0x55a13c91ebc0
+0x55a13c91ec90, 0x55a13c91e1e0
+0x55a13c91e1e0, 0x55a13c91e1b0
+
+0x55a13c91d7e0 [label="f"];
+0x55a13c91ec90 [label="="];
+0x55a13c91e640 [label="a"];
+0x55a13c91ebc0 [label="3"];
+0x55a13c91e1e0 [label="return"];
+0x55a13c91e1b0 [label="0"];

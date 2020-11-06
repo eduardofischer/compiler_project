@@ -1,0 +1,10 @@
+0x55c3025b47e0, 0x55c3025b4e10
+0x55c3025b4e10, 0x55c3025b4d20
+0x55c3025b4e10, 0x55c3025b4f60
+0x55c3025b4f60, 0x55c3025b4e90
+
+0x55c3025b47e0 [label="f"];
+0x55c3025b4e10 [label="output"];
+0x55c3025b4d20 [label="a"];
+0x55c3025b4f60 [label="return"];
+0x55c3025b4e90 [label="0"];

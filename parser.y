@@ -535,7 +535,8 @@ expression: id {
 		op.ast_node = create_node("+");
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
-		printf("%s", extract_code($$.code));
+		if ($$.table_entry.data_type == DT_INT)
+			printf("%s", extract_code($$.code));
 	}
 	| expression '-' expression {
 		PROD_VALUE op;

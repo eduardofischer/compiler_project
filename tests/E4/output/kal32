@@ -1,0 +1,6 @@
+0x5595a2b867e0, 0x5595a2b86df0
+0x5595a2b86df0, 0x5595a2b86d20
+
+0x5595a2b867e0 [label="f"];
+0x5595a2b86df0 [label="return"];
+0x5595a2b86d20 [label="0"];
