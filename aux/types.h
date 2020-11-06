@@ -69,12 +69,24 @@ typedef struct ast_node {
   struct ast_node **children;
 } AST_NODE;
 
+// Estrutura que representa um lista encadeaada (invertida) de instruções
+typedef struct instruction {
+  char *code;
+  char *arg1;
+  char *arg2;
+  char *arg3;
+  struct instruction *prev;
+} INSTRUCTION;
+
 typedef struct prod_value {
   AST_NODE *ast_node;
   SYMBOL_ENTRY table_entry;
   ENTRY_LIST *list;
   ARG_LIST *arg_list;
   int block_return_type;
+  // Variáveis para a geração de código ILOC
+  char *location;
+  INSTRUCTION *code;
 } PROD_VALUE;
 
 #endif

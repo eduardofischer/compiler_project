@@ -6,6 +6,7 @@
 #include "aux/hashtable.h"
 #include "aux/stack.h"
 #include "aux/errors.h"
+#include "aux/iloc_code_gen.h"
 
 extern int line_number, column;
 
@@ -518,7 +519,10 @@ expression: id {
 	}
 	| vector_index { $$ = $1; }
 	| function_call  { $$ = $1; }
-	| literal { $$ = $1; }
+	| literal {
+		$$ = $1;
+		gen_code_literal(&$$);
+	}
 	| '(' expression ')'  { $$ = $2; }
 	| unary_op expression %prec UNARY {
 		$$.ast_node = $1.ast_node; 
@@ -529,89 +533,105 @@ expression: id {
 	| expression '+' expression {
 		PROD_VALUE op;
 		op.ast_node = create_node("+");
-		// $$.table_entry.size = $1.table_entry.size + $3.table_entry.size; // TODO: conferir isso aqui
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
+		printf("%s", extract_code($$.code));
 	}
 	| expression '-' expression {
 		PROD_VALUE op;
 		op.ast_node = create_node("-");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '*' expression {
 		PROD_VALUE op;
 		op.ast_node = create_node("*");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '/' expression	{
 		PROD_VALUE op;
 		op.ast_node = create_node("/");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '%' expression	{
 		PROD_VALUE op;
 		op.ast_node = create_node("%");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '^' expression	{
 		PROD_VALUE op;
 		op.ast_node = create_node("^");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '<' expression { 
 		PROD_VALUE op;
 		op.ast_node = create_node("<");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '>' expression { 
 		PROD_VALUE op;
 		op.ast_node = create_node(">");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '|' expression {
 		PROD_VALUE op;
 		op.ast_node = create_node("|");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '&' expression {
 		PROD_VALUE op;
 		op.ast_node = create_node("&");
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}													
 	| expression TK_OC_LE expression { 
 		PROD_VALUE op;
 		op.ast_node = create_node_lex_value($2); 
 		op.table_entry.data_type = DT_BOOL;
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression TK_OC_GE expression { 
 		PROD_VALUE op;
 		op.ast_node = create_node_lex_value($2);
 		op.table_entry.data_type = DT_BOOL; 
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression TK_OC_EQ expression { 
 		PROD_VALUE op;
 		op.ast_node = create_node_lex_value($2);
 		op.table_entry.data_type = DT_BOOL; 
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression TK_OC_NE expression { 
 		PROD_VALUE op;
 		op.ast_node = create_node_lex_value($2);
 		op.table_entry.data_type = DT_BOOL; 
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression TK_OC_OR expression { 
 		PROD_VALUE op;
 		op.ast_node = create_node_lex_value($2);
 		op.table_entry.data_type = DT_BOOL; 
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression TK_OC_AND expression { 
 		PROD_VALUE op;
 		op.ast_node = create_node_lex_value($2);
 		op.table_entry.data_type = DT_BOOL; 
 		process_binary_exp(&$$, &$1, &op, &$3);
+		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
 	| expression '?' expression ':' expression %prec TERNARY { 
 		$$.ast_node = create_node("?:"); 

@@ -5,23 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "types.h"
 
-// Estrutura que representa um lista encadeaada (invertida) de instruções
-typedef struct instruction {
-  char *code;
-  char *arg1;
-  char *arg2;
-  char *arg3;
-  struct instruction *previous;
-} INSTRUCTION;
+// Geração de código de atribuição de variáveis
+void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value);
 
-// Retorna um identificador único de registrador no formato rX, sendo X um inteiro
-char *new_register();
+// Geração de código de literais
+void gen_code_literal(PROD_VALUE *lit);
 
-// Retorna um rótulo único no formato LX, sendo X um inteiro
-char *new_label();
+// Gera o código de operações binárias
+void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2);
 
-// Retorna um ponteiro para uma estrutura do tipo INSTRUCTION
-INSTRUCTION *new_instruction(char *code, char *arg1, char *arg2, char *arg3);
+// Extrai o código ILOC de uma lista do tipo INSTRUCTION
+char *extract_code(INSTRUCTION *last_inst);
 
 #endif
