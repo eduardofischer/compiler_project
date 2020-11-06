@@ -62,10 +62,18 @@ void check_type(SYMBOL_ENTRY expected, SYMBOL_ENTRY symbol) {
   SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, expected.key);
   SYMBOL_ENTRY *entry2 = search_all_scopes(table_stack, symbol.key);
 
-  if (entry1 == NULL)
-    throw_error(ERR_UNDECLARED, symbol);
-  if (entry2 == NULL)
-    throw_error(ERR_UNDECLARED, symbol);
+  if (expected.entry_type != ET_LITERAL) {
+    if (entry1 == NULL)
+      throw_error(ERR_UNDECLARED, symbol);
+  } else {
+    entry1 = &expected;
+  }
+  if (symbol.entry_type != ET_LITERAL) {
+    if (entry2 == NULL)
+      throw_error(ERR_UNDECLARED, symbol);
+  } else {
+    entry2 = &symbol;
+  }
 
   if (entry1->entry_type == ET_FUNCTION && entry2->entry_type != ET_FUNCTION)
     throw_error(ERR_FUNCTION, expected);
@@ -94,13 +102,16 @@ void check_type(SYMBOL_ENTRY expected, SYMBOL_ENTRY symbol) {
 
 void check_args(SYMBOL_ENTRY symbol, ENTRY_LIST *args) {
   SYMBOL_ENTRY *entry = search_all_scopes(table_stack, symbol.key);
+
   if (entry == NULL)
     throw_error(ERR_UNDECLARED, symbol);
+
   ARG_LIST *expected = entry->arguments;
   ENTRY_LIST *item = args, *next_item;
   while (expected != NULL) {
     if (item == NULL)
       throw_error(ERR_MISSING_ARGS, symbol);
+
     if (expected->type != item->entry.data_type) {
       switch (expected->type) {
         case DT_INT:
@@ -142,8 +153,13 @@ void check_input(SYMBOL_ENTRY symbol){
 
 void check_output(SYMBOL_ENTRY symbol){
   SYMBOL_ENTRY *entry = search_all_scopes(table_stack, symbol.key);
-  if (entry == NULL)
-    throw_error(ERR_UNDECLARED, symbol);
+
+  if (symbol.entry_type != ET_LITERAL) {
+    if (entry == NULL)
+      throw_error(ERR_UNDECLARED, symbol);
+    } else {
+      entry = &symbol;
+  }
 
   if (entry->data_type != DT_INT && entry->data_type != DT_FLOAT)
     throw_error(ERR_WRONG_PAR_OUTPUT, symbol);
@@ -154,7 +170,7 @@ void check_shift(SYMBOL_ENTRY symbol, LEX_VALUE shift_value){
   if (entry == NULL)
     throw_error(ERR_UNDECLARED, symbol);
 
-    if (shift_value.value.i > MAX_SHIFT_NUMBER)
+    if (shift_value.data_type != DT_INT || shift_value.value.i > MAX_SHIFT_NUMBER)
       throw_error(ERR_WRONG_PAR_SHIFT, symbol);
 }
 
@@ -162,10 +178,18 @@ int infer_type(SYMBOL_ENTRY s1, SYMBOL_ENTRY s2) {
   SYMBOL_ENTRY *entry1 = search_all_scopes(table_stack, s1.key);
   SYMBOL_ENTRY *entry2 = search_all_scopes(table_stack, s2.key);
 
-  if (entry1 == NULL)
-    throw_error(ERR_UNDECLARED, s1);
-  if (entry2 == NULL)
-    throw_error(ERR_UNDECLARED, s2);
+  if (s1.entry_type != ET_LITERAL) {
+    if (entry1 == NULL)
+      throw_error(ERR_UNDECLARED, s1);
+  } else {
+    entry1 = &s1;
+  }
+  if (s2.entry_type != ET_LITERAL) {
+    if (entry2 == NULL)
+      throw_error(ERR_UNDECLARED, s2);
+  } else {
+    entry2 = &s2;
+  }
 
   if (entry1->data_type == entry2->data_type)
     return entry1->data_type;

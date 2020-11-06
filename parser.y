@@ -144,33 +144,27 @@ type: TK_PR_INT { $$.table_entry.data_type = DT_INT; }
 literal: TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_INT);
-		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	| TK_LIT_FLOAT {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_FLOAT);
-		insert_ht_entry(table_stack, $$.table_entry);	
 	}
 	| TK_LIT_FALSE {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_BOOL);
-		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	| TK_LIT_TRUE {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_BOOL);
-		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	| TK_LIT_CHAR {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_CHAR);
-		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	| TK_LIT_STRING {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_STRING);
 		$$.table_entry.size = assign_size_var_init($$.table_entry.data_type, $$.ast_node->valor_lexico->value);
-		insert_ht_entry(table_stack, $$.table_entry);
 	}
 	;
 
@@ -823,10 +817,17 @@ void process_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, 
 	else
 		exp->table_entry.data_type = infer_type(op1->table_entry, op2->table_entry);
 
-	op1->table_entry.data_type = find_table_entry(table_stack, op1->table_entry)->data_type;
-	op2->table_entry.data_type = find_table_entry(table_stack, op2->table_entry)->data_type;
-	op1->table_entry.size = find_table_entry(table_stack, op1->table_entry)->size;
-	op2->table_entry.size = find_table_entry(table_stack, op2->table_entry)->size;
+	if (op1->table_entry.entry_type != ET_LITERAL) {
+    SYMBOL_ENTRY *entry1 = find_table_entry(table_stack, op1->table_entry);
+		op1->table_entry.data_type = entry1->data_type;
+		op1->table_entry.size = entry1->size;
+  }
+  if (op2->table_entry.entry_type != ET_LITERAL) {
+    SYMBOL_ENTRY *entry2 = find_table_entry(table_stack, op2->table_entry);
+		op2->table_entry.data_type = entry2->data_type;
+		op2->table_entry.size = entry2->size;
+  }
+	
 	if(check_is_string_op(operator->ast_node->label, op1->table_entry.data_type, op2->table_entry.data_type))
 		exp->table_entry.size = op1->table_entry.size + op2->table_entry.size;
 }
