@@ -70,35 +70,34 @@ INSTRUCTION *_new_instruction(char *code, char *arg1, char *arg2, char *arg3, ch
 // Extrai o código ILOC de uma lista do tipo INSTRUCTION
 char *_extract_code(INSTRUCTION *last_inst) {
   char *code, *prev_code, *temp_code;
+
+  // Gera instruções sem argumentos
   if (last_inst->arg1 == NULL && last_inst->arg2 == NULL && last_inst->arg3 == NULL){
-    int inst_length = strlen(last_inst->code) + 10;
+    int inst_length = strlen(last_inst->code) + 3;
     temp_code = malloc(inst_length);
     sprintf(temp_code, "\t%s\n", last_inst->code);
-  }
-  else{
-    // Gera instruções com 2 destinos
-    if (!strcmp(last_inst->code, "storeAI") ||
-        !strcmp(last_inst->code, "cbr")) {
-      if (last_inst->arg3 != NULL) {
-        int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
-        temp_code = malloc(inst_length);
-        sprintf(temp_code, "\t%s\t%s => %s, %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
-      } else {
-        int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + 10;
-        temp_code = malloc(inst_length);
-        sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2);
-      }
-    } // Gera instruções com 2 origens
-    else { 
-      if (last_inst->arg2 != NULL) {
-        int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
-        temp_code = malloc(inst_length);
-        sprintf(temp_code, "\t%s\t%s, %s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
-      } else {
-        int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg3) + 10;
-        temp_code = malloc(inst_length);
-        sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
-      }
+  } // Gera instruções com dois destinos
+  else if (!strcmp(last_inst->code, "storeAI") ||
+      !strcmp(last_inst->code, "cbr")) {
+    if (last_inst->arg3 != NULL) {
+      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t%s => %s, %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
+    } else {
+      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + 8;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2);
+    }
+  } // Gera instruções com 2 origens
+  else { 
+    if (last_inst->arg2 != NULL) {
+      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t%s, %s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
+    } else {
+      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg3) + 8;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
     }
   }
   
@@ -135,11 +134,13 @@ int _get_program_size(INSTRUCTION *last_inst) {
 
 // Gera o código final do programa
 char *generate_iloc_code(INSTRUCTION *last_inst) {
-  INSTRUCTION *inst_list = last_inst, *inst_aux;
+  INSTRUCTION *inst_list, *inst_aux = last_inst;
   char str_size[12];
-  sprintf(str_size, "%d", _get_program_size(last_inst) + 3);
+  sprintf(str_size, "%d", _get_program_size(last_inst) + 4);
 
-  // TODO: Adiciona instrução de HALT
+  // Adiciona instrução de HALT
+  inst_list = _new_instruction("halt", NULL, NULL, NULL, NULL);
+  concat_inst(inst_aux, inst_list);
 
   // Inicializa registradores auxiliares
   inst_aux = _new_instruction("loadI", str_size, NULL, "rbss", NULL);
