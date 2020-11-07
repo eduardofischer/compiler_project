@@ -25,7 +25,11 @@ char *extract_code(INSTRUCTION *last_inst);
 // Concatena dois trechos de código
 void concat_inst(INSTRUCTION *inst1, INSTRUCTION *inst2);
 
-// a
+// Funcoes para remendar os buracos no código intermediário
 void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list);
+void *find_holes_t(INSTRUCTION *last_inst, char *rot, LIST *list);
+
+// Concatena duas lista de remendos
+void concat_hole_list(LIST *list1, LIST *list2);
 
 #endif

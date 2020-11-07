@@ -70,7 +70,6 @@ INSTRUCTION *_new_instruction(char *code, char *arg1, char *arg2, char *arg3, ch
 // Extrai o código ILOC de uma lista do tipo INSTRUCTION
 char *extract_code(INSTRUCTION *last_inst) {
   char *code, *prev_code, *temp_code;
-
   // Gera instruções com 2 destinos
   if (!strcmp(last_inst->code, "storeAI") ||
       !strcmp(last_inst->code, "cbr")) {
@@ -95,7 +94,7 @@ char *extract_code(INSTRUCTION *last_inst) {
       sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
     }
   }
-
+  
   // Adição da label à instrução
   if (last_inst->label != NULL) {
     code = malloc(strlen(temp_code) + strlen(last_inst->label) + 2);
@@ -103,7 +102,7 @@ char *extract_code(INSTRUCTION *last_inst) {
   } else {
     code = temp_code;
   }
-
+  
   // Concatenação recursiva de isntruções
   if (last_inst->prev != NULL) {
     prev_code = extract_code(last_inst->prev);
@@ -154,8 +153,26 @@ void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
   concat_inst(value->code, var->code);
 }
 
+// Concatena duas lista de remendos
+void concat_hole_list(LIST *list1, LIST *list2) {
+  list1->next = list2;
+}
+
 // a
 void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list) {
+  if (last_inst->arg3 != NULL)
+    if (strcmp(last_inst->arg3, list->rot) == 0) 
+      last_inst->arg3 = rot;
+  
+  if (list->next != NULL)
+    find_holes(last_inst, rot, list->next);
+
+  if (last_inst->prev != NULL)
+    find_holes(last_inst->prev, rot, list);
+  
+}
+
+void *find_holes_t(INSTRUCTION *last_inst, char *rot, LIST *list) {
   if (last_inst->arg2 != NULL)
     if (strcmp(last_inst->arg2, list->rot) == 0) 
       last_inst->arg2 = rot;

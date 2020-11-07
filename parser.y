@@ -592,12 +592,17 @@ expression: id {
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
 		
-		char *str = "Remendo1";
+		char *str = "Remendo0";
 		$$.list_f = malloc(sizeof(LIST));
-		$$.list_f->rot = malloc(sizeof(char)+1);
+		$$.list_f->rot = malloc(sizeof(str)+1);
 		$$.list_f->rot= str;
 		$$.list_f->next = NULL;
 		//printf("%s\n", $$.list_f->rot);
+		char *str1 = "Remendo1";
+		$$.list_t = malloc(sizeof(LIST));
+		$$.list_t->rot = malloc(sizeof(str1)+1);
+		$$.list_t->rot= str1;
+		$$.list_t->next = NULL;
 	}
 	| expression '>' expression { 
 		PROD_VALUE op;
@@ -651,6 +656,19 @@ expression: id {
 		op.table_entry.data_type = DT_BOOL; 
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
+
+		if ($3.list_f != NULL){
+			$$.list_f = malloc(sizeof(LIST));
+			$$.list_f = $3.list_f;
+			printf("DEBUG - %s\n", $$.list_f->rot);
+		}
+		if ($1.list_t != NULL && $3.list_t != NULL){
+			$$.list_t = malloc(sizeof(LIST));
+			//$1.list_t->next = $3.list_t
+			concat_hole_list($1.list_t, $3.list_t);
+			$$.list_t = $1.list_t;
+			printf("DEBUG - %s\n", $$.list_t->rot);
+		}
 	}
 	| expression TK_OC_AND expression { 
 		PROD_VALUE op;
