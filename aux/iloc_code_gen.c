@@ -70,28 +70,35 @@ INSTRUCTION *_new_instruction(char *code, char *arg1, char *arg2, char *arg3, ch
 // Extrai o código ILOC de uma lista do tipo INSTRUCTION
 char *extract_code(INSTRUCTION *last_inst) {
   char *code, *prev_code, *temp_code;
-  // Gera instruções com 2 destinos
-  if (!strcmp(last_inst->code, "storeAI") ||
-      !strcmp(last_inst->code, "cbr")) {
-    if (last_inst->arg3 != NULL) {
-      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t%s => %s, %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
-    } else {
-      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + 10;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2);
-    }
-  } // Gera instruções com 2 origens
-  else { 
-    if (last_inst->arg2 != NULL) {
-      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t%s, %s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
-    } else {
-      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg3) + 10;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
+  if (last_inst->arg1 == NULL && last_inst->arg2 == NULL && last_inst->arg3 == NULL){
+    int inst_length = strlen(last_inst->code) + 10;
+    temp_code = malloc(inst_length);
+    sprintf(temp_code, "\t%s\n", last_inst->code);
+  }
+  else{
+    // Gera instruções com 2 destinos
+    if (!strcmp(last_inst->code, "storeAI") ||
+        !strcmp(last_inst->code, "cbr")) {
+      if (last_inst->arg3 != NULL) {
+        int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
+        temp_code = malloc(inst_length);
+        sprintf(temp_code, "\t%s\t%s => %s, %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
+      } else {
+        int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + 10;
+        temp_code = malloc(inst_length);
+        sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2);
+      }
+    } // Gera instruções com 2 origens
+    else { 
+      if (last_inst->arg2 != NULL) {
+        int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
+        temp_code = malloc(inst_length);
+        sprintf(temp_code, "\t%s\t%s, %s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
+      } else {
+        int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg3) + 10;
+        temp_code = malloc(inst_length);
+        sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
+      }
     }
   }
   
@@ -191,11 +198,11 @@ void *find_holes_t(INSTRUCTION *last_inst, char *rot, LIST *list) {
 void _make_patch(PROD_VALUE *inst1, char *rot) {
   if (inst1->list_f != NULL)
     if (strcmp(inst1->ast_node->label, "||") == 0)
-      find_holes(inst1->code->prev, rot, inst1->list_f);
+      find_holes(inst1->code, rot, inst1->list_f);
 
   if (inst1->list_t != NULL)   
     if (strcmp(inst1->ast_node->label, "&&") == 0)
-      find_holes_t(inst1->code->prev, rot, inst1->list_t);
+      find_holes_t(inst1->code, rot, inst1->list_t);
 }
 
 // Gera buraco que deve ser remendado no futuro
@@ -205,6 +212,19 @@ char* _make_hole(){
   sprintf(label, "Remendo%d", n++);
   return label;
 }
+
+/*
+void conncat_rot(){
+  // Adição da label à instrução
+  if (last_inst->label != NULL) {
+    code = malloc(strlen(temp_code) + strlen(last_inst->label) + 2);
+    sprintf(code, "%s:%s", last_inst->label, temp_code);
+  } else {
+    code = temp_code;
+  }
+
+}
+*/
 
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
@@ -221,7 +241,7 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
       exp->code = _new_instruction("div", op1->location, op2->location, exp->location, NULL);
     else if (strcmp(operator->ast_node->label, "||") == 0){
       char *rot = _new_label();
-      exp->code = _new_instruction(rot, op1->location, op2->location, exp->location, NULL);
+      exp->code = _new_instruction("NOP", NULL, NULL, NULL, rot);
       concat_inst(op1->code, op2->code);
       concat_inst(op2->code, exp->code);
       _make_patch(exp, rot);
@@ -229,7 +249,7 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
     }
      else if (strcmp(operator->ast_node->label, "&&") == 0){
       char *rot = _new_label();
-      exp->code = _new_instruction(rot, op1->location, op2->location, exp->location, NULL);
+      exp->code = _new_instruction("NOP", NULL, NULL, NULL, rot);
       concat_inst(op1->code, op2->code);
       concat_inst(op2->code, exp->code);
       _make_patch(exp, rot);
