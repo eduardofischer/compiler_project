@@ -158,7 +158,7 @@ void concat_hole_list(LIST *list1, LIST *list2) {
   list1->next = list2;
 }
 
-// a
+// Remendo para lista F de buracos
 void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list) {
   if (last_inst->arg3 != NULL)
     if (strcmp(last_inst->arg3, list->rot) == 0) 
@@ -172,24 +172,30 @@ void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list) {
   
 }
 
+// Remendo para lista T de buracos
 void *find_holes_t(INSTRUCTION *last_inst, char *rot, LIST *list) {
   if (last_inst->arg2 != NULL)
     if (strcmp(last_inst->arg2, list->rot) == 0) 
       last_inst->arg2 = rot;
-  
+
   if (list->next != NULL)
-    find_holes(last_inst, rot, list->next);
+    find_holes_t(last_inst, rot, list->next);
 
   if (last_inst->prev != NULL)
-    find_holes(last_inst->prev, rot, list);
+    find_holes_t(last_inst->prev, rot, list);
+  
   
 }
 
 // Faz um remendo
 void _make_patch(PROD_VALUE *inst1, char *rot) {
-  //inst1->arg3 = rot;
   if (inst1->list_f != NULL)
-    find_holes(inst1->code->prev, rot, inst1->list_f);
+    if (strcmp(inst1->ast_node->label, "||") == 0)
+      find_holes(inst1->code->prev, rot, inst1->list_f);
+
+  if (inst1->list_t != NULL)   
+    if (strcmp(inst1->ast_node->label, "&&") == 0)
+      find_holes_t(inst1->code->prev, rot, inst1->list_t);
 }
 
 // Gera buraco que deve ser remendado no futuro
@@ -221,12 +227,20 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
       _make_patch(exp, rot);
       return;
     }
+     else if (strcmp(operator->ast_node->label, "&&") == 0){
+      char *rot = _new_label();
+      exp->code = _new_instruction(rot, op1->location, op2->location, exp->location, NULL);
+      concat_inst(op1->code, op2->code);
+      concat_inst(op2->code, exp->code);
+      _make_patch(exp, rot);
+      return;
+    }
     else if (strcmp(operator->ast_node->label, "<") == 0){
       INSTRUCTION *inst1 = _new_instruction("cmp_LT", op1->location, op2->location, exp->location, NULL);
       
       char *temp1 = _make_hole();
       char *temp2 = _make_hole();
-      
+
       exp->list_f = malloc(sizeof(LIST));
 		  exp->list_f->rot = malloc(sizeof(temp2)+1);
 		  exp->list_f->rot= temp2;
@@ -236,8 +250,8 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
 		  exp->list_t->rot = malloc(sizeof(temp1)+1);
 		  exp->list_t->rot= temp1;
 		  exp->list_t->next = NULL;
-      exp->code = _new_instruction("cbr", exp->location, temp1, temp2, NULL);
 
+      exp->code = _new_instruction("cbr", exp->location, temp1, temp2, NULL);
       concat_inst(inst1, exp->code);
       //printf("exp rot = %s\n", exp->list_f->rot);
     }

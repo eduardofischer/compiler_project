@@ -650,15 +650,14 @@ expression: id {
 		if ($3.list_f != NULL){
 			$$.list_f = malloc(sizeof(LIST));
 			$$.list_f = $3.list_f;
-			printf("DEBUG: Atribui Lista - %s\n", $$.list_f->rot);
+			printf("DEBUG: OR - Atribui Lista - %s\n", $$.list_f->rot);
 		}
 		if ($1.list_t != NULL && $3.list_t != NULL){
 			$$.list_t = malloc(sizeof(LIST));
-			//$1.list_t->next = $3.list_t
 			concat_hole_list($1.list_t, $3.list_t);
 			$$.list_t = $1.list_t;
-			printf("DEBUG: Concat Lista - %s\n", $$.list_t->rot);
-			printf("DEBUG: Concat Lista - %s\n", $$.list_t->next->rot);
+			printf("DEBUG: OR - Concat Lista - %s\n", $$.list_t->rot);
+			printf("DEBUG: OR - Concat Lista - %s\n", $$.list_t->next->rot);
 		}
 	}
 	| expression TK_OC_AND expression { 
@@ -667,6 +666,19 @@ expression: id {
 		op.table_entry.data_type = DT_BOOL; 
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
+
+		if ($3.list_t != NULL){
+			$$.list_t = malloc(sizeof(LIST));
+			$$.list_t = $3.list_t;
+			printf("DEBUG: AND - Atribui Lista - %s\n", $$.list_t->rot);
+		}
+		if ($1.list_f != NULL && $3.list_f != NULL){
+			$$.list_f = malloc(sizeof(LIST));
+			concat_hole_list($1.list_f, $3.list_f);
+			$$.list_f = $1.list_f;
+			printf("DEBUG: AND - Concat Lista - %s\n", $$.list_f->rot);
+			printf("DEBUG: AND - Concat Lista - %s\n", $$.list_f->next->rot);
+		}
 	}
 	| expression '?' expression ':' expression %prec TERNARY {
 		$$.location = NULL; $$.code = NULL; // Temporário
