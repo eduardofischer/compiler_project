@@ -172,7 +172,7 @@ int _get_program_size(INSTRUCTION *last_inst) {
 char *generate_iloc_code(INSTRUCTION *last_inst) {
   INSTRUCTION *inst_list, *inst_aux = last_inst;
   char str_size[12];
-  sprintf(str_size, "%d", _get_program_size(last_inst) + 4);
+  printf(str_size, "%d", _get_program_size(last_inst) + 4);
 
   // Adiciona instrução de HALT
   inst_list = _new_instruction("halt", NULL, NULL, NULL, NULL);
@@ -284,6 +284,41 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
       exp->code = _new_instruction("div", op1->location, op2->location, exp->location, NULL);
     else if (!strcmp(operator->ast_node->label, "<")){
       INSTRUCTION *inst1 = _new_instruction("cmp_LT", op1->location, op2->location, exp->location, NULL);
+      exp->code = _new_instruction("cbr", exp->location, "HOLE", "HOLE", NULL);
+      exp->tl = _new_patch_list(&exp->code->arg2);
+      exp->fl = _new_patch_list(&exp->code->arg3);
+      concat_inst(inst1, exp->code);
+    }
+    else if (!strcmp(operator->ast_node->label, ">")){
+      INSTRUCTION *inst1 = _new_instruction("cmp_GT", op1->location, op2->location, exp->location, NULL);
+      exp->code = _new_instruction("cbr", exp->location, "HOLE", "HOLE", NULL);
+      exp->tl = _new_patch_list(&exp->code->arg2);
+      exp->fl = _new_patch_list(&exp->code->arg3);
+      concat_inst(inst1, exp->code);
+    }
+    else if (!strcmp(operator->ast_node->label, "<=")){
+      INSTRUCTION *inst1 = _new_instruction("cmp_LE", op1->location, op2->location, exp->location, NULL);
+      exp->code = _new_instruction("cbr", exp->location, "HOLE", "HOLE", NULL);
+      exp->tl = _new_patch_list(&exp->code->arg2);
+      exp->fl = _new_patch_list(&exp->code->arg3);
+      concat_inst(inst1, exp->code);
+    }
+    else if (!strcmp(operator->ast_node->label, ">=")){
+      INSTRUCTION *inst1 = _new_instruction("cmp_GE", op1->location, op2->location, exp->location, NULL);
+      exp->code = _new_instruction("cbr", exp->location, "HOLE", "HOLE", NULL);
+      exp->tl = _new_patch_list(&exp->code->arg2);
+      exp->fl = _new_patch_list(&exp->code->arg3);
+      concat_inst(inst1, exp->code);
+    }
+    else if (!strcmp(operator->ast_node->label, "==")){
+      INSTRUCTION *inst1 = _new_instruction("cmp_EQ", op1->location, op2->location, exp->location, NULL);
+      exp->code = _new_instruction("cbr", exp->location, "HOLE", "HOLE", NULL);
+      exp->tl = _new_patch_list(&exp->code->arg2);
+      exp->fl = _new_patch_list(&exp->code->arg3);
+      concat_inst(inst1, exp->code);
+    }
+    else if (!strcmp(operator->ast_node->label, "!=")){
+      INSTRUCTION *inst1 = _new_instruction("cmp_NE", op1->location, op2->location, exp->location, NULL);
       exp->code = _new_instruction("cbr", exp->location, "HOLE", "HOLE", NULL);
       exp->tl = _new_patch_list(&exp->code->arg2);
       exp->fl = _new_patch_list(&exp->code->arg3);
