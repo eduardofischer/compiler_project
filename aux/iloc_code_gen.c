@@ -213,19 +213,6 @@ char* _make_hole(){
   return label;
 }
 
-/*
-void conncat_rot(){
-  // Adição da label à instrução
-  if (last_inst->label != NULL) {
-    code = malloc(strlen(temp_code) + strlen(last_inst->label) + 2);
-    sprintf(code, "%s:%s", last_inst->label, temp_code);
-  } else {
-    code = temp_code;
-  }
-
-}
-*/
-
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
   if (op1->location != NULL && op2->location != NULL) {
