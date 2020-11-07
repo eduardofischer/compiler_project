@@ -591,8 +591,6 @@ expression: id {
 		op.ast_node = create_node("<");
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
-		// printf("DEBUG: ROTULO F- %s\n", $$.fl->label);
-		// printf("DEBUG: ROTULO T- %s\n", $$.tl->label);
 	}
 	| expression '>' expression { 
 		PROD_VALUE op;

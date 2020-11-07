@@ -71,14 +71,14 @@ INSTRUCTION *_new_instruction(char *code, char *arg1, char *arg2, char *arg3, ch
 char *_extract_code(INSTRUCTION *last_inst) {
   char *code, *prev_code, *temp_code;
 
-  // Gera instruções sem argumentos
+  // Instruções sem argumentos
   if (last_inst->arg1 == NULL && last_inst->arg2 == NULL && last_inst->arg3 == NULL){
     int inst_length = strlen(last_inst->code) + 3;
     temp_code = malloc(inst_length);
     sprintf(temp_code, "\t%s\n", last_inst->code);
-  } // Gera instruções com dois destinos
-  else if (!strcmp(last_inst->code, "storeAI") ||
-      !strcmp(last_inst->code, "cbr")) {
+  }
+  // Instruções com dois destinos e flecha dupla
+  else if (!strcmp(last_inst->code, "storeAI")) {
     if (last_inst->arg3 != NULL) {
       int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
       temp_code = malloc(inst_length);
@@ -88,7 +88,43 @@ char *_extract_code(INSTRUCTION *last_inst) {
       temp_code = malloc(inst_length);
       sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2);
     }
-  } // Gera instruções com 2 origens
+  }
+  // Instruções com dois destinos e flecha simples
+  else if (!strcmp(last_inst->code, "cbr")) {
+    if (last_inst->arg3 != NULL) {
+      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t%s -> %s, %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
+    } else {
+      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + 8;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t%s -> %s\n", last_inst->code, last_inst->arg1, last_inst->arg2);
+    }
+  } 
+  // Gera instruções com 2 origens e flecha simples
+  else if (!strcmp(last_inst->code, "cmp_LT") ||
+           !strcmp(last_inst->code, "cmp_LE") || 
+           !strcmp(last_inst->code, "cmp_EQ") || 
+           !strcmp(last_inst->code, "cmp_GE") || 
+           !strcmp(last_inst->code, "cmp_GT") || 
+           !strcmp(last_inst->code, "cmp_NE") || 
+           !strcmp(last_inst->code, "jump") || 
+           !strcmp(last_inst->code, "jumpI")) { 
+    if (last_inst->arg1 == NULL && last_inst->arg2 == NULL) {
+      int inst_length = strlen(last_inst->code)  + strlen(last_inst->arg3) + 9;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t\t -> %s\n", last_inst->code, last_inst->arg3);
+    } else if (last_inst->arg2 != NULL) {
+      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t%s, %s -> %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
+    } else {
+      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg3) + 8;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t%s -> %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
+    }
+  }
+  // Gera instruções com 2 origens e flecha dupla
   else { 
     if (last_inst->arg2 != NULL) {
       int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
@@ -110,7 +146,7 @@ char *_extract_code(INSTRUCTION *last_inst) {
     code = temp_code;
   }
   
-  // Concatenação recursiva de isntruções
+  // Concatenação recursiva de instruções
   if (last_inst->prev != NULL) {
     prev_code = _extract_code(last_inst->prev);
     code = _concat_code(prev_code, code);
@@ -261,6 +297,12 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
 
 // Gera o código de operações lógicas (&& e ||)
 void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
+  INSTRUCTION *inst_aux1, *inst_aux2;
+  char *label_true = _new_label();
+  char *label_false = _new_label();
+  char *label_end = _new_label();
+  exp->location = _new_register();
+
   if (!strcmp(operator->ast_node->label, "||")){
     char *label = _new_label();
     _patch_holes(op1->fl, label);
@@ -274,9 +316,22 @@ void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, P
     exp->tl = op2->tl;
     exp->fl = _concat_patch_list(op1->fl, op2->fl);
   }
-
   concat_inst(op1->code, exp->code);
   concat_inst(exp->code, op2->code);
-  exp->code = op2->code;
+
+  _patch_holes(exp->tl, label_true);
+  _patch_holes(exp->fl, label_false);
+
+  inst_aux1 = _new_instruction("loadI", "1", NULL, exp->location, label_true);
+  concat_inst(op2->code, inst_aux1);
+  inst_aux2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
+  concat_inst(inst_aux1, inst_aux2);
+  inst_aux1 = _new_instruction("loadI", "0", NULL, exp->location, label_false);
+  concat_inst(inst_aux2, inst_aux1);
+  inst_aux2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
+  concat_inst(inst_aux1, inst_aux2);
+  inst_aux1 = _new_instruction("nop", NULL, NULL, NULL, label_end);
+  concat_inst(inst_aux2, inst_aux1);
+  exp->code = inst_aux1;
 }
 
