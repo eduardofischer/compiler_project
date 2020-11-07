@@ -223,9 +223,23 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
     }
     else if (strcmp(operator->ast_node->label, "<") == 0){
       INSTRUCTION *inst1 = _new_instruction("cmp_LT", op1->location, op2->location, exp->location, NULL);
-      exp->code = _new_instruction("cbr", exp->location, _make_hole(), _make_hole(), NULL);
       
+      char *temp1 = _make_hole();
+      char *temp2 = _make_hole();
+      
+      exp->list_f = malloc(sizeof(LIST));
+		  exp->list_f->rot = malloc(sizeof(temp2)+1);
+		  exp->list_f->rot= temp2;
+		  exp->list_f->next = NULL;
+
+      exp->list_t = malloc(sizeof(LIST));
+		  exp->list_t->rot = malloc(sizeof(temp1)+1);
+		  exp->list_t->rot= temp1;
+		  exp->list_t->next = NULL;
+      exp->code = _new_instruction("cbr", exp->location, temp1, temp2, NULL);
+
       concat_inst(inst1, exp->code);
+      //printf("exp rot = %s\n", exp->list_f->rot);
     }
     
     concat_inst(op1->code, op2->code);

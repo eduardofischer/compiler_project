@@ -591,18 +591,8 @@ expression: id {
 		op.ast_node = create_node("<");
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
-		
-		char *str = "Remendo0";
-		$$.list_f = malloc(sizeof(LIST));
-		$$.list_f->rot = malloc(sizeof(str)+1);
-		$$.list_f->rot= str;
-		$$.list_f->next = NULL;
-		//printf("%s\n", $$.list_f->rot);
-		char *str1 = "Remendo1";
-		$$.list_t = malloc(sizeof(LIST));
-		$$.list_t->rot = malloc(sizeof(str1)+1);
-		$$.list_t->rot= str1;
-		$$.list_t->next = NULL;
+		printf("DEBUG: ROTULO F- %s\n", $$.list_f->rot);
+		printf("DEBUG: ROTULO T- %s\n", $$.list_t->rot);
 	}
 	| expression '>' expression { 
 		PROD_VALUE op;
@@ -660,14 +650,15 @@ expression: id {
 		if ($3.list_f != NULL){
 			$$.list_f = malloc(sizeof(LIST));
 			$$.list_f = $3.list_f;
-			printf("DEBUG - %s\n", $$.list_f->rot);
+			printf("DEBUG: Atribui Lista - %s\n", $$.list_f->rot);
 		}
 		if ($1.list_t != NULL && $3.list_t != NULL){
 			$$.list_t = malloc(sizeof(LIST));
 			//$1.list_t->next = $3.list_t
 			concat_hole_list($1.list_t, $3.list_t);
 			$$.list_t = $1.list_t;
-			printf("DEBUG - %s\n", $$.list_t->rot);
+			printf("DEBUG: Concat Lista - %s\n", $$.list_t->rot);
+			printf("DEBUG: Concat Lista - %s\n", $$.list_t->next->rot);
 		}
 	}
 	| expression TK_OC_AND expression { 
