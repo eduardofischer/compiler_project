@@ -136,7 +136,7 @@ program: global_var_decl program {
 		$$ = $1;
 		$$.ast_node = $2.ast_node;
 		if ($$.code != NULL)
-			_concat_inst($2.code, $$.code);
+			concat_inst($2.code, $$.code);
 		else
 			$$.code = $2.code;
 	}
@@ -349,7 +349,7 @@ command_list: command command_list {
 		}
 
 		if ($2.code != NULL) {
-			_concat_inst($1.code, $2.code);
+			concat_inst($1.code, $2.code);
 			$$.code = $2.code;
 		} else {
 			$$.code = $1.code;
@@ -533,7 +533,8 @@ var_attribution: id '=' expression {
 // Expressões da linguagem
 expression: id {
 		$$ = $1;
-		check_variable($1.table_entry);
+		$$.table_entry = *find_table_entry(table_stack, $1.table_entry);
+		gen_code_id(&$$);
 	}
 	| vector_index { $$ = $1; }
 	| function_call  { $$ = $1; }
@@ -837,6 +838,7 @@ void process_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, 
 	exp->ast_node = operator->ast_node;
 	add_child(exp->ast_node, op1->ast_node); 
 	add_child(exp->ast_node, op2->ast_node);
+
 	if (operator->table_entry.data_type > 0)
 		exp->table_entry.data_type = operator->table_entry.data_type;
 	else

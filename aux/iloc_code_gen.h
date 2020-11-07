@@ -10,6 +10,9 @@
 // Geração de código de atribuição de variáveis
 void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value);
 
+// Geração de código de identificadores
+void gen_code_id(PROD_VALUE *id);
+
 // Geração de código de literais
 void gen_code_literal(PROD_VALUE *lit);
 
@@ -20,6 +23,6 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
 char *extract_code(INSTRUCTION *last_inst);
 
 // Concatena dois trechos de código
-void _concat_inst(INSTRUCTION *inst1, INSTRUCTION *inst2);
+void concat_inst(INSTRUCTION *inst1, INSTRUCTION *inst2);
 
 #endif
