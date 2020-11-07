@@ -82,6 +82,7 @@ typedef struct instruction {
   char *arg1;
   char *arg2;
   char *arg3;
+  char *label;
   struct instruction *prev;
 } INSTRUCTION;
 
