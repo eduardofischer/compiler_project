@@ -787,8 +787,11 @@ shift_right: id TK_OC_SR TK_LIT_INT {
 // Comandos return, break e continue
 return: TK_PR_RETURN expression { 
 		$$.ast_node = create_node("return"); 
-		add_child($$.ast_node, $2.ast_node); 
-		$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry)->data_type;
+		add_child($$.ast_node, $2.ast_node);
+		if ($2.table_entry.entry_type != ET_LITERAL)
+			$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry)->data_type;
+		else
+			$$.table_entry = $2.table_entry;
 	}
 break: TK_PR_BREAK { $$.ast_node = create_node("break"); }
 continue: TK_PR_CONTINUE { $$.ast_node = create_node("continue"); }
