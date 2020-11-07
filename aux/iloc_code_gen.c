@@ -100,7 +100,6 @@ char *extract_code(INSTRUCTION *last_inst) {
       }
     }
   }
-  
 
   if (last_inst->prev != NULL) {
     prev_code = extract_code(last_inst->prev);

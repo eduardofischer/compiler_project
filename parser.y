@@ -544,6 +544,7 @@ expression: id {
 	}
 	| '(' expression ')'  { $$ = $2; }
 	| unary_op expression %prec UNARY {
+		$$.location = NULL; $$.code = NULL; // Temporário
 		$$.ast_node = $1.ast_node; 
 		add_child($$.ast_node, $2.ast_node);
 		$$.table_entry = $2.table_entry;
@@ -658,7 +659,8 @@ expression: id {
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
-	| expression '?' expression ':' expression %prec TERNARY { 
+	| expression '?' expression ':' expression %prec TERNARY {
+		$$.location = NULL; $$.code = NULL; // Temporário
 		$$.ast_node = create_node("?:"); 
 		add_child($$.ast_node, $1.ast_node); 
 		add_child($$.ast_node, $3.ast_node); 
