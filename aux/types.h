@@ -88,10 +88,10 @@ typedef struct instruction {
   struct instruction *prev;
 } INSTRUCTION;
 
-typedef struct list {
-  char *rot;
-  struct list *next;
-} LIST;
+typedef struct patch_list {
+  char **label;
+  struct patch_list *next;
+} PATCH_LIST;
 
 typedef struct prod_value {
   AST_NODE *ast_node;
@@ -102,8 +102,8 @@ typedef struct prod_value {
   // Variáveis para a geração de código ILOC
   char *location;
   INSTRUCTION *code;
-  LIST *list_t;
-  LIST *list_f;
+  PATCH_LIST *tl;
+  PATCH_LIST *fl;
 } PROD_VALUE;
 
 #endif

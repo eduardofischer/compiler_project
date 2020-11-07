@@ -195,63 +195,42 @@ void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
   concat_inst(value->code, var->code);
 }
 
-// Concatena duas lista de remendos
-void concat_hole_list(LIST *list1, LIST *list2) {
-  list1->next = list2;
-}
-
-// Remendo para lista F de buracos
-// Geração de código de atribuição de variáveis
+// TODO: Geração de código de chamada de funçao
 void gen_code_func_call(PROD_VALUE *id) {
-  
+  return;
 }
 
-// a
-void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list) {
-  if (last_inst->arg3 != NULL)
-    if (strcmp(last_inst->arg3, list->rot) == 0) 
-      last_inst->arg3 = rot;
-  
-  if (list->next != NULL)
-    find_holes(last_inst, rot, list->next);
+void _patch_holes(PATCH_LIST *list, char *label) {
+  PATCH_LIST *hole = list, *temp;
 
-  if (last_inst->prev != NULL)
-    find_holes(last_inst->prev, rot, list);
-  
+  do {
+    *(hole->label) = label;
+    temp = hole->next;
+    free(hole);
+    hole = temp;
+  } while (hole != NULL);
 }
 
-// Remendo para lista T de buracos
-void *find_holes_t(INSTRUCTION *last_inst, char *rot, LIST *list) {
-  if (last_inst->arg2 != NULL)
-    if (strcmp(last_inst->arg2, list->rot) == 0) 
-      last_inst->arg2 = rot;
-
-  if (list->next != NULL)
-    find_holes_t(last_inst, rot, list->next);
-
-  if (last_inst->prev != NULL)
-    find_holes_t(last_inst->prev, rot, list);
-  
-  
+PATCH_LIST *_new_patch_list(char **addr) {
+  PATCH_LIST *list = malloc(sizeof(PATCH_LIST));
+  list->label = addr;
+  list->next = NULL;
+  return list;
 }
 
-// Faz um remendo
-void _make_patch(PROD_VALUE *inst1, char *rot) {
-  if (inst1->list_f != NULL)
-    if (strcmp(inst1->ast_node->label, "||") == 0)
-      find_holes(inst1->code, rot, inst1->list_f);
-
-  if (inst1->list_t != NULL)   
-    if (strcmp(inst1->ast_node->label, "&&") == 0)
-      find_holes_t(inst1->code, rot, inst1->list_t);
+PATCH_LIST *_insert_patch_list(PATCH_LIST *list, char **addr) {
+  PATCH_LIST *new_patch = malloc(sizeof(PATCH_LIST));
+  new_patch->label = addr;
+  new_patch->next = list;
+  return new_patch;
 }
 
-// Gera buraco que deve ser remendado no futuro
-char* _make_hole(){
-  static int n = 0;
-  char *label = malloc(2 + floor(n/10));
-  sprintf(label, "Remendo%d", n++);
-  return label;
+PATCH_LIST *_concat_patch_list(PATCH_LIST *list1, PATCH_LIST *list2) {
+  PATCH_LIST *last = list1;
+  while (last->next != NULL)
+    last = last->next;
+  last->next = list2;
+  return list1;
 }
 
 // Gera o código de operações binárias
@@ -259,51 +238,20 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
   if (op1->location != NULL && op2->location != NULL) {
     exp->location = _new_register();
     
-    if (strcmp(operator->ast_node->label, "+") == 0)
+    if (!strcmp(operator->ast_node->label, "+"))
       exp->code = _new_instruction("add", op1->location, op2->location, exp->location, NULL);
-    else if (strcmp(operator->ast_node->label, "-") == 0)
+    else if (!strcmp(operator->ast_node->label, "-"))
       exp->code = _new_instruction("sub", op1->location, op2->location, exp->location, NULL);
-    else if (strcmp(operator->ast_node->label, "*") == 0)
+    else if (!strcmp(operator->ast_node->label, "*"))
       exp->code = _new_instruction("mult", op1->location, op2->location, exp->location, NULL);
-    else if (strcmp(operator->ast_node->label, "/") == 0)
+    else if (!strcmp(operator->ast_node->label, "/"))
       exp->code = _new_instruction("div", op1->location, op2->location, exp->location, NULL);
-    else if (strcmp(operator->ast_node->label, "||") == 0){
-      char *rot = _new_label();
-      exp->code = _new_instruction("NOP", NULL, NULL, NULL, rot);
-      concat_inst(op1->code, exp->code);
-      concat_inst(exp->code, op2->code);
-      exp->code = op2->code;
-      _make_patch(exp, rot);
-      return;
-    }
-     else if (strcmp(operator->ast_node->label, "&&") == 0){
-      char *rot = _new_label();
-      exp->code = _new_instruction("NOP", NULL, NULL, NULL, rot);
-      concat_inst(op1->code, exp->code);
-      concat_inst(exp->code, op2->code);
-      exp->code = op2->code;
-      _make_patch(exp, rot);
-      return;
-    }
-    else if (strcmp(operator->ast_node->label, "<") == 0){
+    else if (!strcmp(operator->ast_node->label, "<")){
       INSTRUCTION *inst1 = _new_instruction("cmp_LT", op1->location, op2->location, exp->location, NULL);
-      
-      char *temp1 = _make_hole();
-      char *temp2 = _make_hole();
-
-      exp->list_f = malloc(sizeof(LIST));
-		  exp->list_f->rot = malloc(sizeof(temp2)+1);
-		  exp->list_f->rot= temp2;
-		  exp->list_f->next = NULL;
-
-      exp->list_t = malloc(sizeof(LIST));
-		  exp->list_t->rot = malloc(sizeof(temp1)+1);
-		  exp->list_t->rot= temp1;
-		  exp->list_t->next = NULL;
-
-      exp->code = _new_instruction("cbr", exp->location, temp1, temp2, NULL);
+      exp->code = _new_instruction("cbr", exp->location, "HOLE", "HOLE", NULL);
+      exp->tl = _new_patch_list(&exp->code->arg2);
+      exp->fl = _new_patch_list(&exp->code->arg3);
       concat_inst(inst1, exp->code);
-      //printf("exp rot = %s\n", exp->list_f->rot);
     }
     
     concat_inst(op1->code, op2->code);
@@ -311,4 +259,24 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
   }
 }
 
+// Gera o código de operações lógicas (&& e ||)
+void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
+  if (!strcmp(operator->ast_node->label, "||")){
+    char *label = _new_label();
+    _patch_holes(op1->fl, label);
+    exp->code = _new_instruction("nop", NULL, NULL, NULL, label);
+    exp->tl = _concat_patch_list(op1->tl, op2->tl);
+    exp->fl = op2->fl;
+  } else if (!strcmp(operator->ast_node->label, "&&")){
+    char *label = _new_label();
+    _patch_holes(op1->tl, label);
+    exp->code = _new_instruction("nop", NULL, NULL, NULL, label);
+    exp->tl = op2->tl;
+    exp->fl = _concat_patch_list(op1->fl, op2->fl);
+  }
+
+  concat_inst(op1->code, exp->code);
+  concat_inst(exp->code, op2->code);
+  exp->code = op2->code;
+}
 

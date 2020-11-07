@@ -22,14 +22,17 @@ void gen_code_literal(PROD_VALUE *lit);
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2);
 
+// Gera o código de operações lógicas (&& e ||)
+void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2);
+
 // Concatena dois trechos de código
 void concat_inst(INSTRUCTION *inst1, INSTRUCTION *inst2);
 
 // Funcoes para remendar os buracos no código intermediário
-void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list);
-void *find_holes_t(INSTRUCTION *last_inst, char *rot, LIST *list);
+void *find_holes(INSTRUCTION *last_inst, char *label, PATCH_LIST *list);
+void *find_holes_t(INSTRUCTION *last_inst, char *label, PATCH_LIST *list);
 
 // Concatena duas lista de remendos
-void concat_hole_list(LIST *list1, LIST *list2);
+void concat_hole_list(PATCH_LIST *list1, PATCH_LIST *list2);
 
 #endif
