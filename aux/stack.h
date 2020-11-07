@@ -31,4 +31,7 @@ SYMBOL_ENTRY *search_local_scope(STACK_ITEM *stack, char *key);
 // Injeta os argumentos da função no seu escopo
 void inject_arguments(STACK_ITEM *stack, ARG_LIST *args);
 
+// Verifica se o escopo é global
+int is_global_scope(STACK_ITEM *stack);
+
 #endif

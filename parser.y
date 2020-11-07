@@ -128,7 +128,7 @@ extern STACK_ITEM *table_stack;
 %%
 root: program	 {
 		arvore = (void*) $1.ast_node;
-		printf("%s\n", extract_code($1.code));
+		printf("%s\n", generate_iloc_code($1.code));
 	} 
 	;
 	

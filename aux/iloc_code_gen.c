@@ -68,7 +68,7 @@ INSTRUCTION *_new_instruction(char *code, char *arg1, char *arg2, char *arg3, ch
 }
 
 // Extrai o código ILOC de uma lista do tipo INSTRUCTION
-char *extract_code(INSTRUCTION *last_inst) {
+char *_extract_code(INSTRUCTION *last_inst) {
   char *code, *prev_code, *temp_code;
   if (last_inst->arg1 == NULL && last_inst->arg2 == NULL && last_inst->arg3 == NULL){
     int inst_length = strlen(last_inst->code) + 10;
@@ -113,12 +113,45 @@ char *extract_code(INSTRUCTION *last_inst) {
   
   // Concatenação recursiva de isntruções
   if (last_inst->prev != NULL) {
-    prev_code = extract_code(last_inst->prev);
+    prev_code = _extract_code(last_inst->prev);
     code = _concat_code(prev_code, code);
   }
   
   return code;
 }
+
+// Retorna o tamanho do programa
+int _get_program_size(INSTRUCTION *last_inst) {
+  int size = 1;
+  INSTRUCTION *inst = last_inst;
+  
+  while (inst->prev != NULL) {
+    inst = inst->prev;
+    size++;
+  }
+  
+  return size;
+}
+
+// Gera o código final do programa
+char *generate_iloc_code(INSTRUCTION *last_inst) {
+  INSTRUCTION *inst_list = last_inst, *inst_aux;
+  char str_size[12];
+  sprintf(str_size, "%d", _get_program_size(last_inst) + 3);
+
+  // TODO: Adiciona instrução de HALT
+
+  // Inicializa registradores auxiliares
+  inst_aux = _new_instruction("loadI", str_size, NULL, "rbss", NULL);
+  concat_inst(inst_aux, inst_list);
+  inst_aux = _new_instruction("loadI", RFP_INIT_VALUE, NULL, "rsp", NULL);
+  concat_inst(inst_aux, inst_list);
+  inst_aux = _new_instruction("loadI", RFP_INIT_VALUE, NULL, "rfp", NULL);
+  concat_inst(inst_aux, inst_list);
+
+  return _extract_code(inst_list);
+}
+
 
 // Geração de código de identificadores
 void gen_code_id(PROD_VALUE *id) {

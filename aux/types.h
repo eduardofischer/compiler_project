@@ -21,6 +21,8 @@
 
 #define NOT_DEFINED 99
 
+#define RFP_INIT_VALUE "1024"
+
 typedef union {
   int i;
   float f;

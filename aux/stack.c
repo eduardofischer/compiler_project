@@ -96,3 +96,8 @@ void inject_arguments(STACK_ITEM *stack, ARG_LIST *args) {
     current = current->next;
   }
 }
+
+// Verifica se o escopo é global
+int is_global_scope(STACK_ITEM *stack) {
+  return stack->next == NULL;
+}
