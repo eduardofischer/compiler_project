@@ -270,16 +270,18 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
     else if (strcmp(operator->ast_node->label, "||") == 0){
       char *rot = _new_label();
       exp->code = _new_instruction("NOP", NULL, NULL, NULL, rot);
-      concat_inst(op1->code, op2->code);
-      concat_inst(op2->code, exp->code);
+      concat_inst(op1->code, exp->code);
+      concat_inst(exp->code, op2->code);
+      exp->code = op2->code;
       _make_patch(exp, rot);
       return;
     }
      else if (strcmp(operator->ast_node->label, "&&") == 0){
       char *rot = _new_label();
       exp->code = _new_instruction("NOP", NULL, NULL, NULL, rot);
-      concat_inst(op1->code, op2->code);
-      concat_inst(op2->code, exp->code);
+      concat_inst(op1->code, exp->code);
+      concat_inst(exp->code, op2->code);
+      exp->code = op2->code;
       _make_patch(exp, rot);
       return;
     }
