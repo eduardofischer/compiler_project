@@ -342,15 +342,19 @@ cmd_block_end: '}' { table_stack = destroy_scope(table_stack); }
 cmd_block: cmd_block_start command_list cmd_block_end { $$ = $2; }
 command_list: command command_list {
 		if ($1.ast_node != NULL) {
-			$$ = $1;
+			$$.ast_node = $1.ast_node;
 			add_child($$.ast_node, $2.ast_node);
-			if ($$.code != NULL)
-				_concat_inst($2.code, $$.code);
-			else
-				$$.code = $2.code;
 		} else {
-			$$ = $2;
+			$$.ast_node = $2.ast_node;
 		}
+
+		if ($2.code != NULL) {
+			_concat_inst($1.code, $2.code);
+			$$.code = $2.code;
+		} else {
+			$$.code = $1.code;
+		}
+
 		if ($1.table_entry.entry_type == ET_RETURN) {
 			$$.table_entry.entry_type = ET_RETURN;
 			$$.table_entry.data_type = $1.table_entry.data_type;
