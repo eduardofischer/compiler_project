@@ -168,7 +168,8 @@ void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list) {
 // Faz um remendo
 void _make_patch(PROD_VALUE *inst1, char *rot) {
   //inst1->arg3 = rot;
-  find_holes(inst1->code->prev, rot, inst1->list_f);
+  if (inst1->list_f != NULL)
+    find_holes(inst1->code->prev, rot, inst1->list_f);
 }
 
 // Gera buraco que deve ser remendado no futuro

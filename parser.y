@@ -590,7 +590,7 @@ expression: id {
 		op.ast_node = create_node("<");
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
-
+		
 		char *str = "Remendo1";
 		$$.list_f = malloc(sizeof(LIST));
 		$$.list_f->rot = malloc(sizeof(char)+1);
