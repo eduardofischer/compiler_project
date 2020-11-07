@@ -589,6 +589,13 @@ expression: id {
 		op.ast_node = create_node("<");
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
+
+		char *str = "Remendo1";
+		$$.list_f = malloc(sizeof(LIST));
+		$$.list_f->rot = malloc(sizeof(char)+1);
+		$$.list_f->rot= str;
+		$$.list_f->next = NULL;
+		//printf("%s\n", $$.list_f->rot);
 	}
 	| expression '>' expression { 
 		PROD_VALUE op;
@@ -636,7 +643,7 @@ expression: id {
 		process_binary_exp(&$$, &$1, &op, &$3);
 		gen_code_binary_exp(&$$, &$1, &op, &$3);
 	}
-	| expression TK_OC_OR expression { 
+	| expression TK_OC_OR expression {
 		PROD_VALUE op;
 		op.ast_node = create_node_lex_value($2);
 		op.table_entry.data_type = DT_BOOL; 

@@ -66,16 +66,25 @@ INSTRUCTION *_new_instruction(char *code, char *arg1, char *arg2, char *arg3) {
 char *extract_code(INSTRUCTION *last_inst) {
   char *code, *prev_code;
   
-  if (last_inst->arg2 != NULL) {
+  if (strcmp(last_inst->code, "cbr") == 0){
     int inst_length = sizeof(last_inst->code) + sizeof(last_inst->arg1) +
-      sizeof(last_inst->arg2) + sizeof(last_inst->arg3) + 9;
-    code = malloc(inst_length);
-    sprintf(code, "%s\t%s, %s => %s\n", last_inst->code, last_inst->arg1,
-      last_inst->arg2, last_inst->arg3);
-  } else {
-    int inst_length = sizeof(last_inst->code) + sizeof(last_inst->arg1) + sizeof(last_inst->arg3) + 9;
-    code = malloc(inst_length);
-    sprintf(code, "%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
+        sizeof(last_inst->arg2) + sizeof(last_inst->arg3) + 9;
+      code = malloc(inst_length);
+      sprintf(code, "%s\t%s =>  %s, %s\n", last_inst->code, last_inst->arg1,
+        last_inst->arg2, last_inst->arg3);
+  }
+  else{
+    if (last_inst->arg2 != NULL) {
+      int inst_length = sizeof(last_inst->code) + sizeof(last_inst->arg1) +
+        sizeof(last_inst->arg2) + sizeof(last_inst->arg3) + 9;
+      code = malloc(inst_length);
+      sprintf(code, "%s\t%s, %s => %s\n", last_inst->code, last_inst->arg1,
+        last_inst->arg2, last_inst->arg3);
+    } else {
+      int inst_length = sizeof(last_inst->code) + sizeof(last_inst->arg1) + sizeof(last_inst->arg3) + 9;
+      code = malloc(inst_length);
+      sprintf(code, "%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
+    }
   }
 
   if (last_inst->prev != NULL) {
@@ -109,10 +118,24 @@ void gen_code_literal(PROD_VALUE *lit) {
   }
 }
 
+// a
+void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list) {
+  if (last_inst->arg2 != NULL)
+    if (strcmp(last_inst->arg2, list->rot) == 0) 
+      last_inst->arg2 = rot;
+  
+  if (list->next != NULL)
+    find_holes(last_inst, rot, list->next);
+
+  if (last_inst->prev != NULL)
+    find_holes(last_inst->prev, rot, list);
+  
+}
+
 // Faz um remendo
-void _make_patch(INSTRUCTION *inst1, char *rot) {
-  inst1->arg3 = rot;
-  // find_holes();
+void _make_patch(PROD_VALUE *inst1, char *rot) {
+  //inst1->arg3 = rot;
+  find_holes(inst1->code->prev, rot, inst1->list_f);
 }
 
 // Gera buraco que deve ser remendado no futuro
@@ -125,7 +148,7 @@ char* _make_hole(){
 
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
-  if (exp->table_entry.data_type == DT_INT) {
+  if (op1->location != NULL && op2->location != NULL) {
     exp->location = _new_register();
     
     if (strcmp(operator->ast_node->label, "+") == 0)
@@ -138,7 +161,11 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
       exp->code = _new_instruction("div", op1->location, op2->location, exp->location);
     else if (strcmp(operator->ast_node->label, "||") == 0){
       char *rot = _new_label();
-      _make_patch(exp->code, rot);
+      exp->code = _new_instruction(rot, op1->location, op2->location, exp->location);
+      _concat_inst(op1->code, op2->code);
+      _concat_inst(op2->code, exp->code);
+      _make_patch(exp, rot);
+      return;
     }
     else if (strcmp(operator->ast_node->label, "<") == 0){
       INSTRUCTION *inst1 = _new_instruction("cmp_LT", op1->location, op2->location, exp->location);
@@ -146,7 +173,7 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
       
       _concat_inst(inst1, exp->code);
     }
-    
+
     _concat_inst(op1->code, op2->code);
     _concat_inst(op2->code, exp->code);
   }

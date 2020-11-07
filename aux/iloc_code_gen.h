@@ -22,4 +22,7 @@ char *extract_code(INSTRUCTION *last_inst);
 // Concatena dois trechos de código
 void _concat_inst(INSTRUCTION *inst1, INSTRUCTION *inst2);
 
+// a
+void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list);
+
 #endif
