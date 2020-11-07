@@ -106,6 +106,7 @@ char *extract_code(INSTRUCTION *last_inst) {
   if (last_inst->label != NULL) {
     code = malloc(strlen(temp_code) + strlen(last_inst->label) + 2);
     sprintf(code, "%s:%s", last_inst->label, temp_code);
+    free(temp_code);
   } else {
     code = temp_code;
   }
@@ -166,6 +167,12 @@ void concat_hole_list(LIST *list1, LIST *list2) {
 }
 
 // Remendo para lista F de buracos
+// Geração de código de atribuição de variáveis
+void gen_code_func_call(PROD_VALUE *id) {
+  
+}
+
+// a
 void *find_holes(INSTRUCTION *last_inst, char *rot, LIST *list) {
   if (last_inst->arg3 != NULL)
     if (strcmp(last_inst->arg3, list->rot) == 0) 
