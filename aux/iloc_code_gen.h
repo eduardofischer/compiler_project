@@ -39,5 +39,6 @@ void concat_hole_list(PATCH_LIST *list1, PATCH_LIST *list2);
 void gen_code_if(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst);
 void gen_code_if_else(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst1, PROD_VALUE *inst2);
 void gen_code_while(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst);
+void gen_code_for(PROD_VALUE *code, PROD_VALUE *att1, PROD_VALUE *condition, PROD_VALUE *att2, PROD_VALUE *inst);
 
 #endif

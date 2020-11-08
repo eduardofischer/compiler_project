@@ -823,7 +823,8 @@ iterative_for_while: TK_PR_FOR '(' var_attribution ':' expression ':' var_attrib
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($$.ast_node, $5.ast_node); 
 		add_child($$.ast_node, $7.ast_node); 
-		add_child($$.ast_node, $9.ast_node); 
+		add_child($$.ast_node, $9.ast_node);
+		gen_code_for(&$$, &$3, &$5, &$7, &$9); 
 	}
 	| TK_PR_WHILE '(' expression ')' TK_PR_DO cmd_block { 
 		$$.ast_node = create_node("while"); 
