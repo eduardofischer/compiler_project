@@ -17,6 +17,7 @@ STACK_ITEM *new_scope(STACK_ITEM *stack) {
   item->table = malloc(sizeof(SYMBOL_ENTRY) * HT_SIZE);
   memset(item->table, 0, sizeof(SYMBOL_ENTRY) * HT_SIZE);
   item->offset = stack->offset;
+  item->prev_offset = stack->offset;
   item->next = stack;
   
   return item;
@@ -57,7 +58,7 @@ STACK_ITEM *destroy_scope(STACK_ITEM *stack) {
   free_ht(stack->table);
   next = stack->next;
   if (next != NULL)
-    next->offset = stack->offset;
+    next->offset = stack->prev_offset;
   free(stack);
   return next;
 }
@@ -94,6 +95,7 @@ void inject_arguments(STACK_ITEM *stack, ARG_LIST *args) {
     entry.key = strdup(current->id);
     entry.data_type = current->type;
     entry.entry_type = ET_VARIABLE;
+    entry.size = assign_size(current->type);
     insert_ht_entry(stack, entry);
     current = current->next;
   }

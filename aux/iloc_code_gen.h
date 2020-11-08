@@ -8,7 +8,7 @@
 #include "types.h"
 
 // Gera o código final do programa
-char *generate_iloc_code(INSTRUCTION *last_inst);
+char *generate_iloc_code(INSTRUCTION *last_inst, char *label_main);
 
 // Geração de código de atribuição de variáveis
 void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value);
@@ -21,6 +21,9 @@ void gen_code_literal(PROD_VALUE *lit);
 
 // Geração de código para declaração de função
 char * gen_code_function_def(PROD_VALUE *func, PROD_VALUE *cmd_list);
+
+// Geração de código de chamada de funçao
+void gen_code_func_call(PROD_VALUE *id);
 
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2);

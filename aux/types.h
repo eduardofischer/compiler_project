@@ -64,6 +64,8 @@ typedef struct symbol_entry {
 typedef struct stack_item {
   SYMBOL_ENTRY **table;
   int offset;
+  int prev_offset;
+  char *label_main;
   struct stack_item *next;
 } STACK_ITEM;
 

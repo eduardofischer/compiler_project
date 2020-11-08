@@ -65,8 +65,9 @@ extern STACK_ITEM *table_stack;
 %type <node> literal
 %type <node> type
 %type <node> id
-%type <node> function_def_start
 %type <node> function_def
+%type <node> function_block_end
+%type <node> function_def_start
 %type <node> cmd_block
 %type <node> command_list
 %type <node> command
@@ -128,19 +129,26 @@ extern STACK_ITEM *table_stack;
 %%
 root: program	 {
 		arvore = (void*) $1.ast_node;
-		printf("%s\n", generate_iloc_code($1.code));
+		printf("%s\n", generate_iloc_code($1.code, table_stack->label_main));
 	} 
 	;
 	
 program: global_var_decl program {
 		$$ = $1;
 		$$.ast_node = $2.ast_node;
-		if ($$.code != NULL)
-			concat_inst($2.code, $$.code);
-		else
+		if ($2.code != NULL) {
+			concat_inst($$.code, $2.code);
 			$$.code = $2.code;
+		}
 	}
-	| function_def program	{ $$ = $1; add_child($$.ast_node, $2.ast_node); }
+	| function_def program	{
+		$$ = $1;
+		add_child($$.ast_node, $2.ast_node);
+		if ($2.code != NULL) {
+			concat_inst($$.code, $2.code);
+			$$.code = $2.code;
+		}
+	}
 	| %empty { $$.ast_node = NULL; }
 	;
 
@@ -154,6 +162,7 @@ type: TK_PR_INT { $$.table_entry.data_type = DT_INT; }
 literal: TK_LIT_INT {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_INT);
+		$$.table_entry.size = 4;
 	}
 	| TK_LIT_FLOAT {
 		$$.ast_node = create_node_lex_value($1);
@@ -170,6 +179,7 @@ literal: TK_LIT_INT {
 	| TK_LIT_CHAR {
 		$$.ast_node = create_node_lex_value($1);
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, ET_LITERAL, DT_CHAR);
+		$$.table_entry.size = 1;
 	}
 	| TK_LIT_STRING {
 		$$.ast_node = create_node_lex_value($1);
@@ -275,45 +285,59 @@ id: TK_IDENTIFICADOR {
 		$$.table_entry = init_table_entry($1, $$.ast_node->label, NOT_DEFINED, NOT_DEFINED);
 	}
 
-function_def: function_def_start command_list cmd_block_end {
+function_def: function_block_end cmd_block_end {
+		$$ = $1;
+		insert_ht_entry(table_stack, $$.table_entry);
+		if (!strcmp($$.table_entry.key, "main"))
+			table_stack->label_main = $$.table_entry.func_label;
+	}
+function_block_end: function_def_start command_list {
 		$$ = $1;
 		add_child($$.ast_node, $2.ast_node);
 		check_return($1.table_entry, $2.table_entry.data_type);
+		$$.table_entry.offset = table_stack->offset;
 		$$.table_entry.func_label = gen_code_function_def(&$$, &$2);
-		insert_ht_entry(table_stack, $$.table_entry);
 	}
 function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
+		table_stack->offset = 12;
 		$$ = $2;
 		$$.table_entry.entry_type = ET_FUNCTION;
 		$$.table_entry.data_type = $1.table_entry.data_type;
 		$$.table_entry.arguments = $4.arg_list;
 		$$.table_entry.arguments->next = $5.arg_list;
+		$$.table_entry.size = assign_size($1.table_entry.data_type);
 		// Injeta os argumentos da função no seu escopo
 		check_declared($2.table_entry);
 		inject_arguments(table_stack, $$.table_entry.arguments);
 	}
 	| type id '(' ')' cmd_block_start { 
+		table_stack->offset = 12;
 		$$ = $2;
 		$$.table_entry.entry_type = ET_FUNCTION;
 		$$.table_entry.data_type = $1.table_entry.data_type;
 		$$.table_entry.arguments = NULL;
+		$$.table_entry.size = assign_size($1.table_entry.data_type);
 		check_declared($2.table_entry);
 	}
-	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block_start { 
+	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block_start {
+		table_stack->offset = 12;
 		$$ = $3;
 		$$.table_entry.entry_type = ET_FUNCTION;
 		$$.table_entry.data_type = $2.table_entry.data_type;
 		$$.table_entry.arguments = $5.arg_list;
 		$$.table_entry.arguments->next = $6.arg_list;
+		$$.table_entry.size = assign_size($2.table_entry.data_type);
 		// Injeta os argumentos da função no seu escopo
 		check_declared($3.table_entry);
 		inject_arguments(table_stack, $$.table_entry.arguments);
 	}
-	| TK_PR_STATIC type id '(' ')' cmd_block_start { 
+	| TK_PR_STATIC type id '(' ')' cmd_block_start {
+		table_stack->offset = 12;
 		$$ = $3;
 		$$.table_entry.entry_type = ET_FUNCTION;
 		$$.table_entry.data_type = $2.table_entry.data_type;
 		$$.table_entry.arguments = NULL;
+		$$.table_entry.size = assign_size($2.table_entry.data_type);
 		check_declared($3.table_entry);
 	}
 parameters_list: ',' parameter parameters_list {
@@ -704,22 +728,26 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($3.ast_node, $4.ast_node);
 
-		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry)->data_type;
 		check_function($1.table_entry);
+		if ($3.table_entry.entry_type != ET_LITERAL)
+			$3.table_entry = *find_table_entry(table_stack, $3.table_entry);
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $3.table_entry;
 		$$.list->next = $4.list;
+		$$.table_entry = *search_all_scopes(table_stack, $1.table_entry.key);
+		gen_code_func_call(&$$);
 		check_args($1.table_entry, $$.list);
-		$$.table_entry.data_type = search_all_scopes(table_stack, $1.table_entry.key)->data_type;
 		libera($1.ast_node);
 	}
 	| id '(' ')' {
 		$$.table_entry = $1.table_entry;
 		$$.ast_node = create_node("call "); 
+		$$.list = NULL;
 		concat_label(&($$.ast_node->label), $1.table_entry.key);
 		check_function($1.table_entry);
-		check_args($1.table_entry, NULL);
+		check_args($1.table_entry, $$.list);
+		gen_code_func_call(&$$);
 		libera($1.ast_node);
 	}
 	| vector_index '(' expression arguments_list ')' { 
@@ -728,19 +756,23 @@ function_call: id '(' expression arguments_list ')' {
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($3.ast_node, $4.ast_node); 
 
-		$3.table_entry.data_type = find_table_entry(table_stack, $3.table_entry)->data_type;
+		if ($3.table_entry.entry_type != ET_LITERAL)
+			$3.table_entry = *find_table_entry(table_stack, $3.table_entry);
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $3.table_entry;
 		$$.list->next = $4.list;
 		check_args($1.table_entry, $$.list);
 		$$.table_entry.data_type = search_all_scopes(table_stack, $1.table_entry.key)->data_type;
+		gen_code_func_call(&$$);
 		libera($1.ast_node);
 	}
 	| vector_index '(' ')' { 
 		$$.ast_node = create_node("call "); 
 		// TODO: concat_label(&($$.ast_node->label), $1.ast_node->children[0]->label); 
-		check_args($1.table_entry, NULL);
+		$$.list = NULL;
+		check_args($1.table_entry, $$.list);
+		gen_code_func_call(&$$);
 		libera($1.ast_node); 
 	}
 	;
@@ -748,7 +780,8 @@ arguments_list: ',' expression arguments_list {
 		$$ = $2; 
 		add_child($$.ast_node, $3.ast_node); 
 		// Preenche a lista de argumentos
-		$2.table_entry.data_type = find_table_entry(table_stack, $2.table_entry)->data_type;
+		if ($2.table_entry.entry_type != ET_LITERAL)
+			$2.table_entry = *find_table_entry(table_stack, $2.table_entry);
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
 		$$.list->next = $3.list;

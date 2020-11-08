@@ -31,11 +31,20 @@ char *_concat_code(char *code1, char *code2) {
 // Concatena dois trechos de código
 void concat_inst(INSTRUCTION *inst1, INSTRUCTION *inst2) {
   INSTRUCTION *first = inst2;
-  
-  while (first->prev != NULL)
-    first = first->prev;
-    
-  first->prev = inst1;
+
+  if (inst2 == NULL) {
+    inst2 = malloc(sizeof(INSTRUCTION));
+    inst2->arg1 = inst1->arg1;
+    inst2->arg2 = inst1->arg2;
+    inst2->arg3 = inst1->arg3;
+    inst2->code = inst1->code;
+    inst2->label = inst1->label;
+    inst2->prev = inst1->prev;
+  } else {
+    while (first->prev != NULL)
+      first = first->prev;
+    first->prev = inst1;
+  }
 }
 
 // Retorna um ponteiro para uma estrutura do tipo INSTRUCTION
@@ -139,15 +148,18 @@ int _get_program_size(INSTRUCTION *last_inst) {
 }
 
 // Gera o código final do programa
-char *generate_iloc_code(INSTRUCTION *last_inst) {
+char *generate_iloc_code(INSTRUCTION *last_inst, char *label_main) {
   INSTRUCTION *inst_list, *inst_aux = last_inst;
   char str_size[12];
-  sprintf(str_size, "%d", _get_program_size(last_inst) + 4);
+  sprintf(str_size, "%d", _get_program_size(last_inst) + 5);
 
   // Adiciona instrução de HALT
   inst_list = _new_instruction("halt", NULL, NULL, NULL, NULL);
   concat_inst(inst_aux, inst_list);
 
+  // Adiciona jump para a função main 
+  inst_aux = _new_instruction("jumpI", NULL, NULL, label_main, NULL);
+  concat_inst(inst_aux, inst_list);
   // Inicializa registradores auxiliares
   inst_aux = _new_instruction("loadI", str_size, NULL, "rbss", NULL);
   concat_inst(inst_aux, inst_list);
@@ -190,19 +202,73 @@ void gen_code_literal(PROD_VALUE *lit) {
 
 // Geração de código para declaração de função
 char *gen_code_function_def(PROD_VALUE *func, PROD_VALUE *cmd_list) {
+  INSTRUCTION *aux_inst1, *aux_inst2;
   char *label = _new_label();
   func->location = NULL;
-  // func->code = _new_instruction("addI", "rsp", NULL, "rsp", label);
-  func->code = _new_instruction("nop", NULL, NULL, NULL, label);
-  concat_inst(func->code, cmd_list->code);
+  // Cria um novo registro de ativação
+  char str_offset[12];
+  sprintf(str_offset, "%d", func->table_entry.offset);
+
+  // Atualiza o RFP
+  aux_inst1 = _new_instruction("i2i", "rsp", NULL, "rfp", label);
+  // Atualiza o RSP
+  aux_inst2 = _new_instruction("addI", "rsp", str_offset, "rsp", NULL);
+  concat_inst(aux_inst1, aux_inst2);
+
+  concat_inst(aux_inst2, cmd_list->code);
   func->code = cmd_list->code;
 
   return label;
 }
 
 // TODO: Geração de código de chamada de funçao
-void gen_code_func_call(PROD_VALUE *id) {
-  return;
+void gen_code_func_call(PROD_VALUE *func) {
+  // Registrador de retorno da funçao
+  func->location = _new_register();
+
+  ENTRY_LIST *arg = func->list;
+  INSTRUCTION *aux_inst1, *aux_inst2;
+  // Registro de ativaçao
+  // 0 -> Endereço de retorno
+  // 4 -> RSP salvo
+  // 8 -> RFP salvo
+  // 12 -> Início das variáveis locais
+  int arg_offset = 12; 
+  char str_offset[12];
+
+  // Carrega os parâmetros para o registro de ativaçao
+  while (arg != NULL) {
+    if (arg->entry.entry_type == ET_LITERAL)
+      aux_inst1 = _new_instruction("loadI", arg->entry.key, NULL, func->location, NULL);
+    else {
+      sprintf(str_offset, "%d", arg->entry.offset);
+      aux_inst1 = _new_instruction("loadAI", "rfp", str_offset, func->location, NULL);
+    }
+    concat_inst(func->code, aux_inst1);
+    sprintf(str_offset, "%d", arg_offset);
+    aux_inst2 = _new_instruction("storeAI", func->location, "rsp", str_offset, NULL);
+    concat_inst(aux_inst1, aux_inst2);
+    func->code = aux_inst2;
+    arg_offset += arg->entry.size;
+    arg = arg->next;
+  }
+
+  // Calcula o endereço de retorno (5 instruções abaixo)
+  aux_inst1 = _new_instruction("addI", "rpc", "5", func->location, NULL);
+  concat_inst(func->code, aux_inst1);
+  // Salva o endereço de retorno
+  aux_inst2 = _new_instruction("storeAI", func->location, "rsp", "0", NULL);
+  concat_inst(aux_inst1, aux_inst2);
+  // Salva o RSP
+  aux_inst1 = _new_instruction("storeAI", "rsp", "rsp", "4", NULL);
+  concat_inst(aux_inst2, aux_inst1);
+  // Salva o RFP
+  aux_inst2 = _new_instruction("storeAI", "rfp", "rsp", "8", NULL);
+  concat_inst(aux_inst1, aux_inst2);
+  // Transfere o controle para a funçao chamada
+  aux_inst1 = _new_instruction("jumpI", NULL, NULL, func->table_entry.func_label, NULL);
+  concat_inst(aux_inst2, aux_inst1);
+  func->code = aux_inst1;
 }
 
 // Geração de código de atribuição de variáveis
