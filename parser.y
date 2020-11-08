@@ -807,7 +807,8 @@ continue: TK_PR_CONTINUE { $$.ast_node = create_node("continue"); }
 conditional_if_else: TK_PR_IF '(' expression ')' cmd_block { 
 		$$.ast_node = create_node("if"); 
 		add_child($$.ast_node, $3.ast_node); 
-		add_child($$.ast_node, $5.ast_node); 
+		add_child($$.ast_node, $5.ast_node);
+		gen_code_if(&$$, &$3, &$5); 
 	}
 	| TK_PR_IF '(' expression ')' cmd_block TK_PR_ELSE cmd_block { 
 		$$.ast_node = create_node("if"); 

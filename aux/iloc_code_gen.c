@@ -370,3 +370,20 @@ void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, P
   exp->code = inst_aux1;
 }
 
+// Gera o código do controlador de fluxo if
+void gen_code_if(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst) {
+  INSTRUCTION *inst_aux1, *inst_aux2;
+  code->location = _new_register();
+  char *label_true = _new_label();
+  char *label_false = _new_label();
+
+  _patch_holes(condition->tl, label_true);
+  _patch_holes(condition->fl, label_false);
+
+  inst_aux1 = _new_instruction("nop", NULL, NULL, NULL, label_true);
+  concat_inst(condition->code, inst_aux1);
+  concat_inst(inst_aux1, inst->code);
+  inst_aux2 = _new_instruction("nop", NULL, NULL, NULL, label_false);
+  concat_inst( inst->code, inst_aux2);
+  code->code = inst_aux2;
+}
