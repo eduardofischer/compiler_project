@@ -359,6 +359,16 @@ void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, P
   exp->code = inst_aux1;
 }
 
+// Gera o código de expressões unárias (not)
+void gen_code_unary_exp(PROD_VALUE *code, PROD_VALUE *op, PROD_VALUE *exp) {
+  if (!strcmp(op->ast_node->label, "!")){
+    code->location = exp->location;
+    code->tl = exp->fl;
+    code->fl = exp->tl;
+    code->code = exp->code;
+  }
+}
+
 // Gera o código do controlador de fluxo if
 void gen_code_if(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst) {
   INSTRUCTION *inst_aux1, *inst_aux2;

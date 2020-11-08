@@ -547,6 +547,7 @@ expression: id {
 		$$.ast_node = $1.ast_node; 
 		add_child($$.ast_node, $2.ast_node);
 		$$.table_entry = $2.table_entry;
+		gen_code_unary_exp(&$$, &$1, &$2);
 	}
 	// Expressões binárias
 	| expression '+' expression {

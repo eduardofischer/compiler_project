@@ -44,4 +44,7 @@ void gen_code_if_else(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst1
 void gen_code_while(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst);
 void gen_code_for(PROD_VALUE *code, PROD_VALUE *att1, PROD_VALUE *condition, PROD_VALUE *att2, PROD_VALUE *inst);
 
+// Gera o código de expressões unárias (not)
+void gen_code_unary_exp(PROD_VALUE *code, PROD_VALUE *op, PROD_VALUE *exp);
+
 #endif
