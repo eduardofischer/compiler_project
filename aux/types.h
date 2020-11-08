@@ -69,12 +69,6 @@ typedef struct stack_item {
   struct stack_item *next;
 } STACK_ITEM;
 
-// Lista de argumentos
-typedef struct entry_list {
-  SYMBOL_ENTRY entry;
-  struct entry_list *next;
-} ENTRY_LIST;
-
 // Nó da AST
 typedef struct ast_node {
   char *label;
@@ -92,6 +86,14 @@ typedef struct instruction {
   char *label;
   struct instruction *prev;
 } INSTRUCTION;
+
+// Lista de argumentos
+typedef struct entry_list {
+  SYMBOL_ENTRY entry;
+  char *location;
+  INSTRUCTION *code;
+  struct entry_list *next;
+} ENTRY_LIST;
 
 typedef struct patch_list {
   char **label;

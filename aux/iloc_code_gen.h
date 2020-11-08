@@ -25,6 +25,9 @@ char * gen_code_function_def(PROD_VALUE *func, PROD_VALUE *cmd_list);
 // Geração de código de chamada de funçao
 void gen_code_func_call(PROD_VALUE *id);
 
+// Geração de código de retorno de funçao
+void gen_code_func_return(PROD_VALUE *func, PROD_VALUE *val, int is_main);
+
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2);
 

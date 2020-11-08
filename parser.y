@@ -254,6 +254,8 @@ global_list: ',' id global_list {
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
+		$$.list->location = $2.location;
+		$$.list->code = $2.code;
 		$$.list->next = $3.list;
 		libera($2.ast_node);
 	}
@@ -263,6 +265,8 @@ global_list: ',' id global_list {
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
+		$$.list->location = $2.location;
+		$$.list->code = $2.code;
 		$$.list->next = $6.list;
 		libera($2.ast_node);
 	}
@@ -290,6 +294,8 @@ function_def: function_block_end cmd_block_end {
 		insert_ht_entry(table_stack, $$.table_entry);
 		if (!strcmp($$.table_entry.key, "main"))
 			table_stack->label_main = $$.table_entry.func_label;
+		else
+			table_stack->label_main = NULL;
 	}
 function_block_end: function_def_start command_list {
 		$$ = $1;
@@ -309,6 +315,7 @@ function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
 		// Injeta os argumentos da função no seu escopo
 		check_declared($2.table_entry);
 		inject_arguments(table_stack, $$.table_entry.arguments);
+		table_stack->label_main = strcmp($$.table_entry.key, "main") ? table_stack->label_main = NULL : $$.table_entry.key;
 	}
 	| type id '(' ')' cmd_block_start { 
 		table_stack->offset = 12;
@@ -318,6 +325,7 @@ function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
 		$$.table_entry.arguments = NULL;
 		$$.table_entry.size = assign_size($1.table_entry.data_type);
 		check_declared($2.table_entry);
+		table_stack->label_main = strcmp($$.table_entry.key, "main") ? table_stack->label_main = NULL : $$.table_entry.key;
 	}
 	| TK_PR_STATIC type id '(' parameter parameters_list ')' cmd_block_start {
 		table_stack->offset = 12;
@@ -330,6 +338,7 @@ function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
 		// Injeta os argumentos da função no seu escopo
 		check_declared($3.table_entry);
 		inject_arguments(table_stack, $$.table_entry.arguments);
+		table_stack->label_main = strcmp($$.table_entry.key, "main") ? table_stack->label_main = NULL : $$.table_entry.key;
 	}
 	| TK_PR_STATIC type id '(' ')' cmd_block_start {
 		table_stack->offset = 12;
@@ -339,6 +348,7 @@ function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
 		$$.table_entry.arguments = NULL;
 		$$.table_entry.size = assign_size($2.table_entry.data_type);
 		check_declared($3.table_entry);
+		table_stack->label_main = strcmp($$.table_entry.key, "main") ? table_stack->label_main = NULL : $$.table_entry.key;
 	}
 parameters_list: ',' parameter parameters_list {
 		$$.arg_list = $2.arg_list;
@@ -488,6 +498,8 @@ local_list: ',' id local_list {
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
+		$$.list->location = $2.location;
+		$$.list->code = $2.code;
 		$$.list->next = $3.list;
 		libera($2.ast_node); 
 	}
@@ -501,6 +513,8 @@ local_list: ',' id local_list {
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
+		$$.list->location = $2.location;
+		$$.list->code = $2.code;
 		$$.list->next = $5.list;
 	}
 	| ',' id TK_OC_LE literal local_list { 
@@ -512,6 +526,8 @@ local_list: ',' id local_list {
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
+		$$.list->location = $2.location;
+		$$.list->code = $2.code;
 		$$.list->next = $5.list;
 	}
 	| %empty {
@@ -735,6 +751,8 @@ function_call: id '(' expression arguments_list ')' {
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $3.table_entry;
+		$$.list->location = $3.location;
+		$$.list->code = $3.code;
 		$$.list->next = $4.list;
 		$$.table_entry = *search_all_scopes(table_stack, $1.table_entry.key);
 		gen_code_func_call(&$$);
@@ -762,6 +780,8 @@ function_call: id '(' expression arguments_list ')' {
 		// Preenche a lista de argumentos
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $3.table_entry;
+		$$.list->location = $3.location;
+		$$.list->code = $3.code;
 		$$.list->next = $4.list;
 		check_args($1.table_entry, $$.list);
 		$$.table_entry.data_type = search_all_scopes(table_stack, $1.table_entry.key)->data_type;
@@ -785,6 +805,8 @@ arguments_list: ',' expression arguments_list {
 			$2.table_entry = *find_table_entry(table_stack, $2.table_entry);
 		$$.list = malloc(sizeof(ENTRY_LIST));
 		$$.list->entry = $2.table_entry;
+		$$.list->location = $2.location;
+		$$.list->code = $2.code;
 		$$.list->next = $3.list;
 	}
 	| %empty {
@@ -833,6 +855,7 @@ return: TK_PR_RETURN expression {
 			$$.table_entry.data_type = find_table_entry(table_stack, $2.table_entry)->data_type;
 		else
 			$$.table_entry = $2.table_entry;
+		gen_code_func_return(&$$, &$2, table_stack->label_main != NULL);
 	}
 break: TK_PR_BREAK { $$.ast_node = create_node("break"); }
 continue: TK_PR_CONTINUE { $$.ast_node = create_node("continue"); }

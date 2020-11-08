@@ -151,11 +151,7 @@ int _get_program_size(INSTRUCTION *last_inst) {
 char *generate_iloc_code(INSTRUCTION *last_inst, char *label_main) {
   INSTRUCTION *inst_list, *inst_aux = last_inst;
   char str_size[12];
-  sprintf(str_size, "%d", _get_program_size(last_inst) + 5);
-
-  // Adiciona instrução de HALT
-  inst_list = _new_instruction("halt", NULL, NULL, NULL, NULL);
-  concat_inst(inst_aux, inst_list);
+  sprintf(str_size, "%d", _get_program_size(last_inst) + 4);
 
   // Adiciona jump para a função main 
   inst_aux = _new_instruction("jumpI", NULL, NULL, label_main, NULL);
@@ -201,6 +197,11 @@ void gen_code_literal(PROD_VALUE *lit) {
 }
 
 // Geração de código para declaração de função
+// Registro de ativaçao
+  // 0 -> Endereço de retorno
+  // 4 -> RSP salvo
+  // 8 -> RFP salvo
+  // 12 -> Início das variáveis locais
 char *gen_code_function_def(PROD_VALUE *func, PROD_VALUE *cmd_list) {
   INSTRUCTION *aux_inst1, *aux_inst2;
   char *label = _new_label();
@@ -221,33 +222,26 @@ char *gen_code_function_def(PROD_VALUE *func, PROD_VALUE *cmd_list) {
   return label;
 }
 
-// TODO: Geração de código de chamada de funçao
+// Geração de código de chamada de funçao
+// Registro de ativaçao
+  // 0 -> Endereço de retorno
+  // 4 -> RSP salvo
+  // 8 -> RFP salvo
+  // 12 -> Início das variáveis locais
 void gen_code_func_call(PROD_VALUE *func) {
   // Registrador de retorno da funçao
   func->location = _new_register();
 
   ENTRY_LIST *arg = func->list;
   INSTRUCTION *aux_inst1, *aux_inst2;
-  // Registro de ativaçao
-  // 0 -> Endereço de retorno
-  // 4 -> RSP salvo
-  // 8 -> RFP salvo
-  // 12 -> Início das variáveis locais
   int arg_offset = 12; 
   char str_offset[12];
 
   // Carrega os parâmetros para o registro de ativaçao
   while (arg != NULL) {
-    if (arg->entry.entry_type == ET_LITERAL)
-      aux_inst1 = _new_instruction("loadI", arg->entry.key, NULL, func->location, NULL);
-    else {
-      sprintf(str_offset, "%d", arg->entry.offset);
-      aux_inst1 = _new_instruction("loadAI", "rfp", str_offset, func->location, NULL);
-    }
-    concat_inst(func->code, aux_inst1);
     sprintf(str_offset, "%d", arg_offset);
-    aux_inst2 = _new_instruction("storeAI", func->location, "rsp", str_offset, NULL);
-    concat_inst(aux_inst1, aux_inst2);
+    aux_inst2 = _new_instruction("storeAI", arg->location, "rsp", str_offset, NULL);
+    concat_inst(arg->code, aux_inst2);
     func->code = aux_inst2;
     arg_offset += arg->entry.size;
     arg = arg->next;
@@ -268,6 +262,50 @@ void gen_code_func_call(PROD_VALUE *func) {
   // Transfere o controle para a funçao chamada
   aux_inst1 = _new_instruction("jumpI", NULL, NULL, func->table_entry.func_label, NULL);
   concat_inst(aux_inst2, aux_inst1);
+  // Carrega o valor de retorno
+  aux_inst2 = _new_instruction("loadAI", "rsp", "0", func->location, NULL);
+  concat_inst(aux_inst1, aux_inst2);
+
+  func->code = aux_inst2;
+}
+
+// Geração de código de retorno de funçao
+// Registro de ativaçao
+  // 0 -> Endereço de retorno
+  // 4 -> RSP salvo
+  // 8 -> RFP salvo
+  // 12 -> Início das variáveis locais
+void gen_code_func_return(PROD_VALUE *func, PROD_VALUE *val, int is_main) {
+  INSTRUCTION *aux_inst1, *aux_inst2;
+  char *reg_return = _new_register();
+  char *reg_rsp = _new_register();
+  char *reg_rfp = _new_register();
+
+  if (!is_main) {
+    // Salva o endereço de retorno
+    aux_inst1 = _new_instruction("loadAI", "rfp", "0", reg_return, NULL);
+    // Salva o rsp
+    aux_inst2 = _new_instruction("loadAI", "rfp", "4", reg_rsp, NULL);
+    concat_inst(aux_inst1, aux_inst2);
+    // Salva o rfp
+    aux_inst1 = _new_instruction("loadAI", "rfp", "8", reg_rfp, NULL);
+    concat_inst(aux_inst2, aux_inst1);
+    // Armazena o valor de retorno na base da pilha
+    aux_inst2 = _new_instruction("storeAI", val->location, "rfp", "0", NULL);
+    concat_inst(val->code, aux_inst2);
+    concat_inst(aux_inst1, aux_inst2);
+    // Atualiza o rsp
+    aux_inst1 = _new_instruction("i2i", reg_rsp, NULL, "rsp", NULL);
+    concat_inst(aux_inst2, aux_inst1);
+    // Atualiza o rfp
+    aux_inst2 = _new_instruction("i2i", reg_rfp, NULL, "rfp", NULL);
+    concat_inst(aux_inst1, aux_inst2);
+    // Devolve o controle ao chamador
+    aux_inst1 = _new_instruction("jump", NULL, NULL, reg_return, NULL);
+    concat_inst(aux_inst2, aux_inst1);
+  } else  // Caso seja o retorna da main, insere a instruçao de HALT
+    aux_inst1 = _new_instruction("halt", NULL, NULL, NULL, NULL);
+
   func->code = aux_inst1;
 }
 
