@@ -394,8 +394,13 @@ void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
     else
       var->code = _new_instruction("storeAI", value->location, "rfp", str_offset, NULL);
   }
+  if (inst_aux != NULL){
   concat_inst(value->code, inst_aux);
   concat_inst(inst_aux, var->code);
+  }
+  else {
+    concat_inst(value->code, var->code);
+  }
 }
 
 
