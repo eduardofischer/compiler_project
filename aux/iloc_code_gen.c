@@ -387,3 +387,30 @@ void gen_code_if(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst) {
   concat_inst( inst->code, inst_aux2);
   code->code = inst_aux2;
 }
+
+// Gera o código do controlador de fluxo if else
+void gen_code_if_else(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst1, PROD_VALUE *inst2) {
+  INSTRUCTION *inst_aux1, *inst_aux2, *inst_aux3, *inst_aux4, *inst_aux5;
+  code->location = _new_register();
+  char *label_true = _new_label();
+  char *label_false = _new_label();
+  char *label_end = _new_label();
+
+  _patch_holes(condition->tl, label_true);
+  _patch_holes(condition->fl, label_false);
+
+  inst_aux1 = _new_instruction("nop", NULL, NULL, NULL, label_true);
+  concat_inst(condition->code, inst_aux1);
+  concat_inst(inst_aux1, inst1->code);
+
+  inst_aux2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
+  concat_inst(inst1->code, inst_aux2);
+  inst_aux3 = _new_instruction("nop", NULL, NULL, NULL, label_false);
+  concat_inst(inst_aux2, inst_aux3);
+  concat_inst(inst_aux3, inst2->code);
+  inst_aux4 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
+  concat_inst(inst2->code, inst_aux4);
+  inst_aux5 = _new_instruction("nop", NULL, NULL, NULL, label_end);
+  concat_inst(inst_aux4, inst_aux5);
+  code->code = inst_aux5;
+}
