@@ -326,11 +326,11 @@ void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
 
 void _patch_holes(PATCH_LIST *list, char *label) {
   PATCH_LIST *hole = list, *temp;
-
+  
   while (hole != NULL) {
     *(hole->label) = label;
     temp = hole->next;
-    free(hole);
+    //free(hole);
     hole = temp;
   };
 }
