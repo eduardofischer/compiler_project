@@ -309,20 +309,6 @@ void gen_code_func_return(PROD_VALUE *func, PROD_VALUE *val, int is_main) {
   func->code = aux_inst1;
 }
 
-// Geração de código de atribuição de variáveis
-void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
-  var->location = NULL;
-  if (value->location != NULL) {
-    char str_offset[12];
-    sprintf(str_offset, "%d", var->table_entry.offset);
-    if (var->table_entry.global)
-      var->code = _new_instruction("storeAI", value->location, "rbss", str_offset, NULL);
-    else
-      var->code = _new_instruction("storeAI", value->location, "rfp", str_offset, NULL);
-  }
-
-  concat_inst(value->code, var->code);
-}
 
 void _patch_holes(PATCH_LIST *list, char *label) {
   PATCH_LIST *hole = list, *temp;
@@ -361,6 +347,57 @@ PATCH_LIST *_concat_patch_list(PATCH_LIST *list1, PATCH_LIST *list2) {
     return list1;
   }
 }
+
+INSTRUCTION *_patch_expression(PATCH_LIST *tl, PATCH_LIST *fl, char* location) {
+  INSTRUCTION *inst1, *inst2;
+  char *label_end = _new_label();
+  if (tl != NULL) {
+    char *label_true = _new_label();
+    _patch_holes(tl, label_true);
+
+    inst1 = _new_instruction("loadI", "1", NULL, location, label_true);
+    inst2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
+    concat_inst(inst1, inst2);
+  }
+  if (fl != NULL) {
+    char *label_false = _new_label();
+    _patch_holes(fl, label_false);
+    
+    inst1 = _new_instruction("loadI", "0", NULL, location, label_false);
+    concat_inst(inst2, inst1);
+    inst2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
+    concat_inst(inst1, inst2);
+  }
+  if (tl != NULL || fl != NULL) {
+    inst1 = _new_instruction("nop", NULL, NULL, NULL, label_end);
+    concat_inst(inst2, inst1);
+  } else {
+    return NULL;
+  }
+
+  return inst1;
+}
+
+// Geração de código de atribuição de variáveis
+void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
+  INSTRUCTION *inst_aux = NULL;
+  var->location = NULL;
+
+  if (value->tl != NULL || value->fl != NULL)
+    inst_aux = _patch_expression(value->tl, value->fl, value->location);
+
+  if (value->location != NULL) {
+    char str_offset[12];
+    sprintf(str_offset, "%d", var->table_entry.offset);
+    if (var->table_entry.global)
+      var->code = _new_instruction("storeAI", value->location, "rbss", str_offset, NULL);
+    else
+      var->code = _new_instruction("storeAI", value->location, "rfp", str_offset, NULL);
+  }
+  concat_inst(value->code, inst_aux);
+  concat_inst(inst_aux, var->code);
+}
+
 
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
@@ -425,10 +462,7 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
 
 // Gera o código de operações lógicas (&& e ||)
 void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
-  INSTRUCTION *inst_aux1, *inst_aux2;
-  char *label_true = _new_label();
-  char *label_false = _new_label();
-  char *label_end = _new_label();
+  INSTRUCTION *inst_aux;
   exp->location = _new_register();
 
   if (!strcmp(operator->ast_node->label, "||")){
@@ -447,20 +481,7 @@ void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, P
   concat_inst(op1->code, exp->code);
   concat_inst(exp->code, op2->code);
 
-  _patch_holes(exp->tl, label_true);
-  _patch_holes(exp->fl, label_false);
-
-  inst_aux1 = _new_instruction("loadI", "1", NULL, exp->location, label_true);
-  concat_inst(op2->code, inst_aux1);
-  inst_aux2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
-  concat_inst(inst_aux1, inst_aux2);
-  inst_aux1 = _new_instruction("loadI", "0", NULL, exp->location, label_false);
-  concat_inst(inst_aux2, inst_aux1);
-  inst_aux2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
-  concat_inst(inst_aux1, inst_aux2);
-  inst_aux1 = _new_instruction("nop", NULL, NULL, NULL, label_end);
-  concat_inst(inst_aux2, inst_aux1);
-  exp->code = inst_aux1;
+  exp->code = op2->code;
 }
 
 // Gera o código de expressões unárias (not)
@@ -577,12 +598,12 @@ void gen_code_ternary(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *exp1,
   _patch_holes(condition->tl, label_true);
   _patch_holes(condition->fl, label_false);
 
-  inst_aux1 = _new_instruction("nop", NULL, NULL, NULL, label_true);
+  inst_aux1 = _new_instruction("loadI", "1", NULL, code->location, label_true);
   concat_inst(condition->code, inst_aux1);
   concat_inst(inst_aux1, exp1->code);
   inst_aux2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
   concat_inst(exp1->code, inst_aux2);
-  inst_aux3 = _new_instruction("nop", NULL, NULL, NULL, label_false);
+  inst_aux3 = _new_instruction("loadI", "0", NULL, code->location, label_false);
   concat_inst(inst_aux2, inst_aux3);
   concat_inst(inst_aux3, exp2->code);
   inst_aux4 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
