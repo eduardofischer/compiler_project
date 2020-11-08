@@ -527,3 +527,29 @@ void gen_code_for(PROD_VALUE *code, PROD_VALUE *att1, PROD_VALUE *condition, PRO
   concat_inst(inst_aux3, inst_aux4);
   code->code = inst_aux4;
 }
+
+// Geração de código para expressão Ternária
+void gen_code_ternary(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *exp1, PROD_VALUE *exp2) {
+  INSTRUCTION *inst_aux1, *inst_aux2, *inst_aux3, *inst_aux4, *inst_aux5;
+  code->location = _new_register();
+  char *label_true = _new_label();
+  char *label_false = _new_label();
+  char *label_end = _new_label();
+
+  _patch_holes(condition->tl, label_true);
+  _patch_holes(condition->fl, label_false);
+
+  inst_aux1 = _new_instruction("nop", NULL, NULL, NULL, label_true);
+  concat_inst(condition->code, inst_aux1);
+  concat_inst(inst_aux1, exp1->code);
+  inst_aux2 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
+  concat_inst(exp1->code, inst_aux2);
+  inst_aux3 = _new_instruction("nop", NULL, NULL, NULL, label_false);
+  concat_inst(inst_aux2, inst_aux3);
+  concat_inst(inst_aux3, exp2->code);
+  inst_aux4 = _new_instruction("jumpI", NULL, NULL, label_end, NULL);
+  concat_inst(exp2->code, inst_aux4);
+  inst_aux5 = _new_instruction("nop", NULL, NULL, NULL, label_end);
+  concat_inst(inst_aux4, inst_aux5);
+  code->code = inst_aux5;
+}

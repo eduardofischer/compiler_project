@@ -50,4 +50,7 @@ void gen_code_for(PROD_VALUE *code, PROD_VALUE *att1, PROD_VALUE *condition, PRO
 // Gera o código de expressões unárias (not)
 void gen_code_unary_exp(PROD_VALUE *code, PROD_VALUE *op, PROD_VALUE *exp);
 
+// Geração de código para expressão ternária
+void gen_code_ternary(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *exp1, PROD_VALUE *exp2);
+
 #endif

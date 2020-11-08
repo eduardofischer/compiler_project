@@ -683,6 +683,7 @@ expression: id {
 		add_child($$.ast_node, $3.ast_node); 
 		add_child($$.ast_node, $5.ast_node);
 		$$.table_entry.data_type = infer_type($3.table_entry, $5.table_entry);
+		gen_code_ternary(&$$, &$1, &$3, &$5);
 	}
 	;
 unary_op: '+' { $$.ast_node = create_node("+"); }
