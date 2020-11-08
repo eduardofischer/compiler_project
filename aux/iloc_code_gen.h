@@ -35,8 +35,9 @@ void *find_holes_t(INSTRUCTION *last_inst, char *label, PATCH_LIST *list);
 // Concatena duas lista de remendos
 void concat_hole_list(PATCH_LIST *list1, PATCH_LIST *list2);
 
-// Gera o código para os controladores de fluxo
+// Gera o código para os controladores de fluxo (if, if else, while, for)
 void gen_code_if(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst);
 void gen_code_if_else(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst1, PROD_VALUE *inst2);
+void gen_code_while(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst);
 
 #endif

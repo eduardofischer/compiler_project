@@ -414,3 +414,26 @@ void gen_code_if_else(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst1
   concat_inst(inst_aux4, inst_aux5);
   code->code = inst_aux5;
 }
+
+// Gera o código do controlador de fluxo while
+void gen_code_while(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst){
+  INSTRUCTION *inst_aux1, *inst_aux2, *inst_aux3, *inst_aux4;
+  code->location = _new_register();
+  char *label_true = _new_label();
+  char *label_false = _new_label();
+  char *label_start = _new_label();
+
+  _patch_holes(condition->tl, label_true);
+  _patch_holes(condition->fl, label_false);
+
+  inst_aux1 = _new_instruction("nop", NULL, NULL, NULL, label_start);
+  concat_inst(inst_aux1, condition->code);
+  inst_aux2 = _new_instruction("nop", NULL, NULL, NULL, label_true);
+  concat_inst(condition->code, inst_aux2);
+  concat_inst(inst_aux2, inst->code);
+  inst_aux3 = _new_instruction("jumpI", NULL, NULL, label_start, NULL);
+  concat_inst(inst->code, inst_aux3);
+  inst_aux4 = _new_instruction("nop", NULL, NULL, NULL, label_false);
+  concat_inst(inst_aux3, inst_aux4);
+  code->code = inst_aux4;
+}
