@@ -19,6 +19,9 @@ void gen_code_id(PROD_VALUE *id);
 // Geração de código de literais
 void gen_code_literal(PROD_VALUE *lit);
 
+// Geração de código para declaração de função
+char * gen_code_function_def(PROD_VALUE *func, PROD_VALUE *cmd_list);
+
 // Gera o código de operações binárias
 void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2);
 

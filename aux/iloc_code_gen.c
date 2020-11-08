@@ -77,8 +77,9 @@ char *_extract_code(INSTRUCTION *last_inst) {
     temp_code = malloc(inst_length);
     sprintf(temp_code, "\t%s\n", last_inst->code);
   }
-  // Instruções com dois destinos e flecha dupla
-  else if (!strcmp(last_inst->code, "storeAI")) {
+  // Instruções com dois destinos
+  else if (!strcmp(last_inst->code, "storeAI") ||
+           !strcmp(last_inst->code, "cbr")) {
     if (last_inst->arg3 != NULL) {
       int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
       temp_code = malloc(inst_length);
@@ -89,44 +90,13 @@ char *_extract_code(INSTRUCTION *last_inst) {
       sprintf(temp_code, "\t%s\t%s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2);
     }
   }
-  // Instruções com dois destinos e flecha simples
-  else if (!strcmp(last_inst->code, "cbr")) {
-    if (last_inst->arg3 != NULL) {
-      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t%s -> %s, %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
-    } else {
-      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + 8;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t%s -> %s\n", last_inst->code, last_inst->arg1, last_inst->arg2);
-    }
-  } 
-  // Gera instruções com 2 origens e flecha simples
-  else if (!strcmp(last_inst->code, "cmp_LT") ||
-           !strcmp(last_inst->code, "cmp_LE") || 
-           !strcmp(last_inst->code, "cmp_EQ") || 
-           !strcmp(last_inst->code, "cmp_GE") || 
-           !strcmp(last_inst->code, "cmp_GT") || 
-           !strcmp(last_inst->code, "cmp_NE") || 
-           !strcmp(last_inst->code, "jump") || 
-           !strcmp(last_inst->code, "jumpI")) { 
-    if (last_inst->arg1 == NULL && last_inst->arg2 == NULL) {
-      int inst_length = strlen(last_inst->code)  + strlen(last_inst->arg3) + 9;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t\t -> %s\n", last_inst->code, last_inst->arg3);
-    } else if (last_inst->arg2 != NULL) {
-      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t%s, %s -> %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
-    } else {
-      int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg3) + 8;
-      temp_code = malloc(inst_length);
-      sprintf(temp_code, "\t%s\t%s -> %s\n", last_inst->code, last_inst->arg1, last_inst->arg3);
-    }
-  }
-  // Gera instruções com 2 origens e flecha dupla
+  // Gera instruções com 2 origens
   else { 
-    if (last_inst->arg2 != NULL) {
+    if (last_inst->arg1 == NULL && last_inst->arg2 == NULL) {
+      int inst_length = strlen(last_inst->code)  + strlen(last_inst->arg3) + 7;
+      temp_code = malloc(inst_length);
+      sprintf(temp_code, "\t%s\t=> %s\n", last_inst->code, last_inst->arg3);
+    } else if (last_inst->arg2 != NULL) {
       int inst_length = strlen(last_inst->code) + strlen(last_inst->arg1) + strlen(last_inst->arg2) + strlen(last_inst->arg3) + 10;
       temp_code = malloc(inst_length);
       sprintf(temp_code, "\t%s\t%s, %s => %s\n", last_inst->code, last_inst->arg1, last_inst->arg2, last_inst->arg3);
@@ -172,7 +142,7 @@ int _get_program_size(INSTRUCTION *last_inst) {
 char *generate_iloc_code(INSTRUCTION *last_inst) {
   INSTRUCTION *inst_list, *inst_aux = last_inst;
   char str_size[12];
-  printf(str_size, "%d", _get_program_size(last_inst) + 4);
+  sprintf(str_size, "%d", _get_program_size(last_inst) + 4);
 
   // Adiciona instrução de HALT
   inst_list = _new_instruction("halt", NULL, NULL, NULL, NULL);
@@ -188,7 +158,6 @@ char *generate_iloc_code(INSTRUCTION *last_inst) {
 
   return _extract_code(inst_list);
 }
-
 
 // Geração de código de identificadores
 void gen_code_id(PROD_VALUE *id) {
@@ -219,16 +188,16 @@ void gen_code_literal(PROD_VALUE *lit) {
   }
 }
 
-// Geração de código de atribuição de variáveis
-void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
-  var->location = NULL;
-  if (value->location != NULL) {
-    char str_offset[12];
-    sprintf(str_offset, "%d", var->table_entry.offset);
-    var->code = _new_instruction("storeAI", value->location, "rfp", str_offset, NULL);
-  }
+// Geração de código para declaração de função
+char *gen_code_function_def(PROD_VALUE *func, PROD_VALUE *cmd_list) {
+  char *label = _new_label();
+  func->location = NULL;
+  // func->code = _new_instruction("addI", "rsp", NULL, "rsp", label);
+  func->code = _new_instruction("nop", NULL, NULL, NULL, label);
+  concat_inst(func->code, cmd_list->code);
+  func->code = cmd_list->code;
 
-  concat_inst(value->code, var->code);
+  return label;
 }
 
 // TODO: Geração de código de chamada de funçao
@@ -236,15 +205,30 @@ void gen_code_func_call(PROD_VALUE *id) {
   return;
 }
 
+// Geração de código de atribuição de variáveis
+void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
+  var->location = NULL;
+  if (value->location != NULL) {
+    char str_offset[12];
+    sprintf(str_offset, "%d", var->table_entry.offset);
+    if (var->table_entry.global)
+      var->code = _new_instruction("storeAI", value->location, "rbss", str_offset, NULL);
+    else
+      var->code = _new_instruction("storeAI", value->location, "rfp", str_offset, NULL);
+  }
+
+  concat_inst(value->code, var->code);
+}
+
 void _patch_holes(PATCH_LIST *list, char *label) {
   PATCH_LIST *hole = list, *temp;
 
-  do {
+  while (hole != NULL) {
     *(hole->label) = label;
     temp = hole->next;
     free(hole);
     hole = temp;
-  } while (hole != NULL);
+  };
 }
 
 PATCH_LIST *_new_patch_list(char **addr) {
@@ -263,10 +247,15 @@ PATCH_LIST *_insert_patch_list(PATCH_LIST *list, char **addr) {
 
 PATCH_LIST *_concat_patch_list(PATCH_LIST *list1, PATCH_LIST *list2) {
   PATCH_LIST *last = list1;
-  while (last->next != NULL)
-    last = last->next;
-  last->next = list2;
-  return list1;
+
+  if (list1 == NULL)
+    return list2;
+  else {
+    while (last->next != NULL)
+      last = last->next;
+    last->next = list2;
+    return list1;
+  }
 }
 
 // Gera o código de operações binárias

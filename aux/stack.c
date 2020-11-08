@@ -67,8 +67,10 @@ SYMBOL_ENTRY *search_all_scopes(STACK_ITEM *stack, char *key) {
   STACK_ITEM *scope = stack;
   SYMBOL_ENTRY *entry;
   while (scope != NULL) {
-    if ((entry = get_ht_entry(top(scope), key)) != NULL)
+    if ((entry = get_ht_entry(top(scope), key)) != NULL) {
+      entry->global = is_global_scope(scope);
       return entry;
+    }
     scope = scope->next;
   };
   return NULL;

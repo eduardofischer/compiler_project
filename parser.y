@@ -277,13 +277,12 @@ id: TK_IDENTIFICADOR {
 
 function_def: function_def_start command_list cmd_block_end {
 		$$ = $1;
-		$$.location = NULL;
-		$$.code = $2.code;
 		add_child($$.ast_node, $2.ast_node);
 		check_return($1.table_entry, $2.table_entry.data_type);
+		$$.table_entry.func_label = gen_code_function_def(&$$, &$2);
 		insert_ht_entry(table_stack, $$.table_entry);
 	}
-function_def_start: type id '(' parameter parameters_list ')' cmd_block_start { 
+function_def_start: type id '(' parameter parameters_list ')' cmd_block_start {
 		$$ = $2;
 		$$.table_entry.entry_type = ET_FUNCTION;
 		$$.table_entry.data_type = $1.table_entry.data_type;
@@ -512,7 +511,7 @@ var_attribution: id '=' expression {
 		if($1.table_entry.data_type == DT_STRING)
 			check_string_size($1.table_entry, $3.table_entry.size);
 	
-		$$.table_entry.offset= $1.table_entry.offset;
+		$$.table_entry= $1.table_entry;
 		gen_code_attribution(&$$, &$3);
 	}
 	| vector_index '=' expression { 

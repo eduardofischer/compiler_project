@@ -18,6 +18,7 @@
 #define ET_VECTOR 202
 #define ET_FUNCTION 203
 #define ET_RETURN 204
+#define ET_LOGIC_EXP 205
 
 #define NOT_DEFINED 99
 
@@ -53,6 +54,8 @@ typedef struct symbol_entry {
   int data_type; // int, float, bool, etc...
   int size;
   int offset; // Deslocamento do símbolo dentro do escopo
+  int global; // Flag indicando se é uma variável global
+  char *func_label; // Label ILOC para uma funçao
   ARG_LIST *arguments;
   TOKEN_VAL value;
   struct symbol_entry *next;
