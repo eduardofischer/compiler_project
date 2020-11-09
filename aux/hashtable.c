@@ -48,7 +48,6 @@ int insert_ht_entry(STACK_ITEM *scope, SYMBOL_ENTRY value) {
   if (new_entry->size > 0) {
     new_entry->offset = scope->offset;
     scope->offset += new_entry->size;
-    printf("// DEBUG: %s -> %d\n", new_entry->key, new_entry->offset);
   }
   
   if(table[index] != NULL)
