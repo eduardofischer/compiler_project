@@ -349,7 +349,7 @@ PATCH_LIST *_concat_patch_list(PATCH_LIST *list1, PATCH_LIST *list2) {
 }
 
 INSTRUCTION *_patch_expression(PATCH_LIST *tl, PATCH_LIST *fl, char* location) {
-  INSTRUCTION *inst1, *inst2;
+  INSTRUCTION *inst1=NULL, *inst2=NULL;
   char *label_end = _new_label();
   if (tl != NULL) {
     char *label_true = _new_label();
@@ -395,8 +395,8 @@ void gen_code_attribution(PROD_VALUE *var, PROD_VALUE *value) {
       var->code = _new_instruction("storeAI", value->location, "rfp", str_offset, NULL);
   }
   if (inst_aux != NULL){
-  concat_inst(value->code, inst_aux);
-  concat_inst(inst_aux, var->code);
+    concat_inst(value->code, inst_aux);
+    concat_inst(inst_aux, var->code);
   }
   else {
     concat_inst(value->code, var->code);
@@ -465,19 +465,42 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
   }
 }
 
+void _lit_to_logic(PROD_VALUE *lit) {
+  if (lit->table_entry.entry_type != ET_LITERAL)
+    return;
+  
+  switch(lit->table_entry.data_type) {
+    case DT_INT:
+      if (strcmp(lit->table_entry.key, "0")) {
+        lit->code = _new_instruction("jumpI", NULL, NULL, "HOLE", NULL);
+        lit->tl = _new_patch_list(&lit->code->arg3);
+        lit->fl = NULL;
+      } else {
+        lit->code = _new_instruction("jumpI", NULL, NULL, "HOLE", NULL);
+        lit->tl = NULL;
+        lit->fl = _new_patch_list(&lit->code->arg3);
+      }
+      break;
+  }
+}
+
 // Gera o código de operações lógicas (&& e ||)
 void gen_code_logic_op(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator, PROD_VALUE *op2) {
   INSTRUCTION *inst_aux;
+  char *label = _new_label();
   exp->location = _new_register();
 
+  if (op1->tl == NULL && op1->fl == NULL)
+    _lit_to_logic(op1);
+  if (op2->tl == NULL && op2->fl == NULL)
+    _lit_to_logic(op2);
+
   if (!strcmp(operator->ast_node->label, "||")){
-    char *label = _new_label();
     _patch_holes(op1->fl, label);
     exp->code = _new_instruction("nop", NULL, NULL, NULL, label);
     exp->tl = _concat_patch_list(op1->tl, op2->tl);
     exp->fl = op2->fl;
   } else if (!strcmp(operator->ast_node->label, "&&")){
-    char *label = _new_label();
     _patch_holes(op1->tl, label);
     exp->code = _new_instruction("nop", NULL, NULL, NULL, label);
     exp->tl = op2->tl;
@@ -501,7 +524,7 @@ void gen_code_unary_exp(PROD_VALUE *code, PROD_VALUE *op, PROD_VALUE *exp) {
 
 // Gera o código do controlador de fluxo if
 void gen_code_if(PROD_VALUE *code, PROD_VALUE *condition, PROD_VALUE *inst) {
-  INSTRUCTION *inst_aux1, *inst_aux2;
+  INSTRUCTION *inst_aux1=NULL, *inst_aux2=NULL;
   code->location = _new_register();
   char *label_true = _new_label();
   char *label_false = _new_label();
