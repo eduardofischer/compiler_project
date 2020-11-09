@@ -149,22 +149,22 @@ int _get_program_size(INSTRUCTION *last_inst) {
 
 // Gera o código final do programa
 char *generate_iloc_code(INSTRUCTION *last_inst, char *label_main) {
-  INSTRUCTION *inst_list, *inst_aux = last_inst;
+  INSTRUCTION *inst_aux1=NULL, *inst_aux2=NULL;
   char str_size[12];
   sprintf(str_size, "%d", _get_program_size(last_inst) + 4);
 
-  // Adiciona jump para a função main 
-  inst_aux = _new_instruction("jumpI", NULL, NULL, label_main, NULL);
-  concat_inst(inst_aux, inst_list);
   // Inicializa registradores auxiliares
-  inst_aux = _new_instruction("loadI", str_size, NULL, "rbss", NULL);
-  concat_inst(inst_aux, inst_list);
-  inst_aux = _new_instruction("loadI", RFP_INIT_VALUE, NULL, "rsp", NULL);
-  concat_inst(inst_aux, inst_list);
-  inst_aux = _new_instruction("loadI", RFP_INIT_VALUE, NULL, "rfp", NULL);
-  concat_inst(inst_aux, inst_list);
+  inst_aux1 = _new_instruction("loadI", RFP_INIT_VALUE, NULL, "rfp", NULL);
+  inst_aux2 = _new_instruction("loadI", RFP_INIT_VALUE, NULL, "rsp", NULL);
+  concat_inst(inst_aux1, inst_aux2);
+  inst_aux1 = _new_instruction("loadI", str_size, NULL, "rbss", NULL);
+  concat_inst(inst_aux2, inst_aux1);
+  // Adiciona jump para a função main 
+  inst_aux2 = _new_instruction("jumpI", NULL, NULL, label_main, NULL);
+  concat_inst(inst_aux1, inst_aux2);
+  concat_inst(inst_aux2, last_inst);
 
-  return _extract_code(inst_list);
+  return _extract_code(last_inst);
 }
 
 // Geração de código de identificadores
@@ -277,11 +277,12 @@ void gen_code_func_call(PROD_VALUE *func) {
   // 12 -> Início das variáveis locais
 void gen_code_func_return(PROD_VALUE *func, PROD_VALUE *val, int is_main) {
   INSTRUCTION *aux_inst1, *aux_inst2;
-  char *reg_return = _new_register();
-  char *reg_rsp = _new_register();
-  char *reg_rfp = _new_register();
 
   if (!is_main) {
+    char *reg_return = _new_register();
+    char *reg_rsp = _new_register();
+    char *reg_rfp = _new_register();
+
     // Salva o endereço de retorno
     aux_inst1 = _new_instruction("loadAI", "rfp", "0", reg_return, NULL);
     // Salva o rsp
