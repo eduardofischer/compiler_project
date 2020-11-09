@@ -176,7 +176,10 @@ void gen_code_id(PROD_VALUE *id) {
 
   switch (id->table_entry.entry_type) {
     case ET_VARIABLE:
-      id->code = _new_instruction("loadAI", "rfp", str_offset, id->location, NULL);
+      if (id->table_entry.global)
+        id->code = _new_instruction("loadAI", "rbss", str_offset, id->location, NULL);
+      else
+        id->code = _new_instruction("loadAI", "rfp", str_offset, id->location, NULL);
       break;
     default:
       id->code = NULL;
