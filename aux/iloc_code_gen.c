@@ -461,6 +461,18 @@ void gen_code_binary_exp(PROD_VALUE *exp, PROD_VALUE *op1, PROD_VALUE *operator,
       exp->code = _new_instruction("cbr", exp->location, "HOLE", "HOLE", NULL);
       exp->tl = _new_patch_list(&exp->code->arg2);
       exp->fl = _new_patch_list(&exp->code->arg3);
+
+      INSTRUCTION *inst_aux = NULL, *inst_aux2 = NULL;
+      if (op1->tl != NULL && op1->fl != NULL){
+        inst_aux = _patch_expression(op1->tl, op1->fl, op1->location);
+        concat_inst(op1->code, inst_aux);
+        op1->code = inst_aux;
+      }
+      if (op2->tl != NULL && op2->fl != NULL){
+        inst_aux2 = _patch_expression(op2->tl, op2->fl, op2->location);
+        concat_inst(op2->code, inst_aux2);
+        op2->code = inst_aux2;
+      }
       concat_inst(inst1, exp->code);
     }
     
