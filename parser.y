@@ -7,6 +7,7 @@
 #include "aux/stack.h"
 #include "aux/errors.h"
 #include "aux/iloc_code_gen.h"
+#include "aux/asm.h"
 
 extern int line_number, column;
 
@@ -129,7 +130,8 @@ extern STACK_ITEM *table_stack;
 %%
 root: program	 {
 		arvore = (void*) $1.ast_node;
-		printf("%s\n", generate_iloc_code($1.code, table_stack->label_main));
+		printf("-- ILOC --\n%s\n", generate_iloc_code($1.code, table_stack->label_main));
+		printf("-- x86_64 --\n%s\n", generate_asm($1.code));
 	} 
 	;
 	
