@@ -131,7 +131,9 @@ extern STACK_ITEM *table_stack;
 root: program	 {
 		arvore = (void*) $1.ast_node;
 		printf("-- ILOC --\n%s\n", generate_iloc_code($1.code, table_stack->label_main));
-		printf("-- x86_64 --\n%s\n", generate_asm($1.code));
+		//printf("-- x86_64 --\n%s\n", generate_asm($1.code));
+		printf("-- x86_64 --\n");
+		generate_asm($1.code);
 	} 
 	;
 	
